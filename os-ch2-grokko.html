@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>操作系统 第2章 进程管理 — 理解地图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EB; --paper:#F3EDDD; --forest:#1E3A24; --sky:#BCD8EE;
+  --sage:#AFCDA8; --ink:#1A2018; --marker:#F5E08A; --brick:#B5482A;
+  --correct:#2F7D46; --wrong:#B5482A;
+  --font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;
+  --font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;
+  --font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+  --font-mono:"Roboto Mono","JetBrains Mono",monospace;
+  --radius-pill:999px; --radius-card:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.7;font-size:16px}
+.layout{display:flex;align-items:flex-start;max-width:1100px;margin:0 auto}
+
+/* Sidebar */
+.sidebar{
+  position:sticky;top:0;height:100vh;width:270px;flex-shrink:0;
+  background:var(--forest);color:var(--cream);
+  padding:28px 20px;overflow-y:auto;
+}
+.sidebar h1{font-family:var(--font-display);font-size:1.15rem;line-height:1.35;margin-bottom:6px;color:var(--marker)}
+.sidebar .sub{font-size:.78rem;color:var(--sage);margin-bottom:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-bar{background:rgba(255,255,255,.15);height:8px;border-radius:var(--radius-pill);overflow:hidden}
+.progress-fill{background:var(--marker);height:100%;width:0;transition:width .4s ease}
+.progress-num{font-family:var(--font-mono);font-size:.78rem;margin-top:6px;color:var(--sky)}
+.nav{list-style:none}
+.nav li{margin-bottom:2px}
+.nav a{
+  display:block;padding:8px 10px;border-radius:8px;
+  font-size:.85rem;color:var(--cream);text-decoration:none;
+  transition:background .2s;
+}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav .num{font-family:var(--font-mono);font-size:.72rem;color:var(--sky);margin-right:8px}
+
+/* Main */
+.main{flex:1;min-width:0;padding:40px 44px;max-width:780px}
+.main section{margin-bottom:48px;scroll-margin-top:20px}
+.main h2{
+  font-family:var(--font-head);font-size:1.35rem;font-weight:700;
+  color:var(--forest);margin-bottom:16px;
+  padding-bottom:8px;border-bottom:2px solid var(--sage);
+}
+.main h3{font-family:var(--font-head);font-size:1.05rem;color:var(--forest);margin:18px 0 10px}
+.main p{margin-bottom:12px}
+
+/* Cards */
+.card{
+  background:var(--paper);border-radius:var(--radius-card);
+  padding:20px 24px;margin-bottom:14px;
+  border-left:4px solid var(--sage);
+}
+.card.warn{border-left-color:var(--brick)}
+.card.key{border-left-color:var(--marker)}
+.card.danger{border-left-color:var(--wrong)}
+
+/* Source quotes */
+.src-quote{
+  background:var(--sky);border-radius:8px;padding:10px 14px;
+  font-size:.9px;font-family:var(--font-mono);font-size:.85rem;
+  margin:10px 0;color:var(--ink);
+  border-left:3px solid var(--forest);
+}
+.src-tag{display:inline-block;background:var(--forest);color:var(--marker);font-size:.7rem;padding:2px 8px;border-radius:var(--radius-pill);font-family:var(--font-mono);margin-bottom:6px}
+
+/* Objectives */
+.objective{
+  background:var(--paper);border-radius:var(--radius-card);
+  padding:16px 20px;margin-bottom:10px;
+  border-left:4px solid var(--forest);
+}
+.objective .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);font-weight:600;margin-bottom:4px}
+
+/* Background pack */
+.bg-item{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--sky)}
+.bg-item .label{font-size:.72rem;color:var(--brick);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+
+/* Concept */
+.concept{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.concept .term{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem}
+.concept .plain{color:var(--brick);font-style:italic;margin:6px 0}
+
+/* Misconception */
+.miscon{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--wrong)}
+
+/* Tasks */
+.task{
+  background:var(--paper);border-radius:var(--radius-card);
+  padding:20px 24px;margin-bottom:16px;
+}
+.task .q{font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opt{
+  background:var(--cream);border:2px solid transparent;border-radius:8px;
+  padding:10px 14px;cursor:pointer;font-family:var(--font-body);
+  font-size:.92rem;text-align:left;transition:all .2s;color:var(--ink);
+}
+.opt:hover{border-color:var(--sky)}
+.opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
+.check{
+  background:var(--forest);color:var(--cream);border:none;
+  padding:8px 20px;border-radius:var(--radius-pill);
+  font-family:var(--font-head);font-size:.85rem;cursor:pointer;
+  transition:background .2s;
+}
+.check:hover{background:#2a5232}
+.feedback{
+  margin-top:12px;padding:10px 14px;border-radius:8px;
+  background:var(--cream);font-size:.9rem;line-height:1.6;
+  border:1px solid #ddd;
+}
+.feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
+.feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
+.feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
+
+/* Selects (matching) */
+select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-radius:8px;border:2px solid var(--sage);background:var(--cream);font-family:var(--font-body);font-size:.9rem}
+
+/* Wrong list */
+.wrong-section{background:#fce8e8;border-radius:var(--radius-card);padding:18px 22px;margin-top:20px;border-left:4px solid var(--wrong)}
+.wrong-section h3{color:var(--wrong)}
+#wrongBox{list-style:none;padding-left:0}
+#wrongBox li{padding:6px 0;font-size:.88rem;border-bottom:1px dashed rgba(181,72,42,.2)}
+
+/* Report */
+.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-top:20px}
+.report-section textarea{
+  width:100%;min-height:200px;border-radius:8px;border:2px solid var(--sage);
+  padding:12px;font-family:var(--font-mono);font-size:.85rem;background:var(--cream);
+  color:var(--ink);resize:vertical;
+}
+.report-btns{display:flex;gap:10px;margin-top:10px}
+.report-btns button{
+  background:var(--forest);color:var(--cream);border:none;
+  padding:8px 18px;border-radius:var(--radius-pill);cursor:pointer;
+  font-family:var(--font-head);font-size:.85rem;
+}
+
+/* Structure map */
+.struct-map{font-family:var(--font-mono);font-size:.85rem;line-height:2;background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;white-space:pre-wrap;color:var(--ink)}
+
+/* Formula */
+.formula{
+  background:var(--forest);color:var(--marker);
+  font-family:var(--font-mono);font-size:.95rem;
+  padding:14px 18px;border-radius:8px;margin:10px 0;
+  text-align:center;
+}
+
+/* Table-like */
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+.info-table th{background:var(--forest);color:var(--marker);padding:8px 12px;text-align:left;font-family:var(--font-head);font-size:.82rem}
+.info-table td{padding:8px 12px;border-bottom:1px solid #ddd;background:var(--cream)}
+.info-table tr:nth-child(even) td{background:var(--paper)}
+
+/* Tag badges */
+.badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.badge.fact{background:var(--sky);color:var(--forest)}
+.badge.judge{background:var(--marker);color:var(--forest)}
+.badge.infer{background:var(--sage);color:var(--forest)}
+.badge.eg{background:#E8D5C4;color:var(--brick)}
+
+/* Footer */
+.footer{
+  max-width:1100px;margin:0 auto;padding:30px 44px;
+  text-align:center;font-size:.82rem;color:#888;
+}
+.footer a{color:#1d70b8;text-decoration:underline}
+.footer .tip{margin-top:6px;color:#aaa}
+
+/* Section anchor */
+.sec-id{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);background:var(--marker);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;vertical-align:middle}
+
+/* Responsive */
+@media(max-width:860px){
+  .layout{flex-direction:column}
+  .sidebar{position:relative;height:auto;width:100%;padding:20px}
+  .main{padding:24px 20px}
+  .nav{display:flex;flex-wrap:wrap;gap:4px}
+  .nav li{margin-bottom:0}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ====== SIDEBAR ====== -->
+<aside class="sidebar">
+  <h1>操作系统<br>第2章 进程管理</h1>
+  <div class="sub">考试冲刺 · 2道大题 · 最高优先级</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
+    <div class="progress-num" id="barNum">0 / 0</div>
+  </div>
+  <ul class="nav">
+    <li><a href="#s1"><span class="num">01</span>学习目标与阅读路径</a></li>
+    <li><a href="#s2"><span class="num">02</span>零基础背景包</a></li>
+    <li><a href="#s3"><span class="num">03</span>原文问题定位</a></li>
+    <li><a href="#s4"><span class="num">04</span>原文结构地图</a></li>
+    <li><a href="#s5"><span class="num">05</span>核心判断与依据</a></li>
+    <li><a href="#s6"><span class="num">06</span>关键概念拆解</a></li>
+    <li><a href="#s7"><span class="num">07</span>苏格拉底式阅读</a></li>
+    <li><a href="#s8"><span class="num">08</span>闯关式任务</a></li>
+    <li><a href="#s9"><span class="num">09</span>误解与边界</a></li>
+    <li><a href="#s10"><span class="num">10</span>背景知识缺口</a></li>
+    <li><a href="#s11"><span class="num">11</span>复盘与学习报告</a></li>
+  </ul>
+</aside>
+
+<!-- ====== MAIN ====== -->
+<main class="main">
+
+<!-- ========== 01 学习目标 ========== -->
+<section id="s1">
+  <h2><span class="sec-id">01</span>学习目标与阅读路径</h2>
+
+  <div class="objective">
+    <div class="tag">目标 1 · 调度计算</div>
+    能用四大公式手算 FCFS / SJF / HRN / RR 等调度算法的周转时间、带权周转时间、平均等待时间，做到列表格不出错。
+  </div>
+  <div class="objective">
+    <div class="tag">目标 2 · PV 代码</div>
+    能独立默写生产者-消费者、读者-写者、哲学家进餐的 PV 代码，并解释每个信号量的含义和初值理由。
+  </div>
+  <div class="objective">
+    <div class="tag">目标 3 · 银行家算法</div>
+    给定资源分配表，能跑完安全性算法的全部步骤，找出安全序列或判断不安全。
+  </div>
+  <div class="objective">
+    <div class="tag">目标 4 · 概念辨析</div>
+    能区分进程三态转换条件、进程与线程的关系、同步与互斥的区别、死锁四条件。
+  </div>
+  <div class="objective">
+    <div class="tag">目标 5 · 易错排查</div>
+    能指出至少 3 个高频易错点（如就绪队列 n-1、P 顺序不能反、不安全 ≠ 死锁），并说出为什么容易错。
+  </div>
+
+  <div class="card key">
+    <strong>阅读路径：</strong>先补背景（模块 02）→ 理解原文结构（模块 03-04）→ 逐个吃透核心判断和概念（模块 05-06）→ 闯关练习检验（模块 07-08）→ 查漏补缺（模块 09-10）→ 生成学习报告（模块 11）。
+  </div>
+</section>
+
+<!-- ========== 02 零基础背景包 ========== -->
+<section id="s2">
+  <h2><span class="sec-id">02</span>零基础背景包</h2>
+  <p>以下是读懂本章必须先知道的 5 个基础概念。标注为「背景补充」，不是考试原文。</p>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ① · 程序 vs 进程</div>
+    <strong>程序</strong>是静态的代码文件（死的东西），<strong>进程</strong>是程序在内存中运行起来的活的实例。一个程序可以同时跑出多个进程（比如开三个浏览器窗口）。进程有生命周期：创建 → 就绪 → 运行 → 等待 → 终止。<br>
+    <em>为什么现在需要知道：</em>整章都围绕「进程」展开，不区分程序和进程就无法理解调度和同步。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ② · 并发 vs 并行</div>
+    <strong>并行</strong>是同一时刻多个 CPU 在真正同时执行（多核）；<strong>并发</strong>是单 CPU 通过快速切换（时间片轮转）让多个进程「看起来」同时运行。本章默认讨论单 CPU 并发场景。<br>
+    <em>为什么现在需要知道：</em>调度算法的存在前提就是并发——多个进程争抢一个 CPU。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ③ · 临界资源与临界区</div>
+    <strong>临界资源</strong>是一次只能让一个进程使用的资源（如打印机、共享变量）。<strong>临界区</strong>是进程代码中访问临界资源的那一段程序。<br>
+    <em>为什么现在需要知道：</em>PV 操作的全部目的就是管理临界区的进入和退出。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ④ · 信号量的直觉</div>
+    <strong>信号量 S</strong> 就像一个计数器。S = 3 表示「还有 3 个名额可用」；S = -2 表示「有 2 人在排队等」。P 操作拿一个名额（S-1），V 操作还一个名额（S+1）。<br>
+    <em>为什么现在需要知道：</em>这是进程同步的核心工具，大题直接考 PV 代码编写。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ⑤ · 死锁的直觉</div>
+    <strong>死锁</strong>就像两个人互相拿着对方需要的钥匙，谁都不肯先放手，结果谁都动不了。在操作系统中，多个进程循环等待对方释放资源，导致全部卡死。<br>
+    <em>为什么现在需要知道：</em>银行家算法的全部意义就是「在分配资源前先检查会不会走进死锁」。
+  </div>
+</section>
+
+<!-- ========== 03 原文问题定位 ========== -->
+<section id="s3">
+  <h2><span class="sec-id">03</span>原文问题定位</h2>
+
+  <div class="card">
+    <span class="src-tag">表面问题</span>
+    <strong>这一章在讲什么？</strong><br>
+    进程管理的四大板块：进程基本概念、处理机调度算法、进程同步机制（PV操作）、死锁处理策略。
+  </div>
+
+  <div class="card key">
+    <span class="src-tag">深层问题</span>
+    <strong>它在回答什么？</strong><br>
+    操作系统如何管理多个竞争 CPU 的进程？具体来说——<br>
+    ① 如何<strong>公平高效地分配</strong> CPU 时间？（调度算法）<br>
+    ② 如何<strong>防止进程互相踩踏</strong>共享数据？（同步与互斥）<br>
+    ③ 如何<strong>避免系统卡死</strong>无法前进？（死锁处理）
+  </div>
+
+  <div class="card warn">
+    <span class="src-tag">如果只记一个问题</span>
+    <strong>「多个进程争抢有限资源时，OS 怎么管？」</strong><br>
+    调度管 CPU 分配，同步管共享资源访问，死锁管资源分配安全性——三者的共同主线就是「资源竞争下的秩序」。
+    <div class="src-quote">
+      <span class="badge fact">事实</span>
+      原文：「进程是资源分配和独立运行的基本单位」「调度基本准则：面向用户——周转时间短、响应时间快……面向系统——吞吐量高、CPU 利用率好」「死锁：两个或以上进程因竞争资源互相等待的僵局」
+    </div>
+  </div>
+</section>
+
+<!-- ========== 04 原文结构地图 ========== -->
+<section id="s4">
+  <h2><span class="sec-id">04</span>原文结构地图</h2>
+
+  <p>
+    <span class="badge judge">结构判断</span>
+    本章是<strong>机制流程型结构</strong>，不是观点论证型。四大板块层层递进：先定义「进程是什么」，再解决「怎么分配 CPU」，然后解决「怎么协调共享资源」，最后解决「资源分配会不会卡死」。
+  </p>
+
+  <div class="struct-map">进程管理
+├── 一、进程与线程（定义层）
+│   ├── 程序的顺序执行 → 并发执行（为什么要管？）
+│   ├── 进程定义 + 五特征
+│   ├── 三态转换（就绪↔运行→等待）
+│   ├── PCB（进程控制块 = 进程存在的唯一标志）
+│   └── 线程（进程内的调度单位）
+│
+├── 二、处理机调度（CPU 分配层）
+│   ├── 调度级别：作业 → 交换 → 进程 → 线程
+│   ├── 关键公式：周转/带权周转/平均/响应比
+│   └── 六大算法：FCFS → SJF → HRN → RR → 优先级 → 多级反馈
+│        （递进关系：简单→优化→综合→公平→灵活）
+│
+├── 三、进程同步（协调层）
+│   ├── 同步（协调次序）vs 互斥（竞争资源）
+│   ├── 信号量 S + P/V 操作
+│   ├── 经典问题：生产者-消费者 / 读者-写者 / 哲学家
+│   └── 解题三步：①设信号量 ②赋初值 ③安排P/V
+│
+└── 四、死锁（安全层）
+    ├── 四必要条件：互斥/不剥夺/部分分配/环路等待
+    ├── 处理策略：鸵鸟 → 预防 → 避免 → 检测解除
+    └── 银行家算法 = 避免策略的核心实现
+        （请求四步检查 + 安全性算法）</div>
+
+  <div class="card">
+    <span class="badge fact">事实</span>
+    四大板块之间的关系是<strong>递进</strong>而非并列：调度解决「谁先用 CPU」→ 同步解决「共享时怎么不冲突」→ 死锁解决「分配后会不会全卡住」。后一个问题的前提是前一个问题已被处理。
+  </div>
+</section>
+
+<!-- ========== 05 核心判断与依据 ========== -->
+<section id="s5">
+  <h2><span class="sec-id">05</span>核心判断与依据</h2>
+
+  <div class="card key">
+    <span class="badge judge">判断 1</span>
+    <strong>调度算法的选择直接决定系统性能指标。</strong><br><br>
+    FCFS 对短作业不利（长作业在前时短作业等很久）；SJF 对长作业不利（可能饿死）；HRN 通过响应比综合两者；RR 适合分时系统。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「FCFS 按提交/就绪顺序排队，优先等待最久的」「SJF 优先调度运行时间最短的」「HRN：R = 1 + 已等待时间/需运行时间，综合 FCFS 和 SJF」
+    </div>
+    <em>为什么重要：大题会要求用不同算法计算同一组作业的参数，选错算法就全错。</em>
+  </div>
+
+  <div class="card key">
+    <span class="badge judge">判断 2</span>
+    <strong>PV 操作中 P 的顺序绝对不能颠倒，否则会导致死锁。</strong><br><br>
+    在生产者-消费者问题中，必须先 P(empty) 再 P(mutex)。如果先 P(mutex) 再 P(empty)，当缓冲区满时生产者拿了 mutex 却因 empty=0 被阻塞，消费者拿不到 mutex 也被阻塞——死锁。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「P 顺序不能颠倒，V 顺序任意」「生产者：P(empty)→P(mutex)→放→V(mutex)→V(full)」
+    </div>
+    <em>可能误读：以为 V 的顺序也不能反。实际上 V 操作不会阻塞，所以 V 的顺序不影响正确性。</em>
+  </div>
+
+  <div class="card key">
+    <span class="badge judge">判断 3</span>
+    <strong>银行家算法通过「试探分配 + 安全性检查」在分配前避免死锁。</strong><br><br>
+    它不是破坏死锁必要条件（那是预防），而是在每次请求时检查分配后系统是否仍处于安全状态。安全 = 存在一个进程执行序列使每个进程都能完成。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「请求四步检查：① Request≤Need? ② Request≤Available? ③ 试探分配 ④ 安全性检查」「安全状态：存在安全序列 &lt;P1..Pn&gt;」
+    </div>
+    <em>为什么重要：大题可能直接给你一个资源分配表让你跑安全性算法。</em>
+  </div>
+
+  <div class="card key">
+    <span class="badge judge">判断 4</span>
+    <strong>不安全状态 ≠ 死锁，只是「可能」进入死锁。</strong><br><br>
+    安全状态一定不会死锁；不安全状态可能死锁也可能不死锁（进程可能不按最坏顺序申请资源）。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「不安全 ≠ 死锁，但可能进入死锁」
+    </div>
+    <em>容易误读：把不安全直接等同于死锁，这是常见错误。</em>
+  </div>
+
+  <div class="card key">
+    <span class="badge judge">判断 5</span>
+    <strong>进程从「运行」到「等待」是因为 I/O 请求或 P 操作阻塞，不是因为时间片到。</strong><br><br>
+    时间片到是「运行 → 就绪」，不是「运行 → 等待」。这是最高频考陷阱之一。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「进程从运行→等待的原因是 I/O 请求或 P 操作阻塞（不是时间片到，时间片到是运行→就绪）」
+    </div>
+  </div>
+
+  <div class="card key">
+    <span class="badge judge">判断 6</span>
+    <strong>信号量初值决定功能：互斥信号量初值 = 1，同步信号量初值 = 0 或 n。</strong><br><br>
+    互斥：只允许一个进入临界区，初值 1（一个名额）。同步：初值 0 表示「前趋必须先做完」（前趋 V 后继 P）；初值 n 表示「有 n 个资源可用」。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「互斥=1，同步=0 或 n」「公用信号量（互斥）：初值 1」「私用信号量（同步）：初值 0 或正整数 n」
+    </div>
+  </div>
+
+  <div class="card key">
+    <span class="badge judge">判断 7</span>
+    <strong>死锁需要四个必要条件同时满足，缺一不可。</strong><br><br>
+    互斥 + 不剥夺 + 部分分配 + 环路等待。预防死锁就是破坏其中至少一个条件。<br>
+    <div class="src-quote">
+      <strong>原文依据：</strong>「死锁四个必要条件：① 互斥 ② 不剥夺 ③ 部分分配 ④ 环路等待」「死锁预防（破坏必要条件）」
+    </div>
+    <em>注意：原文写的是「请求和保持/部分分配」，这是同一个条件——持有已有资源的同时请求新资源。</em>
+  </div>
+</section>
+
+<!-- ========== 06 关键概念拆解 ========== -->
+<section id="s6">
+  <h2><span class="sec-id">06</span>关键概念拆解</h2>
+
+  <div class="concept">
+    <div class="term">① 进程（Process）</div>
+    <strong>定义：</strong>具有独立功能的程序在某个数据集合上的一次运行活动。<br>
+    <div class="plain">人话：程序跑起来了，有了生命周期，能被 CPU 调度。</div>
+    <strong>五特征：</strong>动态性（有生命周期）、并发性（可与其他进程同时）、独立性（独立申请资源）、异步性（按各自速度推进）、结构性（= 程序段 + 数据集合 + PCB）。<br>
+    <strong>关系：</strong>进程是资源分配的基本单位；线程是进程内被调度的基本单位。<br>
+    <strong>原文依据：</strong>「进程=程序段+数据集合+PCB」「进程是竞争资源基本单位」<br>
+    <strong>不要误解成：</strong>进程 ≠ 程序。程序是静态文件，进程是动态运行实例。
+  </div>
+
+  <div class="concept">
+    <div class="term">② PCB（进程控制块）</div>
+    <strong>定义：</strong>记录进程全部管理信息的数据结构，是<strong>进程存在的唯一标志</strong>。<br>
+    <div class="plain">人话：每个进程的「身份证 + 档案袋」，OS 靠它管理进程。</div>
+    <strong>内容：</strong>进程标志号、状态、优先数、程序地址、现场保护区（保存 CPU 寄存器等）、通信机构。<br>
+    <strong>关键点：</strong>进程入睡时断点保存在 PCB 的现场保护区；唤醒后从断点继续。<br>
+    <strong>原文依据：</strong>「PCB：进程存在的唯一标志；进程=程序段+数据集合+PCB」<br>
+    <strong>不要误解成：</strong>PCB 不是代码段，是管理元数据。
+  </div>
+
+  <div class="concept">
+    <div class="term">③ 信号量与 PV 操作（Semaphore）</div>
+    <strong>定义：</strong>信号量 S 是表示资源数目或请求进程数的整型量。S≥0 可用资源数；S&lt;0 绝对值 = 等待进程数。<br>
+    <div class="plain">人话：S 是一个计数器。P 拿资源（减 1），拿不到就排队等；V 还资源（加 1），有人等就叫醒一个。</div>
+    <strong>P 操作（wait）：</strong>S−1；若 S−1≥0 继续，若 &lt;0 阻塞入等待队列转调度。<br>
+    <strong>V 操作（signal）：</strong>S+1；若结果 &gt;0 继续，若 ≤0 唤醒一个等待进程。<br>
+    <strong>解题三步：</strong>① 设置信号量 → ② 赋初值（互斥=1, 同步=0 或 n）→ ③ 安排 P/V 位置（P 顺序不能颠倒，V 顺序任意）。<br>
+    <strong>原文依据：</strong>「P 操作：S−1；若 S−1≥0 继续，若 &lt;0 阻塞」「V 操作：S+1；若 ≤0 唤醒一个等待进程」<br>
+    <strong>不要误解成：</strong>P 操作不是「减 1 后不管」，而是「减 1 后如果变负数就阻塞自己」。
+  </div>
+
+  <div class="concept">
+    <div class="term">④ 六大调度算法</div>
+    <strong>定义：</strong>处理机调度决定下一个运行哪个进程，六大算法从简单到复杂递进。<br>
+    <table class="info-table">
+      <tr><th>算法</th><th>核心规则</th><th>优缺点</th></tr>
+      <tr><td>FCFS</td><td>按到达顺序排队</td><td>公平但对短作业不利</td></tr>
+      <tr><td>SJF</td><td>优先最短运行时间</td><td>平均等待最短但长作业可能饿死</td></tr>
+      <tr><td>HRN</td><td>R = 1 + 等待/运行</td><td>综合 FCFS 和 SJF</td></tr>
+      <tr><td>RR</td><td>时间片轮转</td><td>公平，适合分时</td></tr>
+      <tr><td>优先级</td><td>按优先数排序</td><td>灵活但可能饿死低优先级</td></tr>
+      <tr><td>多级反馈队列</td><td>多队列+逐级降级</td><td>最灵活，综合最优</td></tr>
+    </table>
+    <strong>原文依据：</strong>提纲列表完整覆盖六大算法及其规则描述。<br>
+    <strong>不要误解成：</strong>SJF 的「最短」指运行时间最短，不是提交时间最早。
+  </div>
+
+  <div class="concept">
+    <div class="term">⑤ 死锁与银行家算法</div>
+    <strong>死锁定义：</strong>两个或以上进程因竞争资源互相等待的僵局，无外力无法推进。<br>
+    <div class="plain">人话：大家互相等着对方松手，谁都不松，全卡死。</div>
+    <strong>四必要条件：</strong>互斥、不剥夺、部分分配（请求和保持）、环路等待。<br>
+    <strong>银行家算法核心流程：</strong><br>
+    <div class="formula">
+      安全性算法：<br>
+      Work = Available, Finish[i] = false<br>
+      找 Need≤Work 且 Finish=false 的 Pi<br>
+      → Work += Allocation[i], Finish[i] = true<br>
+      → 重复直到全部 Finish=true（安全）或找不到（不安全）
+    </div>
+    <strong>原文依据：</strong>「请求四步检查……安全性算法：Work=Available, Finish=false……」<br>
+    <strong>不要误解成：</strong>银行家是「避免」策略，不是「预防」策略。预防破坏条件，避免检查状态。
+  </div>
+
+  <div class="concept">
+    <div class="term">⑥ 临界区与临界资源</div>
+    <strong>临界资源：</strong>一次仅允许一个进程使用的资源。<br>
+    <strong>临界区：</strong>每个进程中访问临界资源的那段程序。<br>
+    <div class="plain">人话：临界资源是「只能一个人用的东西」，临界区是代码中「用这个东西的那几行」。</div>
+    <strong>互斥实现：</strong>软件方法（四种算法）、硬件方法（Test-and-Set、Swap）。<br>
+    <strong>关系：</strong>互斥 = 管理临界区的进入退出 → 用信号量 P/V 实现。<br>
+    <strong>原文依据：</strong>「临界资源：一次仅允许一个进程使用的资源」「临界区：每个进程中访问临界资源的那段程序」<br>
+    <strong>不要误解成：</strong>临界区不是「危险区域」，而是「需要排队的代码段」。
+  </div>
+</section>
+
+<!-- ========== 07 苏格拉底式阅读 ========== -->
+<section id="s7">
+  <h2><span class="sec-id">07</span>苏格拉底式阅读关卡</h2>
+  <p>以下 8 道题按难度递进。先自己想，再选答案检查。</p>
+
+  <div class="task" data-task="s1" data-answer="C"
+    data-ok="正确！运行→等待是因为 I/O 请求或 P 操作阻塞。时间片到是运行→就绪，不是运行→等待。"
+    data-no="再想想。时间片到的时候，进程并没有等什么资源，它只是「暂时不让了」，所以是回到就绪队列等待下次被调度。运行→等待一定是进程主动请求了某个资源（I/O 或 P 操作）。"
+    data-src="原文依据：「进程从运行→等待的原因是 I/O 请求或 P 操作阻塞（不是时间片到，时间片到是运行→就绪）」"
+    data-review="回到「模块05 核心判断5」和「模块06 概念①」复习">
+    <div class="q">问题 1（基础）：进程从「运行」态转换到「等待」态，以下哪个是正确原因？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 时间片用完</button>
+      <button class="opt" data-val="B">B. 被高优先级进程抢占</button>
+      <button class="opt" data-val="C">C. 发起了 I/O 请求</button>
+      <button class="opt" data-val="D">D. 进程执行完毕</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s2" data-answer="B"
+    data-ok="正确！n 个进程中有 1 个在运行（单 CPU），所以就绪队列最多 n−1 个。"
+    data-no="要注意：系统中有 n 个进程，其中必然有 1 个正在 CPU 上运行（假设单 CPU），所以剩下的最多 n−1 个在就绪队列。等待队列的数量取决于有多少进程在等 I/O。"
+    data-src="原文依据：「系统中有 n 个进程，就绪队列最多 n-1 个」"
+    data-review="回到「模块06 概念①」复习进程三态">
+    <div class="q">问题 2（基础）：系统中共有 n 个进程，就绪队列最多有几个？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. n</button>
+      <button class="opt" data-val="B">B. n−1</button>
+      <button class="opt" data-val="C">C. n+1</button>
+      <button class="opt" data-val="D">D. 不确定</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s3" data-answer="C"
+    data-ok="正确！周转时间 = 完成时间 − 提交时间。这是最基础的公式。"
+    data-no="再看一眼。周转时间是从「提交」到「完成」的总时间，所以是 Tei（完成）− Tsi（提交）。选 B 混淆了运行时间和周转时间。"
+    data-src="原文依据：「周转时间 Ti = Tei − Tsi（完成 − 提交）」"
+    data-review="回到「模块05 核心判断1」复习调度公式">
+    <div class="q">问题 3（公式）：周转时间 Ti 的正确公式是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. Ti = Tsi − Tei</button>
+      <button class="opt" data-val="B">B. Ti = Tri − Tei</button>
+      <button class="opt" data-val="C">C. Ti = Tei − Tsi</button>
+      <button class="opt" data-val="D">D. Ti = Tei + Tsi</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s4" data-answer="B"
+    data-ok="正确！带权周转时间 = 周转时间 / 运行时间。它衡量「等待多久相对于运行多久」。理想值越接近 1 越好。"
+    data-no="带权周转时间是「周转时间相对于运行时间的比值」，公式 Wi = Ti / Tri。选 A 是周转时间本身，不是带权。"
+    data-src="原文依据：「带权周转时间 Wi = Ti / Tri（周转/运行）」"
+    data-review="回到「模块05 核心判断1」复习调度公式">
+    <div class="q">问题 4（公式）：带权周转时间 Wi 的公式是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. Wi = Ti</button>
+      <button class="opt" data-val="B">B. Wi = Ti / Tri</button>
+      <button class="opt" data-val="C">C. Wi = Tri / Ti</button>
+      <button class="opt" data-val="D">D. Wi = Tei − Tri</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s5" data-answer="A"
+    data-ok="正确！必须先 P(empty) 再 P(mutex)。如果先 P(mutex)，缓冲区满时生产者持有 mutex 却因 empty=0 阻塞，消费者拿不到 mutex 也阻塞——死锁。"
+    data-no="这个顺序是错的！如果先 P(mutex) 再 P(empty)，缓冲区满时生产者拿住了 mutex 却被 empty 阻塞，消费者既拿不到 mutex 也被阻塞，造成死锁。正确顺序是先 P(empty) 再 P(mutex)。"
+    data-src="原文依据：「P 顺序不能颠倒」「生产者：P(empty)→P(mutex)→放→V(mutex)→V(full)」"
+    data-review="回到「模块05 核心判断2」和「模块06 概念③」复习PV操作">
+    <div class="q">问题 5（同步）：生产者-消费者问题中，生产者的 P 操作正确顺序是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 先 P(empty)，再 P(mutex)</button>
+      <button class="opt" data-val="B">B. 先 P(mutex)，再 P(empty)</button>
+      <button class="opt" data-val="C">C. 先 P(full)，再 P(mutex)</button>
+      <button class="opt" data-val="D">D. 顺序无所谓</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s6" data-answer="B"
+    data-ok="正确！这句话属于判断。它是我们对 PV 操作特性的推论性总结，不是原文直接陈述的事实，而是基于信号量机制的分析判断。"
+    data-no="再想想。「P 顺序不能反」是一个关于正确性的判断——它不是客观存在的事实（排除 A），也不是从原文直接推导的纯逻辑推论（排除 C），更不是举例（排除 D）。它是基于信号量机制特性的一个规范性判断。"
+    data-src="原文依据：「P 顺序不能颠倒，V 顺序任意」"
+    data-review="回到「模块05」区分事实/判断/推论">
+    <div class="q">问题 6（分析）：「PV 操作中 P 的顺序不能颠倒」这句话属于什么类型的信息？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 事实——客观描述</button>
+      <button class="opt" data-val="B">B. 判断——关于正确性的规范</button>
+      <button class="opt" data-val="C">C. 推论——纯逻辑推导</button>
+      <button class="opt" data-val="D">D. 例子——具体案例</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s7" data-answer="B"
+    data-ok="正确！银行家算法是「避免」策略——在运行时动态检查，不破坏四条件中的任何一个。预防才是破坏条件。"
+    data-no="要注意区分：预防（Prevention）= 破坏死锁四条件之一；避免（Avoidance）= 在分配时检查系统是否仍安全。银行家算法属于后者，它不破坏任何条件，只是在每次请求时做安全性检查。"
+    data-src="原文依据：「死锁避免 vs 预防：避免在动态分配中用银行家算法防止进入不安全状态；预防是破坏必要条件」"
+    data-review="回到「模块05 核心判断3、7」和「模块06 概念⑤」复习死锁策略">
+    <div class="q">问题 7（分析）：银行家算法属于死锁的哪种处理策略？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 预防——破坏死锁必要条件</button>
+      <button class="opt" data-val="B">B. 避免——分配前检查安全性</button>
+      <button class="opt" data-val="C">C. 检测——发现死锁后解除</button>
+      <button class="opt" data-val="D">D. 鸵鸟——置之不理</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="s8" data-answer="A,C,D"
+    data-multi="true"
+    data-ok="正确！选中了3个正确答案。死锁四条件：互斥、不剥夺（请求和保持）、部分分配、环路等待。FCFS 是调度算法，跟死锁条件无关。"
+    data-no="再检查一遍。死锁的四个必要条件是：①互斥 ②不剥夺（请求和保持）③部分分配 ④环路等待。FCFS 是调度算法，不是死锁条件。如果你选了 B，把它去掉。"
+    data-src="原文依据：「死锁四个必要条件：① 互斥 ② 不剥夺（请求和保持/部分分配）③ 部分分配 ④ 环路等待」"
+    data-review="回到「模块05 核心判断7」复习死锁四条件">
+    <div class="q">问题 8（综合·多选）：以下哪些是死锁的必要条件？（多选）</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 互斥条件</button>
+      <button class="opt" data-val="B">B. 先来先服务</button>
+      <button class="opt" data-val="C">C. 部分分配（请求和保持）</button>
+      <button class="opt" data-val="D">D. 环路等待</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ========== 08 闯关式任务 ========== -->
+<section id="s8">
+  <h2><span class="sec-id">08</span>闯关式任务</h2>
+  <p>综合应用题，模拟考试大题场景。</p>
+
+  <div class="task" data-task="t1" data-answer="B"
+    data-ok="正确！HRN 的 R = 1 + 等待时间/运行时间。等待越久 R 越大，越容易被选中；运行时间越短 R 也越大。它综合了 FCFS（等待久优先）和 SJF（运行短优先）。"
+    data-no="HRN 的核心是「响应比」R = 1 + 已等待时间/需运行时间。选 A 是 FCFS 的规则，选 C 是 SJF 的规则，选 D 是 RR 的规则。HRN 的特点是兼顾等待时间和运行时间。"
+    data-src="原文依据：「HRN 最高响应比优先：R = (等待+运行)/运行 = 1 + W/T，综合 FCFS 和 SJF」"
+    data-review="回到「模块06 概念④」复习六大调度算法">
+    <div class="q">任务 1（调度算法辨析）：HRN（最高响应比优先）的调度依据是什么？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 优先选择最先到达的作业</button>
+      <button class="opt" data-val="B">B. 优先选择响应比 R = 1 + 等待/运行 最高的</button>
+      <button class="opt" data-val="C">C. 优先选择运行时间最短的</button>
+      <button class="opt" data-val="D">D. 每个进程轮流执行一个时间片</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="t2" data-answer="B"
+    data-ok="正确！互斥信号量初值=1（只允许一个进程进入临界区），同步信号量初值=0（前趋必须先执行，V 操作解锁后继）。"
+    data-no="互斥信号量保护临界区，只允许一个进程进入，所以初值 = 1。同步信号量协调执行顺序，初值 = 0 表示「后继进程必须等前趋 V 后才能继续」。"
+    data-src="原文依据：「互斥=1，同步=0 或 n」「公用信号量（互斥）：初值 1，二元信号量」「私用信号量（同步）：初值 0 或正整数 n」"
+    data-review="回到「模块05 核心判断6」和「模块06 概念③」复习信号量初值">
+    <div class="q">任务 2（信号量初值）：用于互斥的信号量初值应设为多少？用于同步（前趋关系）的信号量初值呢？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 互斥=0，同步=1</button>
+      <button class="opt" data-val="B">B. 互斥=1，同步=0</button>
+      <button class="opt" data-val="C">C. 互斥=n，同步=n</button>
+      <button class="opt" data-val="D">D. 互斥=0，同步=0</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="t3" data-answer="C"
+    data-ok="正确！就绪→运行是「调度」（被 OS 选中分配 CPU），运行→就绪是「被剥夺」（时间片到或高优先级抢占）。就绪不能直接到等待！"
+    data-no="回顾三态转换图：就绪→运行（调度）、运行→就绪（时间片到/被抢占）、运行→等待（I/O 请求/P 操作）、等待→就绪（I/O 完成/V 操作唤醒）。就绪不能直接到等待，这是高频考点。"
+    data-src="原文依据：「进程三态及转换：就绪、运行、等待（阻塞）；转换有方向（注意：就绪不能直接到等待，是易错点）」"
+    data-review="回到「模块06 概念①」和「模块09 误解1」复习三态转换">
+    <div class="q">任务 3（状态转换）：进程从「就绪」到「运行」和从「运行」到「就绪」分别是什么操作？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 两者都是调度</button>
+      <button class="opt" data-val="B">A. 前者是阻塞，后者是唤醒</button>
+      <button class="opt" data-val="C">C. 前者是调度（被选中），后者是被剥夺（时间片到）</button>
+      <button class="opt" data-val="D">D. 前者是创建，后者是撤销</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="t4" data-answer="A"
+    data-ok="正确！安全性算法中 Work += Allocation[i]。因为假设 Pi 运行完毕后，它持有的所有资源都会释放归还给系统。"
+    data-no="在安全性算法中，当一个进程 Pi 被选中并假设运行完毕时，它占有的资源全部归还给系统，所以 Work = Work + Allocation[i]。Need 是它还需要但没有拿到的资源，不是要归还的。"
+    data-src="原文依据：「安全性算法：找 Need≤Work 且 Finish=false 的进程，执行 Work+=Allocation, Finish=true」"
+    data-review="回到「模块05 核心判断3」和「模块06 概念⑤」复习银行家算法">
+    <div class="q">任务 4（银行家算法）：安全性检查中，选中进程 Pi 后，Work 如何更新？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. Work += Allocation[i]</button>
+      <button class="opt" data-val="B">B. Work += Need[i]</button>
+      <button class="opt" data-val="C">C. Work -= Allocation[i]</button>
+      <button class="opt" data-val="D">D. Work = Available[i]</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="t5" data-type="selects"
+    data-ok="全部正确！读者-写者问题（读优先）：rmutex 保护 readcount，wmutex 实现读写互斥。第一个读者锁 wmutex，最后一个读者释放 wmutex。"
+    data-no="检查匹配关系：rmutex 的作用是保护 readcount（读者计数器），wmutex 的作用是实现读写互斥和写写互斥。readcount 是读者数量计数器。empty 在这里不使用（那是生产者-消费者的信号量）。"
+    data-src="原文依据：「读者-写者（读优先）：rmutex=1（保护 readcount）, wmutex=1（读写/写写互斥）, readcount=0。第一个读者 P(wmutex)，最后一个读者 V(wmutex)」"
+    data-review="回到「模块06 概念③」复习信号量和经典同步问题">
+    <div class="q">任务 5（匹配题）：将读者-写者问题（读优先）中的信号量与其功能配对。</div>
+    <select class="match" data-correct="b">
+      <option value="">rmutex 的功能是…</option>
+      <option value="a">实现读写互斥</option>
+      <option value="b">保护 readcount</option>
+      <option value="c">表示空缓冲区数</option>
+      <option value="d">表示读者数量</option>
+    </select>
+    <select class="match" data-correct="a">
+      <option value="">wmutex 的功能是…</option>
+      <option value="a">实现读写互斥</option>
+      <option value="b">保护 readcount</option>
+      <option value="c">表示空缓冲区数</option>
+      <option value="d">表示读者数量</option>
+    </select>
+    <select class="match" data-correct="d">
+      <option value="">readcount 的功能是…</option>
+      <option value="a">实现读写互斥</option>
+      <option value="b">保护 readcount</option>
+      <option value="c">表示空缓冲区数</option>
+      <option value="d">表示读者数量</option>
+    </select>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="t6" data-answer="B"
+    data-ok="正确！不安全状态只是说「存在死锁的可能」，但如果进程恰好不按最坏顺序申请资源，或者某些进程提前释放资源，就不一定死锁。"
+    data-no="不安全状态 ≠ 死锁！不安全只是说「找不到安全序列」，但进程不一定按最坏情况申请资源。只有真正发生循环等待时才是死锁。安全状态一定不会死锁，但不安全状态可能死锁也可能不死锁。"
+    data-src="原文依据：「不安全 ≠ 死锁，但可能进入死锁」"
+    data-review="回到「模块05 核心判断4」复习安全状态">
+    <div class="q">任务 6（判断纠错）：某同学说「系统处于不安全状态就意味着已经发生死锁」，这个说法对吗？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 对，不安全就是死锁</button>
+      <button class="opt" data-val="B">B. 错，不安全只是可能死锁，不是一定死锁</button>
+      <button class="opt" data-val="C">C. 对，不安全状态必然会变成死锁</button>
+      <button class="opt" data-val="D">D. 错，不安全状态和死锁无关</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="wrong-section">
+    <h3>❌ 错题回流区</h3>
+    <p style="font-size:.85rem;color:#666">答错的题会自动收集到这里，方便集中复习。</p>
+    <ul id="wrongBox">
+      <li style="color:#888">还没有错题。答错的题会自动收集到这里。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== 09 误解与边界 ========== -->
+<section id="s9">
+  <h2><span class="sec-id">09</span>误解与边界</h2>
+
+  <div class="miscon">
+    <strong>误解 1：就绪可以直接到等待</strong><br>
+    <em>为什么容易误解：</em>直觉上觉得「准备好了但没资源就等待」，把就绪和等待混淆。<br>
+    <strong>原文真正说了什么：</strong>三态转换有严格方向。就绪→运行（调度选中）、运行→就绪（时间片到/被抢占）、运行→等待（I/O/P操作）、等待→就绪（I/O完成/V操作唤醒）。<strong>就绪→等待不存在。</strong><br>
+    <strong>原文没有说什么：</strong>没有说就绪可以直接跳到等待。<br>
+    <strong>如何避免：</strong>画三态图时标注箭头方向，就绪只能往运行去。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 2：P 操作就是「减 1」，V 操作就是「加 1」</strong><br>
+    <em>为什么容易误解：</em>简化记忆时只记了数学运算。<br>
+    <strong>原文真正说了什么：</strong>P 操作是「S−1；若结果 &lt;0 则阻塞自己入等待队列」；V 操作是「S+1；若结果 ≤0 则唤醒一个等待进程」。<br>
+    <strong>关键区别：</strong>P 不只是减 1——如果减完后 S&lt;0，当前进程会被阻塞（不是继续运行）。V 不只是加 1——如果加完后 S≤0，说明有进程在排队，要唤醒一个。<br>
+    <strong>如何避免：</strong>记住 P 有「阻塞」效果，V 有「唤醒」效果。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 3：不安全状态 = 死锁</strong><br>
+    <em>为什么容易误解：</em>「不安全」这个词听起来很危险，容易等同于「已经出事」。<br>
+    <strong>原文真正说了什么：</strong>「不安全 ≠ 死锁，但可能进入死锁。」<br>
+    <strong>关键区别：</strong>安全状态 = 一定不死锁；不安全状态 = 可能死锁也可能不死锁。银行家算法的目的是<strong>避免进入不安全状态</strong>，从而保证绝对不会死锁。<br>
+    <strong>如何避免：</strong>区分「可能」和「必然」。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 4：时间片轮转中时间片越短越好</strong><br>
+    <em>为什么容易误解：</em>觉得时间片短则响应更快。<br>
+    <strong>真实情况：</strong>时间片太短会导致频繁上下文切换，CPU 大量时间浪费在切换开销上，实际吞吐量下降。时间片太长则退化为 FCFS。需要合理设置。<br>
+    <strong>原文依据：</strong>「上下文切换过程：保存 A 上下文→恢复 B 上下文，切换后 cache 需更新」——切换有成本。<br>
+    <strong>如何避免：</strong>记住调度算法都有 trade-off。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 5：银行家算法 = 死锁预防</strong><br>
+    <em>为什么容易误解：</em>两者都是「防止死锁」的策略，容易混为一谈。<br>
+    <strong>原文真正说了什么：</strong>死锁<strong>预防</strong> = 破坏四必要条件之一（静态）；死锁<strong>避免</strong> = 动态分配中用银行家检查安全性。<br>
+    <strong>关键区别：</strong>预防在设计阶段就限制资源申请方式；避免在运行时动态检查。<br>
+    <strong>如何避免：</strong>预防破坏条件，避免检查状态——口诀记牢。
+  </div>
+</section>
+
+<!-- ========== 10 背景知识缺口 ========== -->
+<section id="s10">
+  <h2><span class="sec-id">10</span>背景知识缺口</h2>
+
+  <div class="card">
+    <strong>缺口 1 · 中断与异常机制</strong><br>
+    本章说「进程调度时机包括进程完毕、自我阻塞、I/O 请求、时间片到」等，但没有展开讲这些事件是怎么通过<strong>中断</strong>触发的。理解中断有助于理解「为什么调度是自动的」。<br>
+    <em>优先级：考试后补。对做题影响不大，但有助于深入理解。</em>
+  </div>
+
+  <div class="card">
+    <strong>缺口 2 · 虚拟内存与地址空间</strong><br>
+    进程有独立的地址空间（PCB 提到「程序地址」），但本章没展开讲虚拟内存。理解虚拟内存有助于理解「进程独立性」和「进程间通信为什么需要特殊机制」。<br>
+    <em>优先级：如果第3章考内存管理，需要补。本章可以先不深入。</em>
+  </div>
+
+  <div class="card">
+    <strong>缺口 3 · 实际 OS 中的调度器实现</strong><br>
+    本章讲的是理论算法。Linux 实际用 CFS（完全公平调度器），Windows 用多级反馈队列变体。了解实际实现有助于理解理论算法的工程取舍。<br>
+    <em>优先级：考试不需要。面试或深入理解时推荐。</em>
+  </div>
+
+  <div class="card">
+    <strong>缺口 4 · 管程（Monitor）的实现细节</strong><br>
+    本章提到管程是「信号量及操作封装在对象内」，但没展开讲管程的内部结构（条件变量、wait/signal 操作）。Java 的 synchronized 和 Go 的 channel 都与管程有关。<br>
+    <em>优先级：考试够用了（知道定义和封装思想即可）。编程实践时再深入。</em>
+  </div>
+</section>
+
+<!-- ========== 11 复盘与学习报告 ========== -->
+<section id="s11">
+  <h2><span class="sec-id">11</span>复盘与学习报告</h2>
+
+  <div class="card key">
+    <strong>完成后你应该能做到：</strong><br>
+    ✅ 说出进程管理的三大核心问题（CPU分配、共享协调、死锁避免）<br>
+    ✅ 手算调度四大参数（周转/带权周转/平均/响应比）<br>
+    ✅ 默写生产者-消费者、读者-写者的 PV 代码<br>
+    ✅ 跑完银行家安全性算法的全部步骤<br>
+    ✅ 区分安全/不安全/死锁三者的关系<br>
+    ✅ 指出就绪不能直接到等待、P顺序不能反等高频易错点
+  </div>
+
+  <div class="report-section">
+    <h3>生成你的学习报告</h3>
+    <p style="font-size:.85rem;color:#666">完成上面的闯关任务后，点击下方按钮生成学习报告。</p>
+    <div class="report-btns">
+      <button id="genReport">生成报告</button>
+      <button id="copyReport">复制报告</button>
+    </div>
+    <textarea id="report" readonly placeholder="点击「生成报告」查看你的学习情况……"></textarea>
+  </div>
+
+  <div class="card warn" style="margin-top:20px">
+    <strong>考前 5 天复习建议（6.21 → 6.26）：</strong><br>
+    <strong>6.21 今天：</strong>通读本理解地图，完成全部闯关题，标记错题<br>
+    <strong>6.22：</strong>专题突破 PV 代码——默写 5 个经典问题直到不看书也能写出<br>
+    <strong>6.23-6.24：</strong>做课后必做题（调度计算 + 银行家），每道题列表格不跳步<br>
+    <strong>6.25：</strong>错题二刷 + 背诵四公式和四条件<br>
+    <strong>6.26 考试当天：</strong>只看错题本和公式卡片
+  </div>
+</section>
+
+</main>
+</div><!-- /layout -->
+
+<!-- ====== FOOTER ====== -->
+<div class="footer">
+  由 <a href="https://github.com" target="_blank" rel="noopener" style="color:#1d70b8;text-decoration:underline;font-weight:600">Grokko</a> 生成 · github.com/grokko<br>
+  <span class="tip">这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快</span>
+</div>
+
+<!-- ====== 固定互动引擎（原样粘贴，禁止修改逻辑） ====== -->
+<script>
+(function(){
+  "use strict";
+  function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function selectedVals(t){return $all('.opt.selected',t).map(function(o){return o.getAttribute('data-val');}).sort();}
+  function setFb(t,state,html){var fb=t.querySelector('.feedback');if(!fb)return;fb.className='feedback'+(state?(' '+state):'');fb.innerHTML=html;}
+  function updateBar(){
+    var all=$all('.task'),done=$all('.task[data-answered="1"]');
+    var fill=document.getElementById('barFill'),num=document.getElementById('barNum');
+    if(fill)fill.style.width=all.length?(done.length/all.length*100)+'%':'0%';
+    if(num)num.textContent=done.length+' / '+all.length;
+  }
+  function renderWrong(){
+    var box=document.getElementById('wrongBox');if(!box)return;
+    var wrong=$all('.task[data-answered="1"][data-correct="0"]');
+    if(!wrong.length){box.innerHTML='<li style="color:#888">还没有错题。答错的题会自动收集到这里。</li>';return;}
+    box.innerHTML='';
+    wrong.forEach(function(t){var li=document.createElement('li');li.textContent='【'+(t.getAttribute('data-task')||'')+'】'+(t.getAttribute('data-review')||'回到对应模块复习');box.appendChild(li);});
+  }
+  function check(t){
+    var type=t.getAttribute('data-type'),ok=false;
+    if(type==='selects'){
+      var sels=$all('select.match',t),allok=true,empty=false;
+      sels.forEach(function(s){if(!s.value)empty=true;if(s.value!==s.getAttribute('data-correct'))allok=false;});
+      if(empty){setFb(t,'no','请先把每一项都选好再检查。');return;}
+      ok=allok;
+    }else{
+      var sel=selectedVals(t);
+      if(!sel.length){setFb(t,'no','请先选择一个选项再检查。');return;}
+      var ans=(t.getAttribute('data-answer')||'').split(',').map(function(x){return x.trim();}).sort();
+      ok=(sel.join('|')===ans.join('|'));
+    }
+    var body=ok?(t.getAttribute('data-ok')||'回答正确。'):(t.getAttribute('data-no')||'再想想。');
+    var src=t.getAttribute('data-src');
+    setFb(t,ok?'ok':'no',(ok?'✅ ':'❌ ')+body+(src?('<span class="src">'+src+'</span>'):''));
+    t.setAttribute('data-answered','1');t.setAttribute('data-correct',ok?'1':'0');
+    updateBar();renderWrong();
+  }
+  function genReport(){
+    var box=document.getElementById('report');if(!box)return;
+    var all=$all('.task'),done=$all('.task[data-answered="1"]'),right=$all('.task[data-answered="1"][data-correct="1"]');
+    var lines=['=== 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
+    var wrong=$all('.task[data-answered="1"][data-correct="0"]');
+    if(wrong.length){lines.push('我答错的题（建议复习）：');wrong.forEach(function(t){lines.push('- '+(t.getAttribute('data-task')||'')+'：'+(t.getAttribute('data-review')||''));});}
+    else{lines.push('暂无错题。');}
+    box.textContent=lines.join('\n');
+  }
+  document.addEventListener('click',function(e){
+    var c=e.target.closest?e.target:null;
+    var opt=c&&e.target.closest('.opt');
+    if(opt){var t=opt.closest('.task');if(!t)return;
+      if(t.getAttribute('data-multi')==='true'){opt.classList.toggle('selected');}
+      else{$all('.opt',t).forEach(function(o){o.classList.remove('selected');});opt.classList.add('selected');}
+      return;}
+    var btn=c&&e.target.closest('.check');
+    if(btn){var tk=btn.closest('.task');if(tk)check(tk);return;}
+    if(e.target&&e.target.id==='genReport'){genReport();return;}
+    if(e.target&&e.target.id==='copyReport'){var r=document.getElementById('report');if(r&&navigator.clipboard)navigator.clipboard.writeText(r.textContent);return;}
+  });
+  function init(){updateBar();renderWrong();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
