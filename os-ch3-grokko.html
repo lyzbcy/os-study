@@ -1,442 +1,636 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>操作系统第3章：内存管理 - Grokko 理解地图</title>
+<title>操作系统 第3章 内存管理 — 理解地图</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--cream:#FAF6EB;--paper:#F3EDDD;--forest:#1E3A24;--sky:#BCD8EE;--sage:#AFCDA8;--ink:#1A2018;--marker:#F5E08A;--brick:#B5482A;--correct:#2F7D46;--wrong:#B5482A;--font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;--font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;--font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Roboto Mono","JetBrains Mono",monospace;--radius-pill:999px;--radius-card:14px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.72}.layout{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:100vh}.side{position:sticky;top:0;height:100vh;background:var(--forest);color:var(--cream);padding:26px 20px;overflow:auto}.brand{font-family:var(--font-display);font-size:30px;line-height:1;letter-spacing:0;margin-bottom:10px}.sub{font-size:13px;color:rgba(250,246,235,.76);margin-bottom:20px}.progress{background:rgba(250,246,235,.12);border:1px solid rgba(250,246,235,.2);border-radius:var(--radius-card);padding:14px;margin-bottom:18px}.bar{height:10px;background:rgba(250,246,235,.25);border-radius:var(--radius-pill);overflow:hidden}.bar span{display:block;width:0;height:100%;background:var(--marker);transition:.25s}.bar-meta{display:flex;justify-content:space-between;margin-top:9px;font-family:var(--font-mono);font-size:12px}.nav{display:grid;gap:8px}.nav a{color:var(--cream);text-decoration:none;display:grid;grid-template-columns:38px 1fr;gap:9px;align-items:center;padding:10px;border-radius:10px;background:rgba(250,246,235,.08);border:1px solid transparent}.nav a:hover{background:rgba(188,216,238,.18);border-color:rgba(188,216,238,.38)}.nav b{font-family:var(--font-mono);color:var(--marker);font-size:12px}.main{padding:42px 5vw 64px;max-width:1080px}.hero{padding:34px 0 28px;border-bottom:4px solid var(--forest);margin-bottom:28px}.eyebrow{display:inline-block;background:var(--marker);border:2px solid var(--forest);border-radius:var(--radius-pill);padding:5px 12px;font-weight:700;font-size:13px;margin-bottom:14px}h1{font-family:var(--font-display);font-size:clamp(34px,5vw,66px);line-height:1.03;letter-spacing:0;color:var(--forest);margin-bottom:14px}h2{font-family:var(--font-head);font-size:26px;color:var(--forest);margin-bottom:14px}h3{font-family:var(--font-head);font-size:18px;color:var(--forest);margin:18px 0 8px}.lead{font-size:18px;max-width:850px}.path{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.path div,.note,.source,.formula{background:var(--paper);border:2px solid var(--forest);border-radius:var(--radius-card);padding:14px}.path strong{display:block;color:var(--brick);margin-bottom:4px}.module{padding:28px 0;border-bottom:1px solid rgba(30,58,36,.25)}.module-kicker{font-family:var(--font-mono);font-size:12px;color:var(--brick);font-weight:700;text-transform:uppercase;margin-bottom:5px}ul{padding-left:22px;margin:10px 0}li{margin:5px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.card{background:#fffaf0;border:2px solid rgba(30,58,36,.9);border-radius:var(--radius-card);padding:14px}.card h3{margin-top:0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chips span{background:var(--sage);border:1px solid var(--forest);border-radius:var(--radius-pill);padding:5px 10px;font-weight:700;font-size:13px}.quote{border-left:6px solid var(--brick);background:#fffaf0;padding:12px 14px;margin:12px 0}.task{background:var(--sky);border:3px solid var(--forest);border-radius:var(--radius-card);padding:16px;margin-top:16px;box-shadow:5px 5px 0 rgba(30,58,36,.2)}.q{font-weight:800;margin-bottom:10px}.opts{display:grid;gap:8px}.opt,.check,#genReport,#copyReport{font:inherit;font-weight:700;border:2px solid var(--forest);background:#fffaf0;color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left}.opt.selected{background:var(--marker)}.check,#genReport,#copyReport{display:inline-block;margin-top:12px;background:var(--forest);color:var(--cream);text-align:center}.feedback{margin-top:10px;background:rgba(255,250,240,.72);border-radius:10px;padding:10px}.feedback.ok{border-left:6px solid var(--correct)}.feedback.no{border-left:6px solid var(--wrong)}.match-grid{display:grid;gap:8px}.match-grid label{display:grid;grid-template-columns:1fr 230px;gap:10px;align-items:center}.match{font:inherit;border:2px solid var(--forest);border-radius:10px;padding:8px;background:#fffaf0}.wrong-list{display:grid;gap:8px}.wrong-list a{color:var(--brick);font-weight:700}.report-box{white-space:pre-wrap;background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:14px;margin-top:12px}.footer{padding-top:30px;color:rgba(26,32,24,.75);font-size:14px}.footer a{color:#1d70b8;text-decoration:underline;font-weight:700}@media(max-width:880px){.layout{display:block}.side{position:relative;height:auto}.main{padding:28px 18px 50px}.path,.grid{grid-template-columns:1fr}.match-grid label{grid-template-columns:1fr}h1{font-size:36px}}
+:root{
+  --cream:#FAF6EB; --paper:#F3EDDD; --forest:#1E3A24; --sky:#BCD8EE;
+  --sage:#AFCDA8; --ink:#1A2018; --marker:#F5E08A; --brick:#B5482A;
+  --correct:#2F7D46; --wrong:#B5482A;
+  --font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;
+  --font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;
+  --font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+  --font-mono:"Roboto Mono","JetBrains Mono",monospace;
+  --radius-pill:999px; --radius-card:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.7;font-size:16px}
+.layout{display:flex;align-items:flex-start;max-width:1100px;margin:0 auto}
+.sidebar{position:sticky;top:0;height:100vh;width:270px;flex-shrink:0;background:var(--forest);color:var(--cream);padding:28px 20px;overflow-y:auto}
+.sidebar h1{font-family:var(--font-display);font-size:1.15rem;line-height:1.35;margin-bottom:6px;color:var(--marker)}
+.sidebar .sub{font-size:.78rem;color:var(--sage);margin-bottom:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-bar{background:rgba(255,255,255,.15);height:8px;border-radius:var(--radius-pill);overflow:hidden}
+.progress-fill{background:var(--marker);height:100%;width:0;transition:width .4s ease}
+.progress-num{font-family:var(--font-mono);font-size:.78rem;margin-top:6px;color:var(--sky)}
+.nav{list-style:none}
+.nav li{margin-bottom:2px}
+.nav a{display:block;padding:8px 10px;border-radius:8px;font-size:.85rem;color:var(--cream);text-decoration:none;transition:background .2s}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav .num{font-family:var(--font-mono);font-size:.72rem;color:var(--sky);margin-right:8px}
+.main{flex:1;min-width:0;padding:40px 44px;max-width:780px}
+.main section{margin-bottom:48px;scroll-margin-top:20px}
+.main h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--forest);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--sage)}
+.main h3{font-family:var(--font-head);font-size:1.05rem;color:var(--forest);margin:18px 0 10px}
+.main p{margin-bottom:12px}
+.card{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.card.warn{border-left-color:var(--brick)}
+.card.key{border-left-color:var(--marker)}
+.src-quote{background:var(--sky);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:.85rem;margin:10px 0;color:var(--ink);border-left:3px solid var(--forest)}
+.src-tag{display:inline-block;background:var(--forest);color:var(--marker);font-size:.7rem;padding:2px 8px;border-radius:var(--radius-pill);font-family:var(--font-mono);margin-bottom:6px}
+.objective{background:var(--paper);border-radius:var(--radius-card);padding:16px 20px;margin-bottom:10px;border-left:4px solid var(--forest)}
+.objective .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);font-weight:600;margin-bottom:4px}
+.bg-item{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--sky)}
+.bg-item .label{font-size:.72rem;color:var(--brick);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.concept{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.concept .term{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem}
+.concept .plain{color:var(--brick);font-style:italic;margin:6px 0}
+.miscon{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--wrong)}
+.task{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:16px}
+.task .q{font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opt{background:var(--cream);border:2px solid transparent;border-radius:8px;padding:10px 14px;cursor:pointer;font-family:var(--font-body);font-size:.92rem;text-align:left;transition:all .2s;color:var(--ink)}
+.opt:hover{border-color:var(--sky)}
+.opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
+.check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
+.check:hover{background:#2a5232}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
+.feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
+.feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
+select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-radius:8px;border:2px solid var(--sage);background:var(--cream);font-family:var(--font-body);font-size:.9rem}
+.wrong-section{background:#fce8e8;border-radius:var(--radius-card);padding:18px 22px;margin-top:20px;border-left:4px solid var(--wrong)}
+.wrong-section h3{color:var(--wrong)}
+#wrongBox{list-style:none;padding-left:0}
+#wrongBox li{padding:6px 0;font-size:.88rem;border-bottom:1px dashed rgba(181,72,42,.2)}
+.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-top:20px}
+.report-section textarea{width:100%;min-height:200px;border-radius:8px;border:2px solid var(--sage);padding:12px;font-family:var(--font-mono);font-size:.85rem;background:var(--cream);color:var(--ink);resize:vertical}
+.report-btns{display:flex;gap:10px;margin-top:10px}
+.report-btns button{background:var(--forest);color:var(--cream);border:none;padding:8px 18px;border-radius:var(--radius-pill);cursor:pointer;font-family:var(--font-head);font-size:.85rem}
+.struct-map{font-family:var(--font-mono);font-size:.85rem;line-height:2;background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;white-space:pre-wrap;color:var(--ink)}
+.formula{background:var(--forest);color:var(--marker);font-family:var(--font-mono);font-size:.95rem;padding:14px 18px;border-radius:8px;margin:10px 0;text-align:center}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+.info-table th{background:var(--forest);color:var(--marker);padding:8px 12px;text-align:left;font-family:var(--font-head);font-size:.82rem}
+.info-table td{padding:8px 12px;border-bottom:1px solid #ddd;background:var(--cream)}
+.badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.badge.fact{background:var(--sky);color:var(--forest)}
+.badge.judge{background:var(--marker);color:var(--forest)}
+.badge.infer{background:var(--sage);color:var(--forest)}
+.badge.eg{background:#E8D5C4;color:var(--brick)}
+.footer{max-width:1100px;margin:0 auto;padding:30px 44px;text-align:center;font-size:.82rem;color:#888}
+.footer a{color:#1d70b8;text-decoration:underline}
+.footer .tip{margin-top:6px;color:#aaa}
+.sec-id{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);background:var(--marker);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;vertical-align:middle}
+.walkthrough{background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:20px 24px;margin:14px 0}
+.walkthrough .wt-title{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem;margin-bottom:6px}
+.walkthrough .wt-given{background:var(--paper);border-radius:8px;padding:10px 14px;margin:8px 0;font-family:var(--font-mono);font-size:.85rem}
+.walkthrough .wt-step{margin:10px 0;padding-left:14px;border-left:3px solid var(--sage)}
+.walkthrough .wt-step .step-no{font-family:var(--font-mono);font-weight:700;color:var(--brick);font-size:.8rem}
+.walkthrough .wt-final{background:var(--marker);border-radius:8px;padding:10px 14px;margin-top:10px;font-weight:700;color:var(--forest)}
+.calc-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.82rem;font-family:var(--font-mono)}
+.calc-table th{background:var(--forest);color:var(--marker);padding:6px 8px;text-align:center;font-size:.78rem}
+.calc-table td{padding:6px 8px;border:1px solid #ccc;text-align:center;background:var(--cream)}
+.calc-table td.miss{background:#fce8e8;color:var(--wrong);font-weight:700}
+.calc-table td.hit{background:#e8f5e9}
+@media(max-width:860px){.layout{flex-direction:column}.sidebar{position:relative;height:auto;width:100%;padding:20px}.main{padding:24px 20px}.nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin-bottom:0}}
 </style>
 </head>
 <body>
 <div class="layout">
-<aside class="side">
-<div class="brand">Grokko</div>
-<div class="sub">第3章 内存管理 · 11 模块理解地图</div>
-<div class="progress">
-<div class="bar"><span id="barFill"></span></div>
-<div class="bar-meta"><span>已完成</span><span id="barNum">0 / 0</span></div>
-</div>
-<nav class="nav">
-<a href="#m1"><b>01</b><span>学习目标与阅读路径</span></a>
-<a href="#m2"><b>02</b><span>零基础背景包</span></a>
-<a href="#m3"><b>03</b><span>原文问题定位</span></a>
-<a href="#m4"><b>04</b><span>原文结构地图</span></a>
-<a href="#m5"><b>05</b><span>核心判断与依据</span></a>
-<a href="#m6"><b>06</b><span>关键概念拆解</span></a>
-<a href="#m7"><b>07</b><span>苏格拉底式阅读关卡</span></a>
-<a href="#m8"><b>08</b><span>闯关式任务包装</span></a>
-<a href="#m9"><b>09</b><span>误解与边界</span></a>
-<a href="#m10"><b>10</b><span>背景知识缺口</span></a>
-<a href="#m11"><b>11</b><span>复盘与学习报告</span></a>
-</nav>
+<aside class="sidebar">
+  <h1>操作系统<br>第3章 内存管理</h1>
+  <div class="sub">考试冲刺 · 2 道大题 · 高优先级</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
+    <div class="progress-num" id="barNum">0 / 0</div>
+  </div>
+  <ul class="nav">
+    <li><a href="#s1"><span class="num">01</span>学习目标与阅读路径</a></li>
+    <li><a href="#s2"><span class="num">02</span>零基础背景包</a></li>
+    <li><a href="#s3"><span class="num">03</span>原文问题定位</a></li>
+    <li><a href="#s4"><span class="num">04</span>原文结构地图</a></li>
+    <li><a href="#s5"><span class="num">05</span>核心判断与依据</a></li>
+    <li><a href="#s6"><span class="num">06</span>关键概念拆解</a></li>
+    <li><a href="#s7"><span class="num">07</span>苏格拉底式阅读关卡</a></li>
+    <li><a href="#s8"><span class="num">08</span>手把手计算演示</a></li>
+    <li><a href="#s9"><span class="num">09</span>误解与边界</a></li>
+    <li><a href="#s10"><span class="num">10</span>背景知识缺口</a></li>
+    <li><a href="#s11"><span class="num">11</span>复盘与学习报告</a></li>
+  </ul>
 </aside>
+
 <main class="main">
 
-<section class="hero">
-<span class="eyebrow">考试权重最高 ⭐⭐⭐⭐ · 2 道大题</span>
-<h1>操作系统第3章：内存管理</h1>
-<p class="lead">本章是操作系统考试的第二重点战场：地址变换（页式/段式）必出一道大题，页面置换算法（FIFO/LRU/OPT）必出一道大题。还会考可变分区分配算法和位示图计算。拿下本章，大题分数就稳了一半。</p>
-<div class="path">
-<div><strong>先抓公式</strong>地址变换是送分题：页号=⌊逻辑地址÷页面大小⌋，物理地址=块号×页面大小+页内偏移。</div>
-<div><strong>再练画表</strong>页面置换必须会画表：逐行标出每次访页后内存块的状态，数缺页中断次数。</div>
-<div><strong>最后避坑</strong>Belady 现象、越界中断判断、首次适应 vs 最佳适应的区别，是选择题最爱考的混淆点。</div>
-</div>
+<section id="s1">
+  <h2><span class="sec-id">01</span>学习目标与阅读路径</h2>
+  <p>本章对应考试 <strong>2 道大题</strong>：一道考<strong>地址变换</strong>（给页表/段表和逻辑地址，算物理地址），另一道考<strong>页面置换</strong>（给访问序列和块数，画表数缺页次数）。还会考可变分区分配和位示图换算。</p>
+  <div class="objective"><div class="tag">目标 1 · 地址变换</div>给定页表和逻辑地址，3 步内算出物理地址（求页号→查页表→拼物理地址）。</div>
+  <div class="objective"><div class="tag">目标 2 · 段式变换+越界判断</div>给定段表和逻辑地址（段号, 段内地址），算物理地址并判断是否越界中断。</div>
+  <div class="objective"><div class="tag">目标 3 · 页面置换</div>能画出 FIFO / LRU / OPT 三种算法的置换表，数出缺页次数和缺页率。</div>
+  <div class="objective"><div class="tag">目标 4 · 可变分区+位示图</div>能做首次/最佳/最坏适应的分配过程；能做位示图"第 N 块对应何字何位"的换算。</div>
+  <p><strong>阅读路径</strong>：模块 2 唤醒基础概念 → 模块 3-6 过概念 → <span style="background:var(--marker);padding:2px 6px;border-radius:4px;font-weight:700">模块 8 是重点，三道题手把手算</span> → 模块 9 避坑。</p>
+  <div class="src-quote">原文定位：考试权重⭐⭐⭐⭐高，对应 2 道大题（地址变换×1 + 页面置换×1）。</div>
 </section>
 
-<!-- ===== 模块 1 ===== -->
-<section id="m1" class="module">
-<div class="module-kicker">模块 1</div>
-<h2>学习目标与阅读路径</h2>
-<p>本章考试权重最高，对应 <strong>2 道大题</strong>：地址变换 × 1 + 页面置换 × 1。复习时间安排 4.5 小时。核心目标如下：</p>
-<ul>
-<li><strong>会做页式地址变换</strong>：给定页表和逻辑地址，算出物理地址。</li>
-<li><strong>会做段式地址变换</strong>：给定段表和逻辑地址（段号, 段内地址），算物理地址并判断越界。</li>
-<li><strong>会画 FIFO / LRU / OPT 置换表</strong>：给定访问序列和块数，逐行画出每次访问后的内存状态，数出缺页次数。</li>
-<li><strong>会算可变分区分配</strong>：首次适应 vs 最佳适应 vs 最坏适应的分配结果差异。</li>
-<li><strong>会算位示图</strong>：主存大小、页面大小与位示图字/位之间的换算。</li>
-</ul>
-<div class="chips">
-<span>地址变换</span><span>页面置换</span><span>可变分区</span><span>位示图</span><span>快表 TLB</span><span>Belady 现象</span><span>抖动</span>
-</div>
-<div class="quote">原文定位：考试权重⭐⭐⭐⭐高，对应 2 道大题（地址变换×1 + 页面置换×1），题型包括逻辑地址→物理地址转换、页面置换缺页次数/率、可变分区分配、位示图。</div>
-<div class="task" data-task="ch3-m1" data-answer="B" data-ok="完全正确。地址变换和页面置换是本章两大必考大题，复习重心应放在这两个方向。" data-no="A 偏概念辨析不是大题方向；C 的位示图和可变分区虽会考但不是两大题；D 属于第1章运行环境。" data-src="原文：对应 2 道大题（地址变换×1 + 页面置换×1）。" data-review="回到模块 1 看复习目标">
-<div class="q">本章考试最重要的两个大题方向是什么？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 概念辨析 + 简答题</button>
-<button class="opt" data-val="B">B. 地址变换（页式/段式）+ 页面置换算法</button>
-<button class="opt" data-val="C">C. 位示图计算 + 可变分区分配</button>
-<button class="opt" data-val="D">D. 中断处理 + 系统调用</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s2">
+  <h2><span class="sec-id">02</span>零基础背景包</h2>
+  <p>学过但生疏？下面 5 个概念用一句话唤醒。</p>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ① · 逻辑地址 vs 物理地址（唤醒）</div>
+    <strong>逻辑地址</strong>是程序编译后产生的相对地址（从 0 开始，虚的）；<strong>物理地址</strong>是 CPU 实际访问内存的绝对地址（实实在在的内存单元号）。OS 的工作就是把逻辑地址翻译成物理地址——这叫<strong>地址变换/重定位</strong>。<br>
+    <em>一句话记忆：</em>逻辑地址是<strong>书页上的"第几页第几行"</strong>，物理地址是<strong>这本书在书架上的绝对位置</strong>。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ② · 页 vs 块（唤醒）</div>
+    分页管理里，逻辑地址空间按固定大小切成一个个<strong>页（page）</strong>，物理内存按同样大小切成一个个<strong>块/页框（frame）</strong>。页和块大小相同，通过<strong>页表</strong>建立映射：页号 → 块号。<br>
+    <em>一句话记忆：</em>页是<strong>逻辑的格子</strong>，块是<strong>物理的格子</strong>，页表就是"哪个逻辑格子放进哪个物理格子"的对照表。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ③ · 局部性原理（唤醒）</div>
+    程序执行时访问的地址集中在小范围内。<strong>时间局部性</strong>：刚用过的地址近期还会用（所以 LRU 才有效）；<strong>空间局部性</strong>：用了某个地址，附近的也会被用（所以按页调入才划算）。<br>
+    <em>一句话记忆：</em>程序不是乱跑的，它<strong>会在一个小区域里磨蹭很久</strong>。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ④ · 缺页中断（唤醒）</div>
+    CPU 访问的页不在内存里时，硬件产生<strong>缺页中断</strong>，OS 从外存把该页调入内存；如果内存已满，就用<strong>置换算法</strong>淘汰一页再调入。<br>
+    <em>一句话记忆：</em>缺页中断 = <strong>发现要的东西不在手边，得去仓库取</strong>。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ⑤ · Belady 现象（唤醒）</div>
+    一般直觉是"给的块越多缺页越少"，但 <strong>FIFO 算法</strong>可能出现反常：块数增加，缺页反而<strong>增加</strong>。这就是 Belady 现象。LRU 和 OPT 不会出现。<br>
+    <em>一句话记忆：</em>Belady = <strong>给多了反而更糟</strong>，只发生在 FIFO。
+  </div>
+
+  <div class="task" data-task="ch3-m2" data-answer="A" data-ok="对。逻辑地址是相对地址（虚），物理地址是绝对地址（实），重定位就是做这个翻译。" data-no="B 说反了；C 混淆了逻辑/物理与外存/内存的对应；D 没有这种大小关系。" data-src="原文：逻辑地址（相对）/物理地址（绝对）；重定位：虚地址映射为内存地址。" data-review="回到模块 2 看逻辑/物理地址">
+    <div class="q">关于逻辑地址和物理地址，下列哪个说法正确？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 逻辑地址是相对地址，物理地址是 CPU 实际访问的绝对地址</button>
+      <button class="opt" data-val="B">B. 逻辑地址就是物理地址的另一种叫法</button>
+      <button class="opt" data-val="C">C. 逻辑地址是外存地址，物理地址是内存地址</button>
+      <button class="opt" data-val="D">D. 逻辑地址一定比物理地址大</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 2 ===== -->
-<section id="m2" class="module">
-<div class="module-kicker">模块 2</div>
-<h2>零基础背景包</h2>
-<p>进入正文之前，必须先弄清以下基础概念，否则后面的地址变换和置换算法会完全看不懂。</p>
-<div class="note">
-<h3>背景补充 1：逻辑地址 vs 物理地址</h3>
-<p>程序编译后产生的是<strong>逻辑地址</strong>（相对地址/虚地址），从 0 开始编号。CPU 实际访问内存时用的是<strong>物理地址</strong>（绝对地址/实地址）。操作系统核心任务之一就是把逻辑地址翻译成物理地址——这就是"地址变换"或"重定位"。</p>
-</div>
-<div class="note">
-<h3>背景补充 2：页面与页框</h3>
-<p>分页管理中，逻辑地址空间按固定大小切成一个个<strong>页（页面）</strong>，物理内存也按同样大小切成一个个<strong>页框（物理块）</strong>。页和块大小相同，通过<strong>页表</strong>建立映射：页号→块号。</p>
-</div>
-<div class="note">
-<h3>背景补充 3：局部性原理</h3>
-<p>程序执行时访问的地址往往集中在很小范围内。<strong>时间局部性</strong>：刚访问过的地址短期内还会访问。<strong>空间局部性</strong>：访问了某个地址，附近地址大概率也被访问。这是虚拟存储和 LRU 算法的理论基础。</p>
-</div>
-<div class="note">
-<h3>背景补充 4：缺页中断</h3>
-<p>当 CPU 访问的页不在内存中时，硬件产生<strong>缺页中断</strong>，操作系统从外存把该页调入内存。如果内存已满，就需要用<strong>置换算法</strong>淘汰一页。</p>
-</div>
-<div class="task" data-task="ch3-m2" data-answer="A" data-ok="正确。逻辑地址是程序编译后产生的相对地址，物理地址是 CPU 实际访存的绝对地址，重定位就是完成这个映射。" data-no="B 说反了；C 混淆了逻辑/物理地址与外存/内存的对应关系；D 没有这种大小关系。" data-src="原文：逻辑地址（相对）/物理地址（绝对）；重定位：虚地址映射为内存地址。" data-review="回到模块 2 看基础概念">
-<div class="q">关于逻辑地址和物理地址，下列哪个说法是正确的？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 逻辑地址是程序编译后产生的相对地址，物理地址是 CPU 实际访问内存的绝对地址</button>
-<button class="opt" data-val="B">B. 逻辑地址就是物理地址的另一种叫法</button>
-<button class="opt" data-val="C">C. 逻辑地址是外存地址，物理地址是内存地址</button>
-<button class="opt" data-val="D">D. 逻辑地址一定比物理地址大</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s3">
+  <h2><span class="sec-id">03</span>原文问题定位</h2>
+  <div class="card">
+    <span class="src-tag">表面问题</span>
+    <strong>这章在讲什么？</strong><br>
+    内存管理的各种机制：连续分配（分区）、非连续分配（分页/分段）、虚拟内存（置换算法）。
+  </div>
+  <div class="card key">
+    <span class="src-tag">深层问题</span>
+    <strong>它在回答什么？</strong><br>
+    两个核心问题：<br>
+    ① <strong>有限的物理内存怎么分给多个程序？</strong>（分配方式）<br>
+    ② <strong>程序太大、内存装不下怎么办？</strong>（虚拟内存：请求调入 + 置换）<br>
+    考试考查的就是这两个问题的具体操作：<strong>地址怎么转换</strong>（大题1）+ <strong>页面怎么换</strong>（大题2）。
+  </div>
+  <div class="src-quote"><span class="badge fact">事实</span>原文：「虚拟存储器：请求调入功能和置换功能，能从逻辑上对内存容量加以扩充」「逻辑容量由内存容量和外存容量之和决定」</div>
 </section>
 
-<!-- ===== 模块 3 ===== -->
-<section id="m3" class="module">
-<div class="module-kicker">模块 3</div>
-<h2>原文问题定位</h2>
-<p>本章表面在讲内存管理的各种机制，深层在回答两个核心问题：</p>
-<ul>
-<li><strong>问题一：有限的物理内存如何分配给多个程序？</strong>——连续分配（单一/固定/可变分区）和非连续分配（分页/分段/段页式）。</li>
-<li><strong>问题二：程序太大、内存不够用怎么办？</strong>——虚拟存储器：请求调入 + 置换功能，逻辑上扩充内存。速度接近内存，成本接近外存。</li>
-</ul>
-<p>考试考查的就是这两个问题的具体操作：<strong>地址怎么转换</strong>（大题1）和<strong>页面怎么换</strong>（大题2）。</p>
-<div class="quote">原文定位：内存管理基础解决"如何分配"，虚拟内存管理解决"不够用怎么办"。</div>
-<div class="task" data-task="ch3-m3" data-answer="B" data-ok="正确。动态重定位在执行时由硬件（BR+VR）完成地址转换，支持程序在内存中移动。" data-no="A 描述的是静态重定位；C 错，动态重定位需要硬件支持；D 错，动态重定位是在执行时而非编译时完成。" data-src="原文：动态重定位：执行时 CPU 访存前转换，靠硬件（BR 基址寄存器 + VR 虚地址寄存器），MA=(BR)+(VR)。" data-review="回到模块 3 看重定位机制">
-<div class="q">动态重定位与静态重定位的关键区别是什么？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 动态重定位在装入时一次完成，执行中不再转换</button>
-<button class="opt" data-val="B">B. 动态重定位在执行时由硬件完成地址转换，每次访存都要转换</button>
-<button class="opt" data-val="C">C. 动态重定位不需要任何硬件支持</button>
-<button class="opt" data-val="D">D. 动态重定位只能在编译时完成</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s4">
+  <h2><span class="sec-id">04</span>原文结构地图</h2>
+  <p><span class="badge judge">结构判断</span>本章是<strong>机制型</strong>，从简单到复杂、从连续到非连续、从实存到虚存。</p>
+  <div class="struct-map">内存管理
+├── 一、内存管理基础
+│   ├── 程序装入（绝对/静态可重定位/动态运行时）
+│   ├── 逻辑地址 vs 物理地址，重定位（静态/动态）
+│   ├── 内存保护（上下界/保护键/界限寄存器）
+│   └── 交换（主存↔外存）与覆盖
+├── 二、连续分配（一道分区题）
+│   ├── 单一连续（单用户，不支持虚存）
+│   ├── 固定分区（分区表，静态重定位）
+│   ├── 可变分区（动态划分，三种适应算法）★
+│   └── 碎片与回收合并
+├── 三、非连续分配
+│   ├── 分页（页表，地址变换）★大题
+│   ├── 分段（段表，越界判断）★大题
+│   └── 段页式（段表→页表，三级）
+└── 四、虚拟内存
+    ├── 请求分页（缺页中断，局部性）
+    ├── 页面置换 OPT/FIFO/LRU/CLOCK ★大题
+    └── 抖动与工作集</div>
+  <div class="task" data-task="ch3-m4" data-answer="C" data-ok="对。可变分区是动态划分，用空闲分区表/自由链管理，支持动态重定位。" data-no="单一连续是单用户；固定分区是预先划分好。" data-src="原文：可变分区动态划分，已分分区表+空闲分区表/自由链，动态重定位。" data-review="回到模块 4 看分配方式对比">
+    <div class="q">哪种分配方式采用"空闲分区表/自由链"动态管理？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 单一连续分配</button>
+      <button class="opt" data-val="B">B. 固定分区分配</button>
+      <button class="opt" data-val="C">C. 可变分区分配</button>
+      <button class="opt" data-val="D">D. 分页管理</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 4 ===== -->
-<section id="m4" class="module">
-<div class="module-kicker">模块 4</div>
-<h2>原文结构地图</h2>
-<p>本章结构是典型的<strong>机制型</strong>：从简单到复杂，从连续到非连续，从实存到虚存。</p>
-<div class="card">
-<h3>第一层：内存管理基础</h3>
-<ul>
-<li>程序装入（绝对装入 / 静态可重定位 / 动态运行时装入）</li>
-<li>程序链接（静态 / 装入时动态 / 运行时动态）</li>
-<li>逻辑地址与物理地址、重定位机制</li>
-<li>内存保护（上下界法 / 保护键法 / 界限寄存器+态态）</li>
-<li>交换（主存↔外存换作业）与覆盖（同一主存区被不同段重复使用）</li>
-</ul>
-</div>
-<div class="card">
-<h3>第二层：连续分配方式</h3>
-<ul>
-<li><strong>单一连续分配</strong>：单用户单任务，系统区+用户区，不支持虚存</li>
-<li><strong>固定分区分配</strong>：分区分配表（区号/长度/起始地址/状态），静态重定位</li>
-<li><strong>可变分区分配</strong>：动态划分，已分分区表+空闲分区表/自由链，动态重定位</li>
-<li>三种适应算法：首次适应 / 最佳适应 / 最坏适应</li>
-<li>碎片问题与回收合并（4 种情况）</li>
-</ul>
-</div>
-<div class="card">
-<h3>第三层：非连续分配（分页/分段/段页式）</h3>
-<ul>
-<li><strong>分页</strong>：页表、地址变换（页号+页内地址→块号+偏移）、快表 TLB、位示图管理空闲块</li>
-<li><strong>分段</strong>：段表（段号→起始地址+段长）、地址变换、越界判断</li>
-<li><strong>段页式</strong>：段表指向页表，三级地址变换</li>
-</ul>
-</div>
-<div class="card">
-<h3>第四层：虚拟内存管理</h3>
-<ul>
-<li>虚拟存储器（请求调入 + 置换，逻辑上扩充内存）</li>
-<li>请求分页：缺页中断、局部性原理</li>
-<li>页面置换算法：OPT / FIFO / LRU / CLOCK</li>
-<li>页面分配策略与抖动（Thrashing）、工作集</li>
-</ul>
-</div>
-<div class="task" data-task="ch3-m4" data-type="selects" data-ok="三种连续分配方式的特征全部匹配正确！" data-no="仔细看每种分配方式的核心特征：单一连续是单用户，固定分区预先划分，可变分区动态划分。" data-src="原文：单一连续（单用户单任务，不支持虚存）；固定分区（分区分配表，静态重定位）；可变分区（动态划分，已分分区表+空闲分区表）。" data-review="回到模块 4 看分配方式对比">
-<div class="q">把连续分配方式与对应特征配对。</div>
-<div class="match-grid">
-<label><span>单一连续分配</span><select class="match" data-correct="单用户单任务，不支持虚存"><option value="">选择</option><option value="单用户单任务，不支持虚存">单用户单任务，不支持虚存</option><option value="分区大小预先固定，分区分配表">分区大小预先固定，分区分配表</option><option value="动态划分分区，空闲分区表/自由链">动态划分分区，空闲分区表/自由链</option></select></label>
-<label><span>固定分区分配</span><select class="match" data-correct="分区大小预先固定，分区分配表"><option value="">选择</option><option value="单用户单任务，不支持虚存">单用户单任务，不支持虚存</option><option value="分区大小预先固定，分区分配表">分区大小预先固定，分区分配表</option><option value="动态划分分区，空闲分区表/自由链">动态划分分区，空闲分区表/自由链</option></select></label>
-<label><span>可变分区分配</span><select class="match" data-correct="动态划分分区，空闲分区表/自由链"><option value="">选择</option><option value="单用户单任务，不支持虚存">单用户单任务，不支持虚存</option><option value="分区大小预先固定，分区分配表">分区大小预先固定，分区分配表</option><option value="动态划分分区，空闲分区表/自由链">动态划分分区，空闲分区表/自由链</option></select></label>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s5">
+  <h2><span class="sec-id">05</span>核心判断与依据</h2>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 1：页式地址变换 = 求页号 → 查页表 → 拼物理地址</div>
+    页内偏移在逻辑地址和物理地址里<strong>完全相同</strong>，因为页和块大小一样。需要查表变换的只是<strong>页号 → 块号</strong>。<br>
+    <strong>原文依据：</strong>「页式存储管理采用动态重定位；逻辑地址 = 页号 + 页内地址；查页表得块号；物理地址 = 块号 × 页大小 + 页内偏移」
+  </div>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 2：段式变换必须先判断越界</div>
+    段长是可变的，所以段式地址变换必须先检查<strong>段内地址 &lt; 段长</strong>，否则产生<strong>越界中断</strong>。这是段式与页式的关键区别（页式不需要越界判断，因为页大小固定）。<br>
+    <strong>原文依据：</strong>「在分段系统中进行地址转换时，先将段号与段表长度比较……然后再将段内地址和段长作比较，若不越界则相加」
+  </div>
+
+  <div class="concept">
+    <span class="badge judge">判断</span>
+    <div class="term">判断 3：LRU 性能接近 OPT，FIFO 最差且可能 Belady</div>
+    OPT 是理论最优（不可实现），LRU 基于局部性原理接近 OPT，FIFO 最简单但性能差且可能出现 Belady 现象。<strong>LRU 和 OPT 不会出现 Belady</strong>（它们是栈式算法）。<br>
+    <strong>原文依据：</strong>「FIFO 会产生 Belady 现象；LRU 淘汰最近最久未访问的页（基于局部性）；OPT 是衡量标准」
+  </div>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 4：虚拟内存容量 = 内存 + 外存</div>
+    虚拟存储器通过请求调入 + 置换，<strong>逻辑上</strong>扩充内存。逻辑容量由内存容量和外存容量之和决定，速度接近内存，成本接近外存。<br>
+    <strong>原文依据：</strong>「其逻辑容量由内存容量和外存容量之和所决定」
+  </div>
+
+  <div class="task" data-task="ch3-m5" data-answer="B" data-ok="对。分页中页大小固定，页内偏移天然合法，无需越界判断；段式中段长可变，必须检查段内地址是否超过段长。" data-no="页式不查越界是因为页大小固定；段式才必须查越界。" data-src="原文：段式地址转换要先比较段内地址与段长，越界则产生中断。" data-review="回到模块 5 看段式越界判断">
+    <div class="q">为什么段式地址变换要判断越界，而页式不需要？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 页式没有段表</button>
+      <button class="opt" data-val="B">B. 页大小固定天然合法，段长可变必须检查段内地址是否超段长</button>
+      <button class="opt" data-val="C">C. 段式不支持虚拟内存</button>
+      <button class="opt" data-val="D">D. 页式用快表所以不需要</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 5 ===== -->
-<section id="m5" class="module">
-<div class="module-kicker">模块 5 · 大题核心</div>
-<h2>核心判断与依据：地址变换公式</h2>
-<p>这是考试<strong>必考的大题方向</strong>。必须记住以下公式并能熟练计算。</p>
-<h3>页式地址变换</h3>
-<div class="formula">
-页号 P = ⌊逻辑地址 / 页面大小⌋ &nbsp;&nbsp; 页内地址 W = 逻辑地址 mod 页面大小<br>
-查页表得块号 F &nbsp;&nbsp;→&nbsp;&nbsp; 物理地址 = 块号 F × 页面大小 + 页内地址 W
-</div>
-<p><strong>例题</strong>：页面大小 1024B，页表：0→2, 1→3, 2→1, 3→6。求逻辑地址 2148 的物理地址。</p>
-<ul>
-<li>页号 P = ⌊2148/1024⌋ = 2，页内地址 W = 2148 - 2×1024 = 100</li>
-<li>查页表：页号 2 → 块号 1</li>
-<li>物理地址 = 1 × 1024 + 100 = <strong>1124</strong></li>
-</ul>
-<h3>段式地址变换</h3>
-<div class="formula">
-段号 S + 段内地址 W → 查段表得段基址 B 和段长 L<br>
-若 W ≥ L → 越界中断 &nbsp;&nbsp; 否则物理地址 = 段基址 B + 段内地址 W
-</div>
-<p><strong>例题</strong>：段表 [0] 基址 600K 段长 15KB。逻辑地址 [0, 137]：137 < 15KB 不越界，物理地址 = 600K + 137 = 615257。</p>
-<h3>有效存取时间</h3>
-<div class="formula">
-TAT = TLB命中率 × (查TLB + 访存) + (1 - TLB命中率) × (查TLB + 查页表 + 访存)<br>
-含缺页时再加缺页处理开销
-</div>
-<div class="task" data-task="ch3-m5a" data-answer="C" data-ok="正确！页号=⌊2864/1024⌋=2，页内偏移=2864-2048=816。查页表页号2→块号1，物理地址=1×1024+816=1840。" data-no="常见错误：把页号直接当块号（得2864）、忘记乘页面大小、或页内偏移算错。务必按三步走：求页号偏移→查页表→算物理地址。" data-src="原文：页表（页号→块号），地址变换：查页表得块号，块号+页内地址=物理地址。" data-review="回到模块 5 重做地址变换公式练习">
-<div class="q">大题练习：页面 1024B，页表 0→2, 1→3, 2→1, 3→6。逻辑地址 2864 的物理地址是多少？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 2864</button>
-<button class="opt" data-val="B">B. 2048</button>
-<button class="opt" data-val="C">C. 1840</button>
-<button class="opt" data-val="D">D. 3904</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
-<div class="task" data-task="ch3-m5b" data-answer="C" data-ok="正确！段内地址 4000 ≥ 段长 3KB(3072)，产生越界中断。段式管理必须先判断段内地址是否超过段长。" data-no="A 直接相加没有检查越界；B 虽然算了地址但忽略了越界判断；D 不会产生缺段中断因为该段已在内存。" data-src="原文：段表（段号→起始地址+段长），越界中断判断。" data-review="回到模块 5 看段式地址变换和越界判断">
-<div class="q">段表：[1] 段基址 4800，段长 3KB。逻辑地址 [1, 4000] 的结果是什么？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 物理地址 8800</button>
-<button class="opt" data-val="B">B. 物理地址 4800</button>
-<button class="opt" data-val="C">C. 越界中断</button>
-<button class="opt" data-val="D">D. 缺段中断</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
-</section>
-<div class="card">
-<h3>2. 分页管理</h3>
-<p><strong>定义</strong>：将逻辑地址空间分为固定大小的页，物理空间分为相同大小的块（页框），通过页表映射页号到块号。</p>
-<p><strong>地址变换</strong>：逻辑地址 = 页号 + 页内地址；查页表得块号；物理地址 = 块号 × 页大小 + 页内偏移。</p>
-<p><strong>不要误解</strong>：页大小和块大小相同，但页是逻辑概念，块是物理概念。</p>
-</div>
-<div class="card">
-<h3>3. 分段管理</h3>
-<p><strong>定义</strong>：按逻辑信息分段（代码段/数据段/栈段），每段连续分配但各段可不连续。</p>
-<p><strong>地址变换</strong>：逻辑地址 = 段号 + 段内地址；查段表得段基址；物理地址 = 段基址 + 段内地址。注意越界检查！</p>
-</div>
-<div class="card">
-<h3>4. 页面置换算法</h3>
-<p><strong>OPT</strong>：淘汰未来最久不访问的页，理论最优不可实现。</p>
-<p><strong>FIFO</strong>：淘汰最先调入的页，简单但可能产生 Belady 现象（块数增加缺页反而增加）。</p>
-<p><strong>LRU</strong>：淘汰最近最久未访问的页，基于局部性原理，性能好但实现复杂。</p>
-<p><strong>CLOCK</strong>：引用位扫描，1清0跳过，0淘汰，是 LRU 的近似实现。</p>
-</div>
-<div class="card">
-<h3>5. Belady 现象</h3>
-<p><strong>定义</strong>：分配的物理块数增加，缺页次数反而增加的现象。</p>
-<p><strong>出现于</strong>：FIFO 算法。</p>
-<p><strong>不出现于</strong>：LRU 和 OPT（它们满足栈式算法性质）。</p>
-</div>
-<div class="task" data-task="ch3-m6" data-answer="B" data-ok="LRU 淘汰最近最久未访问的页，基于局部性原理。" data-no="FIFO 淘汰最先调入的，OPT 淘汰未来最久不访问的。" data-src="原文：LRU 最近最少使用，淘汰最近最久未访问的页（基于局部性）。" data-review="回到模块6看置换算法对比">
-<div class="q">LRU 算法淘汰的是哪类页面？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 最先调入内存的页</button>
-<button class="opt" data-val="B">B. 最近最久未访问的页</button>
-<button class="opt" data-val="C">C. 未来最长时间不被访问的页</button>
-<button class="opt" data-val="D">D. 引用位为 1 的页</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s6">
+  <h2><span class="sec-id">06</span>关键概念拆解</h2>
+
+  <div class="concept">
+    <div class="term">页表（Page Table）</div>
+    <strong>原文：</strong>记录页号与块号对应关系的数据结构。<br>
+    <strong>人话：</strong>一本"哪个逻辑页放在哪个物理块"的对照册。<strong>页内偏移不用查表</strong>，直接搬过去。<br>
+    <strong>关键：</strong>有了页表，逻辑地址就能翻译成物理地址；为了加速查表，引入<strong>快表 TLB</strong>（页表的高速缓存）。
+  </div>
+
+  <div class="concept">
+    <div class="term">快表 TLB</div>
+    <strong>原文：</strong>存放在高速缓冲寄存器中的页表叫快表，这个寄存器叫联想存储器。<br>
+    <strong>人话：</strong>页表的"快捷方式"。没有 TLB 时每次访存要查两次（查页表 + 取数据）；有 TLB 命中就只需一次。<br>
+    <strong>原文依据：</strong>「执行一次访内操作至少要访问主存两次……为了提高存取速度，设置高速缓冲寄存器存放页表的一部分」
+  </div>
+
+  <div class="concept">
+    <div class="term">位示图（Bitmap）</div>
+    <strong>原文：</strong>一个系统只有一张存储页面表，指出内存各页面是否被分配。<br>
+    <strong>人话：</strong>用一位二进制表示一个块的状态（0 空闲、1 已分配）。整个内存的状态压缩成一串 01。<br>
+    <strong>关键换算：</strong>第 N 块 → 字号 = N div 字长，位号 = N mod 字长（注意题里编号从 0 还是从 1 开始）。
+  </div>
+
+  <div class="concept">
+    <div class="term">抖动（Thrashing）与工作集</div>
+    <strong>抖动：</strong>页面在内存和外存之间频繁换入换出，CPU 大量时间浪费在调页上。<br>
+    <strong>原因：</strong>分配给进程的物理页架过少 / 淘汰算法不合理。<br>
+    <strong>工作集：</strong>进程在某段时间内访问的页面集合。分配页架数 &lt; 工作集大小就会抖动。<br>
+    <strong>原文依据：</strong>「如果在一段时间内，作业占用的主存块数目小于工作集时，运行过程中就会不断出现缺页中断，从而导致系统的抖动」
+  </div>
+
+  <div class="concept">
+    <div class="term">四种页面置换算法对比</div>
+    <table class="info-table">
+      <tr><th>算法</th><th>淘汰谁</th><th>特点</th></tr>
+      <tr><td>OPT</td><td>未来最久不访问的页</td><td>理论最优不可实现，作衡量标准</td></tr>
+      <tr><td>FIFO</td><td>最先调入内存的页</td><td>简单，性能差，<strong>会出现 Belady</strong></td></tr>
+      <tr><td>LRU</td><td>最近最久未访问的页</td><td>基于局部性，性能好，实现复杂</td></tr>
+      <tr><td>CLOCK</td><td>引用位为 0 的页</td><td>LRU 的近似实现，硬件支持简单</td></tr>
+    </table>
+  </div>
+
+  <div class="task" data-task="ch3-m6" data-answer="B" data-ok="对。LRU 淘汰最近最久未访问的页，基于局部性原理。" data-no="A 是 FIFO；C 是 OPT；D 是 CLOCK 的机制。" data-src="原文：LRU 淘汰最近最久未访问的页（基于局部性）。" data-review="回到模块 6 看置换算法对比">
+    <div class="q">LRU 算法淘汰的是哪类页面？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 最先调入内存的页</button>
+      <button class="opt" data-val="B">B. 最近最久未访问的页</button>
+      <button class="opt" data-val="C">C. 未来最长时间不被访问的页</button>
+      <button class="opt" data-val="D">D. 引用位为 1 的页</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 7 ===== -->
-<section id="m7" class="module">
-<div class="module-kicker">模块 7</div>
-<h2>苏格拉底式阅读关卡</h2>
-<p>用以下追问检查理解深度：</p>
-<ul>
-<li>为什么分页管理中，逻辑地址和物理地址的页内偏移不需要变换？</li>
-<li>FIFO 会出现 Belady 现象而 LRU 不会，根本原因是什么？</li>
-<li>快表（TLB）和 Cache 有什么区别？为什么快表能加速分页？</li>
-<li>可变分区的三种适应算法，什么情况下最佳适应反而比首次适应差？</li>
-</ul>
-<div class="task" data-task="ch3-m7" data-answer="C" data-ok="页内偏移在逻辑和物理地址中相同，因为页和块大小一样，只需变换页号。" data-no="A描述的是段式变换，B是错误的，D也不正确。" data-src="原文：逻辑地址 = 页号 + 页内地址；查页表得块号；物理地址 = 块号 × 页大小 + 页内偏移。" data-review="回到模块5复习地址变换公式">
-<div class="q">分页管理中，逻辑地址到物理地址的变换中，哪部分不需要查表？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 页号</button>
-<button class="opt" data-val="B">B. 块号</button>
-<button class="opt" data-val="C">C. 页内地址（偏移）</button>
-<button class="opt" data-val="D">D. 段号</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
-<div class="task" data-task="ch3-m7b" data-answer="A" data-ok="FIFO 不具有栈式算法性质，分配块数增加时旧页可能被提前淘汰导致缺页增加。" data-no="LRU和OPT满足栈式性质，不会出现Belady。" data-src="原文：FIFO会产生Belady现象（块数增加缺页反而增加）。" data-review="回到模块6看Belady现象">
-<div class="q">FIFO 会出现 Belady 现象而 LRU 不会，原因是？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. FIFO 不是栈式算法，LRU 和 OPT 是栈式算法</button>
-<button class="opt" data-val="B">B. FIFO 比较的是时间，LRU 比较的是频率</button>
-<button class="opt" data-val="C">C. FIFO 用队列，LRU 用栈</button>
-<button class="opt" data-val="D">D. FIFO 只能用于单道系统</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s7">
+  <h2><span class="sec-id">07</span>苏格拉底式阅读关卡</h2>
+  <p>下面几道题逼你想清楚计算步骤和概念边界。</p>
+
+  <div class="task" data-task="ch3-m7a" data-answer="C" data-ok="对。页内偏移在逻辑和物理地址中相同，因为页和块大小一样，只需变换页号。" data-no="页号要查页表；块号是查表结果；段号属于段式管理。" data-src="原文：页式地址变换只变换页号→块号，页内偏移不变。" data-review="回到模块 8 看地址变换演示">
+    <div class="q">分页地址变换中，哪部分<strong>不需要</strong>查表？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 页号</button>
+      <button class="opt" data-val="B">B. 块号</button>
+      <button class="opt" data-val="C">C. 页内偏移</button>
+      <button class="opt" data-val="D">D. 段号</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch3-m7b" data-answer="A" data-ok="对。FIFO 不是栈式算法，分配块数增加时旧页可能被提前淘汰导致缺页增加。" data-no="LRU 和 OPT 满足栈式性质，不会出现 Belady。" data-src="原文：FIFO 会产生 Belady 现象。" data-review="回到模块 8 看 Belady 演示">
+    <div class="q">FIFO 会出现 Belady 现象而 LRU 不会，原因是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. FIFO 不是栈式算法，LRU 和 OPT 是栈式算法</button>
+      <button class="opt" data-val="B">B. FIFO 比较时间，LRU 比较频率</button>
+      <button class="opt" data-val="C">C. FIFO 用队列，LRU 用栈</button>
+      <button class="opt" data-val="D">D. FIFO 只能用于单道系统</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch3-m7c" data-answer="B" data-ok="对。抖动是物理页架不够导致频繁换页，改进算法或增加页架可缓解。" data-no="抖动与算法快慢无关，与页架数和置换策略有关。" data-src="原文：抖动原因：(1)分给进程物理页架过少 (2)淘汰算法不合理。" data-review="回到模块 6 看抖动">
+    <div class="q">「抖动（Thrashing）」的根本原因是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. CPU 速度太慢</button>
+      <button class="opt" data-val="B">B. 分配给进程的物理页架过少或淘汰算法不合理</button>
+      <button class="opt" data-val="C">C. 内存容量太大</button>
+      <button class="opt" data-val="D">D. 页表太大</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 8 ===== -->
-<section id="m8" class="module">
-<div class="module-kicker">模块 8</div>
-<h2>闯关式任务包装</h2>
-<p>建议把本章拆成 4 轮闯关：</p>
-<ul>
-<li>第 1 轮：默写地址变换公式（页式和段式），做 2 道地址变换题。</li>
-<li>第 2 轮：画 FIFO 和 LRU 的置换表（用同一序列对比）。</li>
-<li>第 3 轮：做 1 道可变分区分配题（首次 vs 最佳）。</li>
-<li>第 4 轮：做 1 道位示图计算题。</li>
-</ul>
-<div class="task" data-task="ch3-m8" data-type="selects" data-ok="三种适应算法的匹配正确。" data-no="注意：最佳适应选最小且≥需求的，最坏适应选最大的。" data-src="原文：最先适应按地址顺序，最佳适应选最接近尺寸，最坏适应选最大。" data-review="回到模块5复习可变分区">
-<div class="q">把可变分区算法与其策略配对。</div>
-<div class="match-grid">
-<label><span>最先适应</span><select class="match" data-correct="按地址递增取第一个能容纳的"><option value="">选择</option><option value="按地址递增取第一个能容纳的">按地址递增取第一个能容纳的</option><option value="选最接近需求尺寸的">选最接近需求尺寸的</option><option value="选最大的空闲区">选最大的空闲区</option></select></label>
-<label><span>最佳适应</span><select class="match" data-correct="选最接近需求尺寸的"><option value="">选择</option><option value="按地址递增取第一个能容纳的">按地址递增取第一个能容纳的</option><option value="选最接近需求尺寸的">选最接近需求尺寸的</option><option value="选最大的空闲区">选最大的空闲区</option></select></label>
-<label><span>最坏适应</span><select class="match" data-correct="选最大的空闲区"><option value="">选择</option><option value="按地址递增取第一个能容纳的">按地址递增取第一个能容纳的</option><option value="选最接近需求尺寸的">选最接近需求尺寸的</option><option value="选最大的空闲区">选最大的空闲区</option></select></label>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
-<div class="task" data-task="ch3-m8b" data-answer="C" data-ok="物理地址 = 块号 × 页大小 + 页内偏移 = 3 × 1024 + 100 = 3172。" data-no="注意公式是块号×页大小+偏移，不是块号+偏移。" data-src="原文：地址变换：查页表得块号，块号+页内地址=物理地址。具体：物理地址=块号×页大小+页内偏移。" data-review="回到模块5做地址变换练习">
-<div class="q">页面大小 1024B，页号 2 对应块号 3，逻辑地址 [2, 100] 的物理地址是？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 2044</button>
-<button class="opt" data-val="B">B. 3072</button>
-<button class="opt" data-val="C">C. 3172</button>
-<button class="opt" data-val="D">D. 1124</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s8">
+  <h2><span class="sec-id">08</span>手把手计算演示</h2>
+  <p style="background:var(--marker);padding:10px 14px;border-radius:8px;border:2px solid var(--forest)">本章<strong>三大计算题型</strong>，每道题从读题到答案<strong>每一步都写出来</strong>。看懂这三道，大题稳了一半。</p>
+
+  <!-- 演示 1：页式地址变换 -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 1 · 页式地址变换（3 步法）</div>
+    <p>大题1标准题型：给页表和逻辑地址，算物理地址。套路固定，背熟三步。</p>
+    <div class="wt-given">已知：页面大小 1024B，页表：0→2, 1→3, 2→1, 3→6（页号→块号）。<br>
+求：逻辑地址 2148 对应的物理地址。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 拆逻辑地址 → 求页号 P 和页内偏移 W</div>
+      <div class="formula">页号 P = ⌊逻辑地址 ÷ 页面大小⌋<br>页内偏移 W = 逻辑地址 mod 页面大小</div>
+      P = ⌊2148 ÷ 1024⌋ = ⌊2.099...⌋ = <strong>2</strong><br>
+      W = 2148 − 2 × 1024 = 2148 − 2048 = <strong>100</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 查页表：页号 → 块号</div>
+      页表里"页号 2 → 块号 1"，所以 <strong>F = 1</strong>。<br>
+      <span class="badge eg">关键</span>页号超出页表长度会"地址越界中断"（如本题页号 4 超出最大页号 3，就非法）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 拼物理地址</div>
+      <div class="formula">物理地址 = 块号 F × 页面大小 + 页内偏移 W</div>
+      物理地址 = 1 × 1024 + 100 = <strong>1124</strong>
+    </div>
+
+    <div class="wt-final">✓ 答：逻辑地址 2148 → 物理地址 1124。<br>（页内偏移 100 直接搬过去，查表只换了页号 2→块号 1）</div>
+  </div>
+
+  <div class="task" data-task="ch3-m8a" data-answer="C" data-ok="对。页号=⌊2864/1024⌋=2，偏移=2864−2048=816，查表页号2→块号1，物理地址=1×1024+816=1840。" data-no="常见错误：把页号当块号（得2864）、忘记乘页大小、偏移算错。" data-src="原文：页式地址变换：查页表得块号，物理地址=块号×页大小+页内偏移。" data-review="回到模块 8 演示 1 的三步法">
+    <div class="q">页面 1024B，页表 0→2, 1→3, 2→1, 3→6。逻辑地址 2864 的物理地址是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 2864</button>
+      <button class="opt" data-val="B">B. 2048</button>
+      <button class="opt" data-val="C">C. 1840</button>
+      <button class="opt" data-val="D">D. 3904</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <!-- 演示 2：页面置换 -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 2 · 页面置换表（FIFO vs LRU，同一序列对比）</div>
+    <p>大题2标准题型：给访问序列和块数，画表数缺页。这里用 3 个块、一个短序列对比 FIFO 和 LRU。</p>
+    <div class="wt-given">已知：内存 3 块，访问序列：1, 2, 3, 4, 1, 2, 5。<br>开始内存为空，首次访问必缺页。<br>分别用 FIFO 和 LRU 求缺页次数。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 理解 FIFO（先进先出）</div>
+      FIFO = 淘汰<strong>最先调入</strong>的那页（队列，先进先出）。<br>
+      画表时：每来一页，若内存有就命中（不缺页）；若没有就缺页，内存满就淘汰<strong>最早进来的</strong>。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 画 FIFO 表</div>
+      <table class="calc-table">
+        <tr><th>访问</th><th>1</th><th>2</th><th>3</th><th>4</th><th>1</th><th>2</th><th>5</th></tr>
+        <tr><th>块1</th><td class="hit">1</td><td>1</td><td>1</td><td class="miss">4</td><td>4</td><td>4</td><td class="miss">5</td></tr>
+        <tr><th>块2</th><td></td><td class="hit">2</td><td>2</td><td>2</td><td class="miss">1</td><td>1</td><td>1</td></tr>
+        <tr><th>块3</th><td></td><td></td><td class="hit">3</td><td>3</td><td>3</td><td class="miss">2</td><td>2</td></tr>
+        <tr><th>缺页?</th><td class="miss">是</td><td class="miss">是</td><td class="miss">是</td><td class="miss">是</td><td class="miss">是</td><td class="miss">是</td><td class="miss">是</td></tr>
+      </table>
+      第 4 步访问 4，内存{1,2,3}没有，淘汰最早进来的 1 → 换成 4。<br>
+      第 5 步访问 1，内存{4,2,3}没有，淘汰最早的 2 → 换成 1（注意：FIFO 看的是<strong>调入顺序</strong>，不是最近访问）。<br>
+      <strong>FIFO 缺页 = 7 次</strong>（本例全缺页）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 画 LRU 表（淘汰最近最久未访问）</div>
+      <table class="calc-table">
+        <tr><th>访问</th><th>1</th><th>2</th><th>3</th><th>4</th><th>1</th><th>2</th><th>5</th></tr>
+        <tr><th>块1</th><td class="hit">1</td><td>1</td><td>1</td><td class="miss">4</td><td>4</td><td>4</td><td class="miss">5</td></tr>
+        <tr><th>块2</th><td></td><td class="hit">2</td><td>2</td><td>2</td><td class="miss">1</td><td>1</td><td>1</td></tr>
+        <tr><th>块3</th><td></td><td></td><td class="hit">3</td><td>3</td><td>3</td><td class="miss">2</td><td>2</td></tr>
+      </table>
+      本例 LRU 结果与 FIFO 相同（序列特殊），但通常不同。<strong>LRU 关键</strong>：淘汰时看"谁最久没被碰过"，刚被访问的页面优先级最高。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 数缺页次数和缺页率</div>
+      缺页次数 = 表里"缺页?是"的格子数。<br>
+      缺页率 = 缺页次数 ÷ 访问总次数。<br>
+      本例：7 次缺页 ÷ 7 次访问 = <strong>100%</strong>。<br>
+      <span class="badge eg">注意</span>题目说"前 4 页已在内存"时，前 4 次不算缺页，要从第 5 次开始数。
+    </div>
+
+    <div class="wt-final">✓ 答：FIFO 缺页 7 次，LRU 缺页 7 次（本例特殊），缺页率 100%。<br>口诀：画表时每次访问后更新内存状态，缺页就标红数。</div>
+  </div>
+
+  <div class="task" data-task="ch3-m8b" data-answer="A" data-ok="对。FIFO 淘汰最早调入的页（队列先进先出），不管最近有没有被访问过。" data-no="B 是 LRU；C 是 OPT；D 是 CLOCK。" data-src="原文：FIFO 总是淘汰最先调入主存的那一页。" data-review="回到模块 8 演示 2 的 FIFO 表">
+    <div class="q">FIFO 算法在淘汰页面时，依据的是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 哪页最先调入内存（调入时间最早）</button>
+      <button class="opt" data-val="B">B. 哪页最近最久未被访问</button>
+      <button class="opt" data-val="C">C. 哪页未来最久不被访问</button>
+      <button class="opt" data-val="D">D. 哪页引用位为 0</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <!-- 演示 3：可变分区 -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 3 · 可变分区分配（首次适应 vs 最佳适应）</div>
+    <p>选择题/小大题常考：给空闲区序列和作业请求，比较两种算法的分配结果。</p>
+    <div class="wt-given">已知：内存按地址顺序依次有 3 个空闲区：F1=32K、F2=10K、F3=228K。<br>
+现要依次分配作业 J1=20K、J2=10K。<br>
+分别用<strong>首次适应</strong>和<strong>最佳适应</strong>，说明每个作业被分到哪个空闲区。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 理解三种算法</div>
+      • <strong>首次适应（First Fit）</strong>：按地址顺序找，<strong>第一个</strong>能放下的就分配。<br>
+      • <strong>最佳适应（Best Fit）</strong>：找所有能放下的里<strong>最小</strong>的那个（最接近需求尺寸，少浪费）。<br>
+      • <strong>最坏适应（Worst Fit）</strong>：找<strong>最大</strong>的空闲区分配（剩得多，将来还能用）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 首次适应分配过程</div>
+      J1=20K：按地址找，F1=32K 能放下 → 分配，F1 剩 12K。<br>
+      J2=10K：按地址找，F1 剩 12K 能放下 → 分配，F1 剩 2K。<br>
+      结果：两个作业都挤在 F1，剩 2K 碎片。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 最佳适应分配过程</div>
+      J1=20K：能放下的有 F1=32K、F3=228K，选<strong>最小</strong>的 F1=32K → 分配，F1 剩 12K。<br>
+      J2=10K：能放下的有 F1=12K、F2=10K、F3=228K，选<strong>最小</strong>的 F2=10K（正好！不浪费）→ 分配，F2 剩 0K。<br>
+      结果：J1 在 F1，J2 在 F2，<strong>F2 零浪费</strong>。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 对比结论</div>
+      最佳适应倾向于"选最贴身的"，能减少大空闲区被切碎；但长期会产生很多<strong>极小的不可用碎片</strong>。<br>
+      首次实现简单速度快，但可能在低地址区堆积大量小碎片。<br>
+      <span class="badge eg">考试常考</span>首次适应分配后申请大块可能失败，最佳适应能成功（或反之）——具体看题目数据。
+    </div>
+
+    <div class="wt-final">✓ 答：首次适应下 J1、J2 都进 F1（剩 2K）；最佳适应下 J1 进 F1、J2 进 F2（F2 零浪费）。<br>口诀：首次"看到能放就放"，最佳"挑最合身的"。</div>
+  </div>
+
+  <div class="task" data-task="ch3-m8c" data-answer="B" data-ok="对。最佳适应选"最小且≥需求"的，目的是少浪费，但会产生很多小碎片。" data-no="首次适应按地址顺序取第一个能放下的；最佳适应挑最贴身的。" data-src="原文：最佳适应把能容纳的一个最接近尺寸且≥作业大小的分区给申请者。" data-review="回到模块 8 演示 3 的第 1 步">
+    <div class="q">最佳适应算法选择空闲区的标准是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 按地址顺序第一个能容纳的</button>
+      <button class="opt" data-val="B">B. 能容纳的空闲区里最小（最接近需求尺寸）的那个</button>
+      <button class="opt" data-val="C">C. 最大的空闲区</button>
+      <button class="opt" data-val="D">D. 随机选一个</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 9 ===== -->
-<section id="m9" class="module">
-<div class="module-kicker">模块 9</div>
-<h2>误解与边界</h2>
-<ul>
-<li><strong>误解</strong>：「快表就是 Cache」。实际：快表是页表项的高速缓存，不是通用数据缓存。</li>
-<li><strong>误解</strong>：「块数越多缺页一定越少」。实际：FIFO 有 Belady 异常，块数增加可能反而增加缺页。</li>
-<li><strong>误解</strong>：「分页和分段是一样的」。实际：页是固定大小自动划分，段是按逻辑信息可变长划分。</li>
-<li><strong>误解</strong>：「虚拟内存容量等于内存大小」。实际：虚拟内存容量 = 内存 + 外存，远大于物理内存。</li>
-<li><strong>误解</strong>：「抖动是因为算法太慢」。实际：抖动是物理页架不够导致频繁换页，解决方法是增加页架或改进算法。</li>
-</ul>
-<div class="task" data-task="ch3-m9" data-answer="B" data-ok="虚拟存储器容量=内存+外存，速度接近内存，成本接近外存。" data-no="虚拟内存远大于物理内存大小。" data-src="原文：虚拟存储器：请求调入+置换功能，逻辑上扩充内存；容量=内存+外存。" data-review="回到模块2看虚拟内存概念">
-<div class="q">虚拟存储器的容量取决于什么？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 仅取决于内存大小</button>
-<button class="opt" data-val="B">B. 内存和外存容量之和</button>
-<button class="opt" data-val="C">C. 仅取决于外存大小</button>
-<button class="opt" data-val="D">D. 取决于 CPU 位数</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s9">
+  <h2><span class="sec-id">09</span>误解与边界</h2>
+
+  <div class="miscon">
+    <strong>误解 1：快表就是 Cache</strong><br>
+    <span class="badge fact">易错</span>快表（TLB）是<strong>页表项</strong>的高速缓存，不是通用数据缓存。它只缓存"页号→块号"的映射，加速地址变换。<br>
+    <strong>原文：</strong>「存放在高速缓冲寄存器中的页表叫快表」。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 2：块数越多缺页一定越少</strong><br>
+    <span class="badge judge">大题扣分点</span>不对。FIFO 会出现 <strong>Belady 现象</strong>——块数增加缺页反而增加。只有 LRU 和 OPT 满足"栈式算法"性质，块数越多缺页单调不增。<br>
+    <strong>原文：</strong>「FIFO 会产生 Belady 现象」。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 3：分页和分段是一回事</strong><br>
+    <span class="badge infer">推论错</span>页是<strong>固定大小</strong>自动划分（系统决定，用户无感）；段是<strong>按逻辑信息可变长</strong>划分（用户/编译器决定，如代码段、数据段）。所以段式必须查越界，页式不用。<br>
+    <strong>原文：</strong>「分页：大小相同区域；分段：每个段定义一组逻辑信息，长度可变」。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 4：虚拟内存容量 = 内存大小</strong><br>
+    <span class="badge fact">事实错</span>虚拟内存<strong>逻辑容量 = 内存 + 外存</strong>，远大于物理内存。速度接近内存，成本接近外存。<br>
+    <strong>原文：</strong>「其逻辑容量由内存容量和外存容量之和所决定」。
+  </div>
+
+  <div class="task" data-task="ch3-m9" data-answer="B" data-ok="对。虚拟内存逻辑上扩充内存，容量=内存+外存。" data-no="虚拟内存远大于物理内存大小。" data-src="原文：虚拟存储器逻辑容量由内存和外存容量之和决定。" data-review="回到模块 9 看虚拟内存误解">
+    <div class="q">虚拟存储器的容量取决于什么？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 仅取决于内存大小</button>
+      <button class="opt" data-val="B">B. 内存和外存容量之和</button>
+      <button class="opt" data-val="C">C. 仅取决于外存大小</button>
+      <button class="opt" data-val="D">D. 取决于 CPU 位数</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 10 ===== -->
-<section id="m10" class="module">
-<div class="module-kicker">模块 10</div>
-<h2>背景知识缺口</h2>
-<p>要完全掌握本章，还需了解：</p>
-<ul>
-<li><strong>Cache 工作原理</strong>：理解 TLB 为什么能加速——和 Cache 的局部性原理类似。</li>
-<li><strong>磁盘 I/O</strong>：缺页时需要从磁盘调入页面，理解磁盘读写延迟远大于内存。</li>
-<li><strong>位运算</strong>：位示图用二进制位表示空闲/已分配，需要理解字号位号换算。</li>
-<li><strong>程序局部性</strong>：时间局部性和空间局部性是 LRU 和预调页的理论基础。</li>
-</ul>
-<div class="task" data-task="ch3-m10" data-answer="C" data-ok="局部性原理包括时间局部性（刚访问的很快再访问）和空间局部性（访问了某地址附近的也会被访问）。" data-no="其他选项不完整或不正确。" data-src="原文：局部性原理：程序执行的时间局部性+空间局部性（LRU的依据）。" data-review="回到模块10看局部性原理">
-<div class="q">LRU 算法的理论依据是什么？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 最佳匹配原理</button>
-<button class="opt" data-val="B">B. 栈式算法性质</button>
-<button class="opt" data-val="C">C. 程序的局部性原理</button>
-<button class="opt" data-val="D">D. 中断响应机制</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
+<section id="s10">
+  <h2><span class="sec-id">10</span>背景知识缺口</h2>
+  <p>读完本章如果还卡，通常缺的是：</p>
+  <ul>
+    <li><strong>Cache 工作原理</strong>：理解 TLB 为什么能加速——和 Cache 的局部性原理类似。考试后补即可。</li>
+    <li><strong>磁盘 I/O 延迟</strong>：缺页时从磁盘调入，理解磁盘读写延迟远大于内存（所以缺页代价大）。第4章会讲磁盘。</li>
+    <li><strong>位运算基础</strong>：位示图用二进制位表示空闲/已分配，字号位号换算需要 div/mod 运算。</li>
+    <li><strong>多级页表</strong>：本章只考单级页表。实际 64 位系统用多级页表，考试不要求。</li>
+  </ul>
+  <div class="task" data-task="ch3-m10" data-answer="C" data-ok="对。LRU 基于程序局部性原理（时间局部性：刚访问的近期还会访问）。" data-no="最佳匹配是可变分区算法；栈式性质是 Belady 相关；中断响应与 LRU 无关。" data-src="原文：LRU 基于局部性原理。" data-review="回到模块 10 看局部性">
+    <div class="q">LRU 算法的理论依据是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 最佳匹配原理</button>
+      <button class="opt" data-val="B">B. 栈式算法性质</button>
+      <button class="opt" data-val="C">C. 程序的局部性原理</button>
+      <button class="opt" data-val="D">D. 中断响应机制</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
-<!-- ===== 模块 11 ===== -->
-<section id="m11" class="module">
-<div class="module-kicker">模块 11</div>
-<h2>复盘与学习报告</h2>
-<p>本章是考试第二重点（2 道大题），复盘标准：</p>
-<ul>
-<li>能默写页式和段式地址变换公式，并手算物理地址。</li>
-<li>能用 FIFO、LRU、OPT 三种算法画置换表，算出缺页次数。</li>
-<li>能解释 Belady 现象为什么只在 FIFO 中出现。</li>
-<li>能做可变分区三种适应算法的分配过程。</li>
-<li>能做位示图的字号位号换算。</li>
-</ul>
-<div class="chips">
-<span>地址变换</span><span>页面置换</span><span>可变分区</span><span>位示图</span><span>Belady</span>
-</div>
-<div class="task" data-task="ch3-m11" data-answer="A" data-ok="本章核心是地址变换和页面置换，对应2道大题。" data-no="磁盘调度是第4章内容，PV操作是第2章内容。" data-src="原文：考试权重高，对应2道大题（地址变换+页面置换）。" data-review="回到模块1看学习目标">
-<div class="q">本章（内存管理）对应的2道大题是什么？</div>
-<div class="opts">
-<button class="opt" data-val="A">A. 地址变换 + 页面置换</button>
-<button class="opt" data-val="B">B. 磁盘调度 + 记录优化</button>
-<button class="opt" data-val="C">C. PV操作 + 银行家算法</button>
-<button class="opt" data-val="D">D. 进程调度 + 死锁检测</button>
-</div>
-<button class="check">检查</button>
-<div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-</div>
-</section>
+<section id="s11">
+  <h2><span class="sec-id">11</span>复盘与学习报告</h2>
+  <p>本章复盘问自己四件事：</p>
+  <ul>
+    <li>能不能默写页式地址变换三步法（求页号→查页表→拼物理地址）？</li>
+    <li>能不能画出 FIFO / LRU 的置换表并数出缺页次数？</li>
+    <li>能不能说清段式为什么要查越界、页式为什么不用？</li>
+    <li>能不能区分首次/最佳/最坏适应的分配策略？</li>
+  </ul>
 
-<section class="module" id="reportZone">
-<div class="module-kicker">学习报告</div>
-<h2>错题回流与复盘</h2>
-<p>做完题后生成报告，把错题带回对应模块复看。</p>
-<div id="wrongBox" class="wrong-list"></div>
-<button id="genReport">生成学习报告</button>
-<button id="copyReport">复制报告</button>
-<pre id="report" class="report-box"></pre>
-</section>
+  <div class="wrong-section">
+    <h3>错题回流</h3>
+    <p>答错的题会自动收集到这里，按提示回到对应模块复习。</p>
+    <ul id="wrongBox"></ul>
+  </div>
 
-<footer class="footer">
-由 <a href="https://github.com/remi-huang/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · github.com/remi-huang/grokko<br>
-这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。
-</footer>
+  <div class="report-section">
+    <h3>生成学习报告</h3>
+    <p>点击按钮，生成你的本章学习报告（可复制到笔记）。</p>
+    <textarea id="report" readonly></textarea>
+    <div class="report-btns">
+      <button id="genReport">生成学习报告</button>
+      <button id="copyReport">复制报告</button>
+    </div>
+  </div>
+</section>
 
 </main>
 </div>
+
+<footer class="footer">
+  由 <a href="https://github.com/remi-huang/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · 强化计算演示版<br>
+  <span class="tip">这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。</span>
+</footer>
+
 <script>
 (function(){
   "use strict";
@@ -478,10 +672,15 @@ TAT = TLB命中率 × (查TLB + 访存) + (1 - TLB命中率) × (查TLB + 查页
   function genReport(){
     var box=document.getElementById('report');if(!box)return;
     var all=$all('.task'),done=$all('.task[data-answered="1"]'),right=$all('.task[data-answered="1"][data-correct="1"]');
-    var lines=['=== 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
+    var lines=['=== 第3章 内存管理 · 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
     var wrong=$all('.task[data-answered="1"][data-correct="0"]');
     if(wrong.length){lines.push('我答错的题（建议复习）：');wrong.forEach(function(t){lines.push('- '+(t.getAttribute('data-task')||'')+'：'+(t.getAttribute('data-review')||''));});}
     else{lines.push('暂无错题。');}
+    lines.push('','核心自测：');
+    lines.push('- [ ] 能默写页式地址变换三步法');
+    lines.push('- [ ] 能画 FIFO/LRU 置换表并数缺页次数');
+    lines.push('- [ ] 能说清段式查越界、页式不查的原因');
+    lines.push('- [ ] 能区分首次/最佳/最坏适应');
     box.textContent=lines.join('\n');
   }
   document.addEventListener('click',function(e){

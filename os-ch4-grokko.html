@@ -3,50 +3,551 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>操作系统第 4 章：文件管理 - Grokko 理解地图</title>
+<title>操作系统 第4章 文件管理 — 理解地图</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--cream:#FAF6EB;--paper:#F3EDDD;--forest:#1E3A24;--sky:#BCD8EE;--sage:#AFCDA8;--ink:#1A2018;--marker:#F5E08A;--brick:#B5482A;--correct:#2F7D46;--wrong:#B5482A;--font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;--font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;--font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Roboto Mono","JetBrains Mono",monospace;--radius-pill:999px;--radius-card:14px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.72}.layout{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:100vh}.side{position:sticky;top:0;height:100vh;background:var(--forest);color:var(--cream);padding:26px 20px;overflow:auto}.brand{font-family:var(--font-display);font-size:30px;line-height:1;letter-spacing:0;margin-bottom:10px}.sub{font-size:13px;color:rgba(250,246,235,.76);margin-bottom:20px}.progress{background:rgba(250,246,235,.12);border:1px solid rgba(250,246,235,.2);border-radius:var(--radius-card);padding:14px;margin-bottom:18px}.bar{height:10px;background:rgba(250,246,235,.25);border-radius:var(--radius-pill);overflow:hidden}.bar span{display:block;width:0;height:100%;background:var(--marker);transition:.25s}.bar-meta{display:flex;justify-content:space-between;margin-top:9px;font-family:var(--font-mono);font-size:12px}.nav{display:grid;gap:8px}.nav a{color:var(--cream);text-decoration:none;display:grid;grid-template-columns:38px 1fr;gap:9px;align-items:center;padding:10px;border-radius:10px;background:rgba(250,246,235,.08);border:1px solid transparent}.nav a:hover{background:rgba(188,216,238,.18);border-color:rgba(188,216,238,.38)}.nav b{font-family:var(--font-mono);color:var(--marker);font-size:12px}.main{padding:42px 5vw 64px;max-width:1080px}.hero{padding:34px 0 28px;border-bottom:4px solid var(--forest);margin-bottom:28px}.eyebrow{display:inline-block;background:var(--marker);border:2px solid var(--forest);border-radius:var(--radius-pill);padding:5px 12px;font-weight:700;font-size:13px;margin-bottom:14px}h1{font-family:var(--font-display);font-size:clamp(34px,5vw,66px);line-height:1.03;letter-spacing:0;color:var(--forest);margin-bottom:14px}h2{font-family:var(--font-head);font-size:26px;color:var(--forest);margin-bottom:14px}h3{font-family:var(--font-head);font-size:18px;color:var(--forest);margin:18px 0 8px}.lead{font-size:18px;max-width:850px}.path{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.path div,.note,.source,.formula{background:var(--paper);border:2px solid var(--forest);border-radius:var(--radius-card);padding:14px}.path strong{display:block;color:var(--brick);margin-bottom:4px}.module{padding:28px 0;border-bottom:1px solid rgba(30,58,36,.25)}.module-kicker{font-family:var(--font-mono);font-size:12px;color:var(--brick);font-weight:700;text-transform:uppercase;margin-bottom:5px}ul{padding-left:22px;margin:10px 0}li{margin:5px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.card{background:#fffaf0;border:2px solid rgba(30,58,36,.9);border-radius:var(--radius-card);padding:14px}.card h3{margin-top:0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chips span{background:var(--sage);border:1px solid var(--forest);border-radius:var(--radius-pill);padding:5px 10px;font-weight:700;font-size:13px}.quote{border-left:6px solid var(--brick);background:#fffaf0;padding:12px 14px;margin:12px 0}.task{background:var(--sky);border:3px solid var(--forest);border-radius:var(--radius-card);padding:16px;margin-top:16px;box-shadow:5px 5px 0 rgba(30,58,36,.2)}.q{font-weight:800;margin-bottom:10px}.opts{display:grid;gap:8px}.opt,.check,#genReport,#copyReport{font:inherit;font-weight:700;border:2px solid var(--forest);background:#fffaf0;color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left}.opt.selected{background:var(--marker)}.check,#genReport,#copyReport{display:inline-block;margin-top:12px;background:var(--forest);color:var(--cream);text-align:center}.feedback{margin-top:10px;background:rgba(255,250,240,.72);border-radius:10px;padding:10px}.feedback.ok{border-left:6px solid var(--correct)}.feedback.no{border-left:6px solid var(--wrong)}.match-grid{display:grid;gap:8px}.match-grid label{display:grid;grid-template-columns:1fr 230px;gap:10px;align-items:center}.match{font:inherit;border:2px solid var(--forest);border-radius:10px;padding:8px;background:#fffaf0}.wrong-list{display:grid;gap:8px}.wrong-list a{color:var(--brick);font-weight:700}.report-box{white-space:pre-wrap;background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:14px;margin-top:12px}.footer{padding-top:30px;color:rgba(26,32,24,.75);font-size:14px}.footer a{color:#1d70b8;text-decoration:underline;font-weight:700}@media(max-width:880px){.layout{display:block}.side{position:relative;height:auto}.main{padding:28px 18px 50px}.path,.grid{grid-template-columns:1fr}.match-grid label{grid-template-columns:1fr}h1{font-size:36px}}
+:root{
+  --cream:#FAF6EB; --paper:#F3EDDD; --forest:#1E3A24; --sky:#BCD8EE;
+  --sage:#AFCDA8; --ink:#1A2018; --marker:#F5E08A; --brick:#B5482A;
+  --correct:#2F7D46; --wrong:#B5482A;
+  --font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;
+  --font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;
+  --font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+  --font-mono:"Roboto Mono","JetBrains Mono",monospace;
+  --radius-pill:999px; --radius-card:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.7;font-size:16px}
+.layout{display:flex;align-items:flex-start;max-width:1100px;margin:0 auto}
+.sidebar{position:sticky;top:0;height:100vh;width:270px;flex-shrink:0;background:var(--forest);color:var(--cream);padding:28px 20px;overflow-y:auto}
+.sidebar h1{font-family:var(--font-display);font-size:1.15rem;line-height:1.35;margin-bottom:6px;color:var(--marker)}
+.sidebar .sub{font-size:.78rem;color:var(--sage);margin-bottom:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-bar{background:rgba(255,255,255,.15);height:8px;border-radius:var(--radius-pill);overflow:hidden}
+.progress-fill{background:var(--marker);height:100%;width:0;transition:width .4s ease}
+.progress-num{font-family:var(--font-mono);font-size:.78rem;margin-top:6px;color:var(--sky)}
+.nav{list-style:none}
+.nav li{margin-bottom:2px}
+.nav a{display:block;padding:8px 10px;border-radius:8px;font-size:.85rem;color:var(--cream);text-decoration:none;transition:background .2s}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav .num{font-family:var(--font-mono);font-size:.72rem;color:var(--sky);margin-right:8px}
+.main{flex:1;min-width:0;padding:40px 44px;max-width:780px}
+.main section{margin-bottom:48px;scroll-margin-top:20px}
+.main h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--forest);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--sage)}
+.main h3{font-family:var(--font-head);font-size:1.05rem;color:var(--forest);margin:18px 0 10px}
+.main p{margin-bottom:12px}
+.card{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.card.warn{border-left-color:var(--brick)}
+.card.key{border-left-color:var(--marker)}
+.src-quote{background:var(--sky);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:.85rem;margin:10px 0;color:var(--ink);border-left:3px solid var(--forest)}
+.src-tag{display:inline-block;background:var(--forest);color:var(--marker);font-size:.7rem;padding:2px 8px;border-radius:var(--radius-pill);font-family:var(--font-mono);margin-bottom:6px}
+.objective{background:var(--paper);border-radius:var(--radius-card);padding:16px 20px;margin-bottom:10px;border-left:4px solid var(--forest)}
+.objective .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);font-weight:600;margin-bottom:4px}
+.bg-item{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--sky)}
+.bg-item .label{font-size:.72rem;color:var(--brick);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.concept{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.concept .term{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem}
+.concept .plain{color:var(--brick);font-style:italic;margin:6px 0}
+.miscon{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--wrong)}
+.task{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:16px}
+.task .q{font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opt{background:var(--cream);border:2px solid transparent;border-radius:8px;padding:10px 14px;cursor:pointer;font-family:var(--font-body);font-size:.92rem;text-align:left;transition:all .2s;color:var(--ink)}
+.opt:hover{border-color:var(--sky)}
+.opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
+.check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
+.check:hover{background:#2a5232}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
+.feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
+.feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
+select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-radius:8px;border:2px solid var(--sage);background:var(--cream);font-family:var(--font-body);font-size:.9rem}
+.wrong-section{background:#fce8e8;border-radius:var(--radius-card);padding:18px 22px;margin-top:20px;border-left:4px solid var(--wrong)}
+.wrong-section h3{color:var(--wrong)}
+#wrongBox{list-style:none;padding-left:0}
+#wrongBox li{padding:6px 0;font-size:.88rem;border-bottom:1px dashed rgba(181,72,42,.2)}
+.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-top:20px}
+.report-section textarea{width:100%;min-height:200px;border-radius:8px;border:2px solid var(--sage);padding:12px;font-family:var(--font-mono);font-size:.85rem;background:var(--cream);color:var(--ink);resize:vertical}
+.report-btns{display:flex;gap:10px;margin-top:10px}
+.report-btns button{background:var(--forest);color:var(--cream);border:none;padding:8px 18px;border-radius:var(--radius-pill);cursor:pointer;font-family:var(--font-head);font-size:.85rem}
+.struct-map{font-family:var(--font-mono);font-size:.85rem;line-height:2;background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;white-space:pre-wrap;color:var(--ink)}
+.formula{background:var(--forest);color:var(--marker);font-family:var(--font-mono);font-size:.95rem;padding:14px 18px;border-radius:8px;margin:10px 0;text-align:center}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+.info-table th{background:var(--forest);color:var(--marker);padding:8px 12px;text-align:left;font-family:var(--font-head);font-size:.82rem}
+.info-table td{padding:8px 12px;border-bottom:1px solid #ddd;background:var(--cream)}
+.badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.badge.fact{background:var(--sky);color:var(--forest)}
+.badge.judge{background:var(--marker);color:var(--forest)}
+.badge.infer{background:var(--sage);color:var(--forest)}
+.badge.eg{background:#E8D5C4;color:var(--brick)}
+.footer{max-width:1100px;margin:0 auto;padding:30px 44px;text-align:center;font-size:.82rem;color:#888}
+.footer a{color:#1d70b8;text-decoration:underline}
+.footer .tip{margin-top:6px;color:#aaa}
+.sec-id{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);background:var(--marker);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;vertical-align:middle}
+.walkthrough{background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:20px 24px;margin:14px 0}
+.walkthrough .wt-title{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem;margin-bottom:6px}
+.walkthrough .wt-given{background:var(--paper);border-radius:8px;padding:10px 14px;margin:8px 0;font-family:var(--font-mono);font-size:.85rem}
+.walkthrough .wt-step{margin:10px 0;padding-left:14px;border-left:3px solid var(--sage)}
+.walkthrough .wt-step .step-no{font-family:var(--font-mono);font-weight:700;color:var(--brick);font-size:.8rem}
+.walkthrough .wt-final{background:var(--marker);border-radius:8px;padding:10px 14px;margin-top:10px;font-weight:700;color:var(--forest)}
+.calc-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.82rem;font-family:var(--font-mono)}
+.calc-table th{background:var(--forest);color:var(--marker);padding:6px 8px;text-align:center;font-size:.78rem}
+.calc-table td{padding:6px 8px;border:1px solid #ccc;text-align:center;background:var(--cream)}
+@media(max-width:860px){.layout{flex-direction:column}.sidebar{position:relative;height:auto;width:100%;padding:20px}.main{padding:24px 20px}.nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin-bottom:0}}
 </style>
 </head>
 <body>
-<div class="layout"><aside class="side"><div class="brand">Grokko</div><div class="sub">第4章 文件管理 · 11 模块理解地图</div><div class="progress"><div class="bar"><span id="barFill"></span></div><div class="bar-meta"><span>已完成</span><span id="barNum">0 / 0</span></div></div><nav class="nav"><a href="#m1"><b>01</b><span>学习目标与阅读路径</span></a><a href="#m2"><b>02</b><span>零基础背景包</span></a><a href="#m3"><b>03</b><span>原文问题定位</span></a><a href="#m4"><b>04</b><span>原文结构地图</span></a><a href="#m5"><b>05</b><span>核心判断与依据</span></a><a href="#m6"><b>06</b><span>关键概念拆解</span></a><a href="#m7"><b>07</b><span>苏格拉底式阅读关卡</span></a><a href="#m8"><b>08</b><span>闯关式任务包装</span></a><a href="#m9"><b>09</b><span>误解与边界</span></a><a href="#m10"><b>10</b><span>背景知识缺口</span></a><a href="#m11"><b>11</b><span>复盘与学习报告</span></a></nav></aside><main class="main"><section class="hero"><span class="eyebrow">考试权重中 · 1 道大题（磁盘调度/记录优化/位示图）</span><h1>操作系统第 4 章：文件管理</h1><p class="lead">本章的核心是：文件系统如何组织、存储和管理数据，以及磁盘调度算法如何减少访盘时间。大题考点集中在四种磁盘调度算法的移动距离计算、旋转调度中的记录优化分布、以及位示图管理磁盘空间。</p><div class="path"><div><strong>先抓主线</strong>文件系统基础（文件定义、逻辑/物理结构、目录、FCB/I节点）→ 磁盘结构 → 四种调度算法。</div><div><strong>再练大题</strong>FCFS / SSTF / SCAN / CSCAN 会算移动距离；记录优化分布会算间隔和总时间；位示图会做字号位号换算。</div><div><strong>最后避坑</strong>SCAN 方向判断错是最大丢分点；优化分布间隔公式要熟；位示图行列从 1 还是 0 编号要看清。</div></div></section>
+<div class="layout">
+<aside class="sidebar">
+  <h1>操作系统<br>第4章 文件管理</h1>
+  <div class="sub">考试冲刺 · 1 道大题 · 中等优先级</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
+    <div class="progress-num" id="barNum">0 / 0</div>
+  </div>
+  <ul class="nav">
+    <li><a href="#s1"><span class="num">01</span>学习目标与阅读路径</a></li>
+    <li><a href="#s2"><span class="num">02</span>零基础背景包</a></li>
+    <li><a href="#s3"><span class="num">03</span>原文问题定位</a></li>
+    <li><a href="#s4"><span class="num">04</span>原文结构地图</a></li>
+    <li><a href="#s5"><span class="num">05</span>核心判断与依据</a></li>
+    <li><a href="#s6"><span class="num">06</span>关键概念拆解</a></li>
+    <li><a href="#s7"><span class="num">07</span>苏格拉底式阅读关卡</a></li>
+    <li><a href="#s8"><span class="num">08</span>手把手计算演示</a></li>
+    <li><a href="#s9"><span class="num">09</span>误解与边界</a></li>
+    <li><a href="#s10"><span class="num">10</span>背景知识缺口</a></li>
+    <li><a href="#s11"><span class="num">11</span>复盘与学习报告</a></li>
+  </ul>
+</aside>
 
-<section id="m1" class="module"><div class="module-kicker">模块 1</div><h2>学习目标与阅读路径</h2><p>本章考试权重中，有 1 道大题，题型集中在磁盘调度算法（移臂距离计算）、记录优化分布（旋转调度）和位示图（磁盘空间管理）。复习目标是：会算、会排、会换算。</p><div class="chips"><span>四种磁盘调度算法</span><span>移动距离计算</span><span>记录优化分布</span><span>旋转调度</span><span>位示图</span><span>FCB/I节点</span><span>目录结构</span></div><div class="quote">原文定位：考试权重⭐⭐中，对应 1 道大题（磁盘调度算法 / 记录优化分布 / 位示图），题型为移臂距离计算 + 旋转调度优化 + 磁盘空间管理。</div>
-<div class="task" data-task="ch4-m1" data-answer="B" data-ok="本章大题集中在磁盘调度算法的移动距离计算、记录优化分布和位示图三块，复习必须以计算为核心。" data-no="A/C 是选择题知识点，不是大题重点。" data-src="原文：考试权重⭐⭐中，1道大题（磁盘调度算法/记录优化分布/位示图）。" data-review="回到模块 1 看复习定位"><div class="q">本章复习的最佳策略是什么？</div><div class="opts"><button class="opt" data-val="A">A. 背诵文件定义和分类即可</button><button class="opt" data-val="B">B. 以四种调度算法计算、记录优化分布计算和位示图换算为核 心，动手做题</button><button class="opt" data-val="C">C. 只看概念不走计算</button><button class="opt" data-val="D">D. 只背目录结构分类</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+<main class="main">
 
-<section id="m2" class="module"><div class="module-kicker">模块 2</div><h2>零基础背景包</h2><p>在进入磁盘调度之前，需要先理解磁盘的物理结构和文件系统的基本概念。</p><div class="quote">背景补充：磁盘由多个盘面组成，每个盘面有若干同心圆磁道，相同磁道号的所有盘面组成一个柱面。数据存放在扇区中。物理地址 = 磁头号（盘面号）+ 磁道号（柱面号）+ 扇区号。</div><div class="quote">背景补充：一次访盘时间 = 寻道时间（磁头移动到目标柱面）+ 旋转延迟时间（盘片旋转到目标扇区）+ 存取时间（读写数据）。调度算法的主要目标是减少寻道时间。</div><div class="quote">背景补充：文件是具有符号名的信息项的集合。文件系统是管理存取文件信息的软件机构（数据结构 + 管理软件 + 操作）。</div>
-<div class="task" data-task="ch4-m2" data-answer="C" data-ok="正确！一次访盘时间 = 寻道时间 + 旋转延迟时间 + 存取时间。磁盘调度的核心是减少寻道时间。" data-no="记住三段式：寻道 + 旋转延迟 + 存取。少了哪段都不对。" data-src="原文：一次访盘时间 = 寻道时间 + 旋转延迟时间 + 存取时间。" data-review="回到模块 2 看磁盘基础"><div class="q">一次访盘时间由哪三部分组成？</div><div class="opts"><button class="opt" data-val="A">A. CPU时间 + 内存时间 + I/O时间</button><button class="opt" data-val="B">B. 排队时间 + 服务时间 + 传输时间</button><button class="opt" data-val="C">C. 寻道时间 + 旋转延迟时间 + 存取时间</button><button class="opt" data-val="D">D. 分配时间 + 回收时间 + 碎片时间</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+<section id="s1">
+  <h2><span class="sec-id">01</span>学习目标与阅读路径</h2>
+  <p>本章对应考试 <strong>1 道大题</strong>，三选一出题：<strong>磁盘调度算法</strong>（算移臂距离）、<strong>记录优化分布</strong>（算旋转等待）、<strong>位示图</strong>（算字号位号）。复习时间约 2 小时。</p>
+  <div class="objective"><div class="tag">目标 1 · 磁盘调度</div>给定磁头位置和请求序列，能用 FCFS / SSTF / SCAN / CSCAN 四种算法分别算出服务顺序和总移动距离。</div>
+  <div class="objective"><div class="tag">目标 2 · 记录优化分布</div>给定盘转速、扇区数、读时间、处理时间，能算出优化分布的间隔扇区数和优化前后的总时间。</div>
+  <div class="objective"><div class="tag">目标 3 · 位示图换算</div>能做"第 N 块对应何字何位"和"X 字 Y 位对应第几块"的换算。</div>
+  <div class="objective"><div class="tag">目标 4 · 概念辨析（选择）</div>能区分 FCB / I节点 / 柱面 / 扇区等概念，应付选择题。</div>
+  <p><strong>阅读路径</strong>：模块 2 唤醒磁盘结构 → 模块 3-6 过概念 → <span style="background:var(--marker);padding:2px 6px;border-radius:4px;font-weight:700">模块 8 手把手算两道大题</span> → 模块 9 避坑。</p>
+  <div class="src-quote">原文定位：考试权重⭐⭐中，对应 1 道大题（磁盘调度 / 记录优化分布 / 位示图）。</div>
+</section>
 
-<section id="m3" class="module"><div class="module-kicker">模块 3</div><h2>原文问题定位</h2><p>原文把本章分成三大块：文件系统基础、文件系统实现、磁盘组织与管理。大题考点全部落在第三块。</p><ul><li>文件系统基础：文件定义、分类、逻辑/物理结构、FCB、目录结构、共享与保护。</li><li>文件系统实现：层次结构、目录实现（线性列表/哈希表）、文件实现考虑因素。</li><li>磁盘组织与管理：磁盘结构、四种调度算法、旋转调度、记录优化分布、位示图。</li></ul><div class="quote">原文定位：磁盘组织与管理（约 827~935 行）标注了 ⭐ 大题考点。四种调度算法 + 记录优化分布 + 位示图是出大题的区域。</div>
-<div class="task" data-task="ch4-m3" data-answer="C" data-ok="正确！大题全部在磁盘组织与管理部分，尤其是调度算法和记录优化分布。" data-no="文件系统基础和实现部分主要出选择题，不是大题区域。" data-src="原文：磁盘组织与管理（⭐大题考点，约827~935行）。" data-review="回到模块 3 看三块结构"><div class="q">本章大题考点集中在原文的哪一块？</div><div class="opts"><button class="opt" data-val="A">A. 文件系统基础（定义、分类、目录）</button><button class="opt" data-val="B">B. 文件系统实现（层次结构、目录实现）</button><button class="opt" data-val="C">C. 磁盘组织与管理（调度算法、优化分布、位示图）</button><button class="opt" data-val="D">D. 文件保护与共享</button></div><button class="check">检查><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+<section id="s2">
+  <h2><span class="sec-id">02</span>零基础背景包</h2>
+  <p>学过但生疏？下面 5 个概念用一句话唤醒。</p>
 
-<section id="m4" class="module"><div class="module-kicker">模块 4</div><h2>原文结构地图</h2><div class="grid"><div class="card"><h3>文件系统基础</h3><ul><li>文件定义与UNIX分类</li><li>逻辑结构：记录式/流式</li><li>物理结构：连续/链接/索引</li><li>FCB 文件控制块</li><li>目录结构：一级/二级/树形</li><li>文件共享与保护</li></ul></div><div class="card"><h3>文件系统实现</h3><ul><li>层次结构</li><li>目录实现：线性列表/哈希表</li><li>文件实现考虑因素</li></ul></div><div class="card"><h3>磁盘结构与调度</h3><ul><li>磁道/柱面/扇区</li><li>FCFS 先来先服务</li><li>SSTF 最短寻道优先</li><li>SCAN 扫描（电梯）</li><li>CSCAN 单向扫描</li></ul></div><div class="card"><h3>大题计算区</h3><ul><li>移臂距离计算</li><li>旋转调度与记录优化分布</li><li>位示图管理磁盘空间</li></ul></div></div>
-<div class="task" data-task="ch4-m4" data-type="selects" data-ok="四种磁盘调度算法的特点全部匹配正确！" data-no="再仔细看每种算法的定义，尤其注意 SCAN 和 CSCAN 的方向差异。" data-src="原文：FCFS按到达顺序；SSTF选最近；SCAN一个方向到头再反向；CSCAN总从0号向里扫描到最大后返回。" data-review="回到模块 4 看四种算法对比"><div class="q">把调度算法与它的核心特点配对。</div><div class="match-grid"><label><span>FCFS</span><select class="match" data-correct="按请求到达顺序服务"><option value="">选择</option><option value="按请求到达顺序服务">按请求到达顺序服务</option><option value="选距当前磁头最近的请求">选距当前磁头最近的请求</option><option value="一个方向移动到头再反向">一个方向移动到头再反向</option><option value="总从0号向里扫描到最大后返回">总从0号向里扫描到最大后返回</option></select></label><label><span>SSTF</span><select class="match" data-correct="选距当前磁头最近的请求"><option value="">选择</option><option value="按请求到达顺序服务">按请求到达顺序服务</option><option value="选距当前磁头最近的请求">选距当前磁头最近的请求</option><option value="一个方向移动到头再反向">一个方向移动到头再反向</option><option value="总从0号向里扫描到最大后返回">总从0号向里扫描到最大后返回</option></select></label><label><span>SCAN</span><select class="match" data-correct="一个方向移动到头再反向"><option value="">选择</option><option value="按请求到达顺序服务">按请求到达顺序服务</option><option value="选距当前磁头最近的请求">选距当前磁头最近的请求</option><option value="一个方向移动到头再反向">一个方向移动到头再反向</option><option value="总从0号向里扫描到最大后返回">总从0号向里扫描到最大后返回</option></select></label><label><span>CSCAN</span><select class="match" data-correct="总从0号向里扫描到最大后返回"><option value="">选择</option><option value="按请求到达顺序服务">按请求到达顺序服务</option><option value="选距当前磁头最近的请求">选距当前磁头最近的请求</option><option value="一个方向移动到头再反向">一个方向移动到头再反向</option><option value="总从0号向里扫描到最大后返回">总从0号向里扫描到最大后返回</option></select></label></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+  <div class="bg-item">
+    <div class="label">背景补充 ① · 磁盘物理结构（唤醒）</div>
+    磁盘有多个<strong>盘面</strong>，每面有同心圆<strong>磁道</strong>，磁道上一段弧是<strong>扇区</strong>。所有盘面上<strong>同一半径</strong>的磁道组成一个<strong>柱面</strong>。<br>
+    <em>一句话记忆：</em>柱面是"一圈盘子在同一半径上的所有磁道叠成的圆柱"。<br>
+    <strong>物理地址三元组</strong>：磁头号（盘面号）+ 磁道号（柱面号）+ 扇区号。
+  </div>
 
-<section id="m5" class="module"><div class="module-kicker">模块 5</div><h2>核心判断与依据</h2><p>本章有几条必须稳定的核心判断。</p><ul><li>文件是具有符号名的信息项的集合 —— 这是文件的基本定义。</li><li>FCB（文件控制块）是 OS 管理文件的数据结构，FCB 的存在即文件存在的标志。</li><li>索引节点（I节点）的优点是便于共享、加快检索。</li><li>一次访盘时间 = 寻道时间 + 旋转延迟时间 + 存取时间，调度算法主要减少寻道时间。</li><li>SSTF 可能产生饥饿，SCAN 和 CSCAN 不会。</li><li>记录优化分布的核心思路：前一个记录处理完，下一个记录正好转到磁头下。</li></ul><div class="quote">原文依据：调度目标——减少寻道 + 延迟。FCFS 简单公平但可能最内到最外反复移动；SSTF 改善平均时间但可能饥饿；SCAN 到头再反向；CSCAN 返回时不服务。</div>
-<div class="task" data-task="ch4-m5" data-answer="B" data-ok="正确！SSTF 选择离当前磁头最近的请求，如果新请求持续到来且都比远处请求近，远处请求会一直得不到服务，产生饥饿。" data-no="FCFS 按顺序服务不会饥饿；SCAN 和 CSCAN 会扫过所有柱面也不会饥饿。" data-src="原文：SSTF 最短寻道时间优先，改善平均时间，但可能饥饿。" data-review="回到模块 5 看调度算法特性"><div class="q">下列哪种调度算法可能产生"饥饿"现象？</div><div class="opts"><button class="opt" data-val="A">A. FCFS</button><button class="opt" data-val="B">B. SSTF</button><button class="opt" data-val="C">C. SCAN</button><button class="opt" data-val="D">D. CSCAN</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+  <div class="bg-item">
+    <div class="label">背景补充 ② · 一次访盘时间（唤醒）</div>
+    <div class="formula">一次访盘时间 = 寻道时间 + 旋转延迟时间 + 存取时间</div>
+    <strong>寻道</strong>=磁头移动到目标柱面（最慢，调度算法主要优化它）；<strong>旋转延迟</strong>=盘片转到目标扇区；<strong>存取</strong>=读写数据。
+  </div>
 
-<section id="m6" class="module"><div class="module-kicker">模块 6</div><h2>关键概念拆解</h2><div class="grid"><div class="card"><h3>FCB 文件控制块</h3><p>OS 管理文件的数据结构，包含文件名、物理位置、属性等。FCB 的存在 = 文件存在的标志。文件目录就是 FCB 的有序集合。</p></div><div class="card"><h3>索引节点（I节点）</h3><p>把文件描述信息从目录项中分离出来。优点：便于文件共享、加快目录检索速度。目录项 = 文件名 + I节点号。</p></div><div class="card"><h3>柱面</h3><p>所有盘面上相同磁道号（即相同半径）的磁道组成的集合。磁头移动以柱面为单位计算寻道距离。</p></div><div class="card"><h3>位示图</h3><p>用每一位（bit）对应一个磁盘块，0 表示空闲，1 表示已分配。用于磁盘空间的分配和回收。关键操作：字号、位号与物理块号的换算。</p></div><div class="card"><h3>记录优化分布</h3><p>通过合理安排记录在扇区中的物理位置，使得处理完一个记录后，下一个记录刚好转到磁头下方，消除额外的旋转等待时间。</p></div><div class="card"><h3>二级目录结构</h3><p>主文件目录（MFD）+ 用户文件目录（UFD），解决了单级目录中的文件重名问题。</p></div></div>
-<div class="task" data-task="ch4-m6" data-answer="C" data-ok="正确！目录项 = 文件名 + I节点号。I节点存储文件的属性和物理位置等描述信息。" data-no="目录项不是 FCB 的全部内容，它只存文件名和指向I节点的指针（I节点号）。" data-src="原文：目录项=文件名+I节点号。I节点优点：便于共享、加快检索。" data-review="回到模块 6 看 I节点概念"><div class="q">引入索引节点后，文件目录项中存储的内容是什么？</div><div class="opts"><button class="opt" data-val="A">A. 文件名 + 文件全部属性</button><button class="opt" data-val="B">B. 文件名 + 物理块号列表</button><button class="opt" data-val="C">C. 文件名 + I节点号</button><button class="opt" data-val="D">D. 文件名 + 用户名</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+  <div class="bg-item">
+    <div class="label">背景补充 ③ · FCB 与 I节点（唤醒）</div>
+    <strong>FCB</strong>（文件控制块）= OS 管理文件的数据结构，<strong>FCB 存在 = 文件存在</strong>。<strong>I节点</strong>=把 FCB 里的描述信息单独抽出来，目录项只留"文件名 + I节点号"，优点是便于共享、加快检索。
+  </div>
 
-<section id="m7" class="module"><div class="module-kicker">模块 7</div><h2>苏格拉底式阅读关卡</h2><p>用四个追问检查自己是否真正理解了磁盘调度和记录优化分布。</p><ul><li>SCAN 和 CSCAN 的关键区别是什么？如果删掉"返回时不服务"这个条件，CSCAN 还成立吗？</li><li>SSTF 选择了最近的请求，为什么反而可能产生饥饿？你能构造一个饥饿场景吗？</li><li>记录优化分布中，为什么相邻记录不放在相邻扇区？处理时间对间隔有什么影响？</li><li>位示图中"行列从 1 编号"和"从 0 编号"对换算结果有什么影响？</li></ul><div class="task" data-task="ch4-m7" data-answer="C" data-ok="正确！SCAN 到头后反方向继续服务，CSCAN 到头后快速返回起点且返回时不服务。" data-no="SCAN 和 CSCAN 的关键差异在于到达最大柱面后的处理方式。" data-src="原文：SCAN到头再反向；CSCAN总从0号向里扫描，到最大后快速返回0号（返回时不服务）。" data-review="回到模块 7 看追问"><div class="q">SCAN 和 CSCAN 的关键区别是什么？</div><div class="opts"><button class="opt" data-val="A">A. SCAN 按顺序服务，CSCAN 选最近的</button><button class="opt" data-val="B">B. SCAN 有两个方向，CSCAN 只有一个磁头</button><button class="opt" data-val="C">C. SCAN 到头后反向服务，CSCAN 到头后返回起点且返回时不服务</button><button class="opt" data-val="D">D. SCAN 用于磁盘，CSCAN 用于磁带</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+  <div class="bg-item">
+    <div class="label">背景补充 ④ · 位示图（唤醒）</div>
+    <strong>位示图</strong>=用一位二进制（0/1）表示一个磁盘块的空闲/已分配状态。整个磁盘的状态压缩成一串 01。关键操作是<strong>字号位号与块号的换算</strong>。
+  </div>
 
-<section id="m8" class="module"><div class="module-kicker">模块 8</div><h2>闯关式任务包装：磁盘调度算法实战</h2><p>把四种调度算法压成一轮计算练习。典型题型：给定磁头起始位置和请求序列，求各算法的服务顺序和总移动距离。</p><div class="quote">典型例题：磁头在 53 号柱面，请求序列 98,183,37,122,14,124,65,67。用 FCFS/SSTF/SCAN 分别求服务序列和总移动距离。这种题必须动手算，不能只看。</div><div class="quote">记录优化分布典型题：盘转一周 20ms，10 扇区 10 记录 A~J，读一个记录 2ms + 处理 4ms。顺序存放总时间 = 204ms；优化分布后总时间 = 60ms。优化间隔 = (2+4)/2 = 3 个扇区。</div>
-<div class="task" data-task="ch4-m8a" data-answer="B" data-ok="正确！顺序存放时，读 A(2ms)+处理A(4ms)=6ms，此时 B 刚转过磁头，需要再等 14ms（盘转完剩余 7 个扇区×2ms）才能读到 B。所以每个记录实际花费 6+14=20ms，最后一个记录不用等，总计 9×20+6=186ms。但你可能看到的不同题参数会变，核心是理解'等下一圈'的现象。" data-no="想想：处理完 A 后（6ms），磁头已经在 B 的下一个位置了，B 要等一整圈才能回到磁头下。" data-src="原文：盘转一周20ms，10扇区，读一个记录2ms，处理4ms。" data-review="回到模块 8 看记录优化分布计算"><div class="q">盘转一周 20ms，10 扇区，每记录读 2ms + 处理 4ms。如果记录按 A,B,C…顺序存放在相邻扇区，处理完 A 后读 B 需要等多久？</div><div class="opts"><button class="opt" data-val="A">A. 2ms（直接读下一个扇区）</button><button class="opt" data-val="B">B. 约18ms（B 已转过磁头，要等下一圈）</button><button class="opt" data-val="C">C. 0ms（B 就在 A 后面）</button><button class="opt" data-val="D">D. 4ms（等于处理时间）</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div>
-<div class="task" data-task="ch4-m8b" data-answer="C" data-ok="正确！优化间隔 = (读取时间 + 处理时间) / 每扇区时间 = (2+4)/2 = 3 个扇区。这样处理完一个记录时，下一个记录正好转到磁头下。" data-no="核心公式：间隔扇区数 = (读时间 + 处理时间) / 每扇区旋转时间。" data-src="原文：典型参数下优化间隔 = (2+4)/2 = 3 个扇区。" data-review="回到模块 8 看优化分布公式"><div class="q">同上题参数（20ms/圈，10扇区，读2ms+处理4ms），优化分布时相邻记录之间应间隔几个扇区？</div><div class="opts"><button class="opt" data-val="A">A. 1 个扇区</button><button class="opt" data-val="B">B. 2 个扇区</button><button class="opt" data-val="C">C. 3 个扇区</button><button class="opt" data-val="D">D. 5 个扇区</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+  <div class="bg-item">
+    <div class="label">背景补充 ⑤ · 记录优化分布（唤醒）</div>
+    磁盘转着圈，处理一个记录需要时间。如果记录紧挨着放，处理完上一个，下一个已经转过去了，得等一整圈。优化分布 = <strong>精确算出间隔，让下一个记录正好转到磁头下</strong>。
+  </div>
 
-<section id="m9" class="module"><div class="module-kicker">模块 9</div><h2>误解与边界</h2><ul><li><strong>误解：SCAN 不需要判断初始移动方向。</strong>实际上 SCAN 题目必须看清磁头当前正在向哪个方向移动（向内/向外），方向不同，服务顺序完全不同。</li><li><strong>误解：SSTF 一定是最优的。</strong>SSTF 只保证局部最优（选最近的），但不保证全局最优，而且可能产生饥饿。</li><li><strong>误解：CSCAN 返回时也服务请求。</strong>CSCAN 从最大柱面返回 0 号时是"快速返回"，不服务任何请求。</li><li><strong>误解：记录优化分布就是把记录散开放。</strong>不是随机散开，而是精确计算间隔，使得处理完前一个记录后下一个正好转到磁头下。</li><li><strong>误解：位示图行列编号不影响计算。</strong>从 1 编号和从 0 编号的换算公式不同，考试必须看清题目条件。</li></ul><div class="task" data-task="ch4-m9a" data-answer="A,C,D" data-ok="全对！A 缺少方向判断、C 把 CSCAN 当 SCAN、D 忽略编号起始值，这些都是常见丢分点。" data-no="至少有3个是正确的，再想想SCAN方向、CSCAN返回特性、位示图编号。" data-src="原文：SCAN注意判断初始移动方向；CSCAN返回时不服务；位示图行列从1编号。" data-review="回到模块 9 看所有易错点"><div class="q">下列哪些是本章常见的计算丢分点？（多选）</div><div class="opts"><button class="opt" data-val="A">A. SCAN 没有判断磁头初始移动方向</button><button class="opt" data-val="B">B. FCFS 按到达顺序服务</button><button class="opt" data-val="C">C. CSCAN 返回时误认为还在服务请求</button><button class="opt" data-val="D">D. 位示图换算时没注意行列从 1 还是 0 编号</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+  <div class="task" data-task="ch4-m2" data-answer="C" data-ok="对。一次访盘时间 = 寻道 + 旋转延迟 + 存取。调度算法主要减少寻道时间。" data-no="记住三段式：寻道 + 旋转延迟 + 存取。" data-src="原文：一次访盘时间 = 寻道时间 + 旋转延迟时间 + 存取时间。" data-review="回到模块 2 看访盘时间">
+    <div class="q">一次访盘时间由哪三部分组成？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. CPU时间 + 内存时间 + I/O时间</button>
+      <button class="opt" data-val="B">B. 排队时间 + 服务时间 + 传输时间</button>
+      <button class="opt" data-val="C">C. 寻道时间 + 旋转延迟时间 + 存取时间</button>
+      <button class="opt" data-val="D">D. 分配时间 + 回收时间 + 碎片时间</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
 
-<section id="m10" class="module"><div class="module-kicker">模块 10</div><h2>背景知识缺口</h2><p>要完全掌握本章大题，还需要以下背景。</p><ul><li><strong>磁盘物理结构细节</strong>：盘面、磁道、柱面、扇区的层级关系，以及物理地址的三元组表示法（磁头号+磁道号+扇区号）。</li><li><strong>旋转延迟的直觉</strong>：磁盘转速决定了转一圈的时间，扇区数决定了每扇区的时间。这些参数直接决定优化分布的间隔计算。</li><li><strong>位示图的二进制运算</strong>：字号 = 块号 / 字长（整除），位号 = 块号 % 字长。注意编号从 0 还是从 1 开始。</li><li><strong>文件物理结构的联系</strong>：连续分配、链接分配、索引分配——了解它们与磁盘调度之间的隐含关系。</li></ul><div class="task" data-task="ch4-m10" data-answer="B" data-ok="正确！位示图中，字号 = 块号 / 字长（整除），位号 = 块号 % 字长（取余）。注意编号起始值。" data-no="字号用整除，位号用取余。" data-src="原文：位示图管理磁盘空间，行列从1编号，0空闲1已分配。" data-review="回到模块 10 看位示图换算"><div class="q">位示图中，已知块号，如何求字号和位号？</div><div class="opts"><button class="opt" data-val="A">A. 字号 = 块号 % 字长，位号 = 块号 / 字长</button><button class="opt" data-val="B">B. 字号 = 块号 / 字长（整除），位号 = 块号 % 字长（取余）</button><button class="opt" data-val="C">C. 字号 = 块号 × 字长，位号 = 块号 - 字长</button><button class="opt" data-val="D">D. 字号 = 块号 + 字长，位号 = 字长 - 块号</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+<section id="s3">
+  <h2><span class="sec-id">03</span>原文问题定位</h2>
+  <div class="card">
+    <span class="src-tag">表面问题</span>
+    文件系统如何组织、存储和管理数据，以及磁盘调度算法如何减少访盘时间。
+  </div>
+  <div class="card key">
+    <span class="src-tag">深层问题</span>
+    <strong>磁盘慢，怎么让访问更快？</strong>两个子问题：<br>
+    ① <strong>磁头怎么动最省时间？</strong>（调度算法：FCFS/SSTF/SCAN/CSCAN）<br>
+    ② <strong>记录怎么放才能减少等待？</strong>（旋转调度/优化分布）
+  </div>
+  <div class="src-quote"><span class="badge fact">事实</span>原文：「磁盘调度的目标：减少寻道时间，减少延迟时间」</div>
+</section>
 
-<section id="m11" class="module"><div class="module-kicker">模块 11</div><h2>复盘与学习报告</h2><p>本章复盘只问三件事：能否用四种算法分别算出服务顺序和总移动距离；能否算出记录优化分布的间隔和总时间；能否做位示图的字号位号换算。</p><div class="chips"><span>四种调度算法计算</span><span>记录优化分布</span><span>位示图换算</span><span>目录结构辨析</span></div><div class="task" data-task="ch4-m11" data-answer="C" data-ok="正确！顺序存放总时间 204ms，优化分布后总时间仅 60ms。差距来自消除了等待磁头旋转的空闲时间。" data-no="顺序存放时每处理完一个记录要等将近一整圈才能读下一个，总时间远大于优化分布。" data-src="原文：题5，顺序处理总时间204ms，优化分布总时间60ms。" data-review="回到模块 11 做最终复盘"><div class="q">盘转一周 20ms，10 扇区 10 记录，读 2ms + 处理 4ms。顺序存放处理完所有记录的总时间约为多少？</div><div class="opts"><button class="opt" data-val="A">A. 60ms</button><button class="opt" data-val="B">B. 120ms</button><button class="opt" data-val="C">C. 204ms</button><button class="opt" data-val="D">D. 300ms</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
+<section id="s4">
+  <h2><span class="sec-id">04</span>原文结构地图</h2>
+  <p><span class="badge judge">结构判断</span>本章分三块，但<strong>大题只考第三块</strong>（磁盘组织与管理）。前两块是选择题背景。</p>
+  <div class="struct-map">文件管理
+├── 一、文件系统基础（选择题）
+│   ├── 文件定义、UNIX 分类（普通/目录/特别）
+│   ├── 逻辑结构（顺序/索引/索引顺序）
+│   ├── FCB 与目录结构（一级/二级/树形）
+│   └── 文件共享与保护（rwx）
+├── 二、文件系统实现（选择题）
+│   ├── 层次结构
+│   ├── 目录实现（线性列表/哈希表）
+│   └── 文件实现考虑
+└── 三、磁盘组织与管理 ★大题
+    ├── 磁盘结构（磁道/柱面/扇区）
+    ├── 四种调度算法（FCFS/SSTF/SCAN/CSCAN）
+    ├── 旋转调度与记录优化分布
+    └── 位示图管理磁盘空间</div>
+  <div class="task" data-task="ch4-m4" data-answer="C" data-ok="对。大题全部落在磁盘组织与管理，前两块是选择题背景。" data-no="文件系统基础和实现主要出选择题，不出大题。" data-src="原文：磁盘组织与管理是⭐大题考点。" data-review="回到模块 4 看三块结构">
+    <div class="q">本章大题考点集中在原文的哪一块？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 文件系统基础（定义、分类、目录）</button>
+      <button class="opt" data-val="B">B. 文件系统实现（层次结构、目录实现）</button>
+      <button class="opt" data-val="C">C. 磁盘组织与管理（调度算法、优化分布、位示图）</button>
+      <button class="opt" data-val="D">D. 文件保护与共享</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
 
-<section class="module" id="reportZone"><div class="module-kicker">学习报告</div><h2>错题回流与复盘</h2><p>做完题后生成报告，把错题带回对应模块复看。</p><div id="wrongBox" class="wrong-list"></div><button id="genReport">生成学习报告</button> <button id="copyReport">复制报告</button><pre id="report" class="report-box"></pre></section>
+<section id="s5">
+  <h2><span class="sec-id">05</span>核心判断与依据</h2>
 
-<footer class="footer">由 <a href="https://github.com/&lt;your-username&gt;/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · github.com/&lt;your-username&gt;/grokko<br>这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。</footer></main></div>
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 1：调度算法主要优化寻道时间</div>
+    寻道时间（磁头移动）远大于旋转延迟和存取时间，所以四种调度算法的核心都是<strong>减少磁头移动距离</strong>。<br>
+    <strong>原文依据：</strong>「磁盘调度的目标：减少寻道时间，减少延迟时间」
+  </div>
+
+  <div class="concept">
+    <span class="badge judge">判断</span>
+    <div class="term">判断 2：SSTF 可能饥饿，SCAN/CSCAN 不会</div>
+    SSTF 选最近的请求，如果持续有更近的新请求到来，远处请求会一直得不到服务。<strong>SCAN（电梯）和 CSCAN 会扫过所有柱面，不会饥饿</strong>。<br>
+    <strong>原文依据：</strong>「SSTF 改善平均时间，但造成某些访问请求长期等待得不到服务」「SCAN 到头再反向」
+  </div>
+
+  <div class="concept">
+    <span class="badge judge">判断</span>
+    <div class="term">判断 3：记录优化分布的间隔由"读时间+处理时间"决定</div>
+    要让处理完上一个记录时下一个正好转到磁头下，间隔扇区数 = (读时间 + 处理时间) ÷ 每扇区旋转时间。<br>
+    <strong>原文依据：</strong>「优化要求前一个记录处理完，下一个记录正在磁头下」
+  </div>
+
+  <div class="task" data-task="ch4-m5" data-answer="B" data-ok="对。SSTF 选最近的，远处请求可能一直得不到服务。" data-no="FCFS 按顺序不会饥饿；SCAN/CSCAN 扫过所有柱面也不会。" data-src="原文：SSTF 可能造成某些访问请求长期等待。" data-review="回到模块 5 看 SSTF 饥饿">
+    <div class="q">哪种调度算法可能产生"饥饿"？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. FCFS</button>
+      <button class="opt" data-val="B">B. SSTF</button>
+      <button class="opt" data-val="C">C. SCAN</button>
+      <button class="opt" data-val="D">D. CSCAN</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="sec-id">06</span>关键概念拆解</h2>
+
+  <div class="concept">
+    <div class="term">四种磁盘调度算法对比</div>
+    <table class="info-table">
+      <tr><th>算法</th><th>核心规则</th><th>优缺点</th></tr>
+      <tr><td>FCFS</td><td>按请求到达顺序服务</td><td>简单公平，但可能最内到最外反复移动</td></tr>
+      <tr><td>SSTF</td><td>选距当前磁头最近的请求</td><td>改善平均时间，但<strong>可能饥饿</strong></td></tr>
+      <tr><td>SCAN（电梯）</td><td>一个方向移到头，再反向</td><td>不会饥饿，需判断<strong>初始方向</strong></td></tr>
+      <tr><td>CSCAN（单向）</td><td>总从 0 向里扫到最大，快速返回 0</td><td><strong>返回时不服务</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="concept">
+    <div class="term">柱面（Cylinder）</div>
+    所有盘面上<strong>相同磁道号</strong>（相同半径）的磁道组成的集合。磁头移动以柱面为单位计算寻道距离。<br>
+    <strong>不要误解成：</strong>柱面不是单个磁道，是"一圈盘面在同一半径上叠成的圆柱"。
+  </div>
+
+  <div class="concept">
+    <div class="term">位示图换算公式</div>
+    <strong>关键</strong>：看清题里"行列从 0 还是 1 编号"。<br>
+    若从 0 编号、字长 W：<br>
+    • 字号 = 块号 ÷ W（整除）<br>
+    • 位号 = 块号 mod W（取余）<br>
+    若从 1 编号，需要 +1 或 −1 调整。<br>
+    <strong>原文依据：</strong>位示图管理磁盘空间，每块 1 位。
+  </div>
+
+  <div class="task" data-task="ch4-m6" data-answer="C" data-ok="对。引入 I 节点后，目录项 = 文件名 + I节点号，描述信息放 I 节点里。" data-no="目录项不是 FCB 全部内容，只存文件名和指向 I 节点的指针。" data-src="原文：目录项 = 文件名 + I节点号。I节点优点：便于共享、加快检索。" data-review="回到模块 6 看 I 节点">
+    <div class="q">引入索引节点后，文件目录项存储的内容是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 文件名 + 文件全部属性</button>
+      <button class="opt" data-val="B">B. 文件名 + 物理块号列表</button>
+      <button class="opt" data-val="C">C. 文件名 + I节点号</button>
+      <button class="opt" data-val="D">D. 文件名 + 用户名</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="sec-id">07</span>苏格拉底式阅读关卡</h2>
+  <p>下面几道题逼你想清楚算法差异和计算步骤。</p>
+
+  <div class="task" data-task="ch4-m7a" data-answer="C" data-ok="对。SCAN 到头后反向继续服务；CSCAN 到头后快速返回起点，返回时不服务。" data-no="关键差异在于到达最大柱面后的处理方式。" data-src="原文：SCAN 到头再反向；CSCAN 返回时不服务。" data-review="回到模块 8 看磁盘调度演示">
+    <div class="q">SCAN 和 CSCAN 的关键区别是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. SCAN 按顺序，CSCAN 选最近的</button>
+      <button class="opt" data-val="B">B. SCAN 有两个方向，CSCAN 只有一个磁头</button>
+      <button class="opt" data-val="C">C. SCAN 到头反向服务，CSCAN 到头返回起点且返回时不服务</button>
+      <button class="opt" data-val="D">D. SCAN 用于磁盘，CSCAN 用于磁带</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch4-m7b" data-answer="A" data-ok="对。SCAN 题必须看清磁头当前向哪个方向移动，方向不同服务顺序完全不同。" data-no="SCAN 的方向判断是最常见的丢分点。" data-src="原文：SCAN 当设备无请求时磁头不动；有请求时按一个方向移动。" data-review="回到模块 9 看 SCAN 方向误解">
+    <div class="q">做 SCAN 算法题时，最容易丢分的点是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 没判断磁头初始移动方向</button>
+      <button class="opt" data-val="B">B. 把 FCFS 当 SCAN</button>
+      <button class="opt" data-val="C">C. 忘记除以扇区数</button>
+      <button class="opt" data-val="D">D. 多算了一个请求</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s8">
+  <h2><span class="sec-id">08</span>手把手计算演示</h2>
+  <p style="background:var(--marker);padding:10px 14px;border-radius:8px;border:2px solid var(--forest)">本章<strong>两大计算题型</strong>，每道从读题到答案<strong>每一步都写出来</strong>。</p>
+
+  <!-- 演示 1：磁盘调度 -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 1 · 磁盘调度四算法（FCFS / SSTF / SCAN）</div>
+    <p>大题标准题型：给定磁头位置和请求序列，分别算各算法的服务顺序和总移动距离。</p>
+    <div class="wt-given">已知：磁盘有 200 个柱面（0~199），磁头当前在 <strong>53 号</strong>柱面，<strong>向柱面号减小方向</strong>移动。<br>
+请求序列（按到达顺序）：98, 183, 37, 122, 14, 124, 65, 67。<br>
+求：FCFS、SSTF、SCAN 三种算法的服务顺序和总移动距离。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · FCFS（按到达顺序服务）</div>
+      服务顺序就是请求顺序：53 → 98 → 183 → 37 → 122 → 14 → 124 → 65 → 67<br>
+      移动距离逐段算：<br>
+      |98−53|=45，|183−98|=85，|37−183|=146，|122−37|=85，|14−122|=108，|124−14|=110，|65−124|=59，|67−65|=2<br>
+      <strong>总移动 = 45+85+146+85+108+110+59+2 = 640 个柱面</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · SSTF（每次选最近的）</div>
+      从 53 出发，找最近的请求：<br>
+      • 53 → <strong>65</strong>（|65−53|=12，最近）<br>
+      • 65 → <strong>67</strong>（|67−65|=2）<br>
+      • 67 → <strong>37</strong>（|37−67|=30，比 98 近）<br>
+      • 37 → <strong>14</strong>（|14−37|=23）<br>
+      • 14 → <strong>98</strong>（|98−14|=84，比 122 近）<br>
+      • 98 → <strong>122</strong>（|122−98|=24）<br>
+      • 122 → <strong>124</strong>（|124−122|=2）<br>
+      • 124 → <strong>183</strong>（|183−124|=59）<br>
+      服务顺序：53→65→67→37→14→98→122→124→183<br>
+      <strong>总移动 = 12+2+30+23+84+24+2+59 = 236 个柱面</strong>（比 FCFS 少很多）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · SCAN（电梯算法，向减小方向先走到底）</div>
+      磁头当前向<strong>减小方向</strong>移动，所以先把比 53 小的请求按从大到小服务，到底（0）后反向服务比 53 大的：<br>
+      • 向小走：53 → <strong>37</strong> → <strong>14</strong>（到底，反向）<br>
+      • 反向向大走：14 → <strong>65</strong> → <strong>67</strong> → <strong>98</strong> → <strong>122</strong> → <strong>124</strong> → <strong>183</strong><br>
+      服务顺序：53→37→14→65→67→98→122→124→183<br>
+      移动：到 14 走了 53−14=39，再到 183 走了 183−14=169<br>
+      <strong>总移动 = 39 + 169 = 208 个柱面</strong>
+    </div>
+
+    <div class="wt-final">✓ 答：FCFS=640，SSTF=236，SCAN=208（柱面）。<br>口诀：FCFS 按序、SSTF 选近、SCAN 看方向走到底再反向。</div>
+  </div>
+
+  <div class="task" data-task="ch4-m8a" data-answer="B" data-ok="对。SSTF 每次选距当前磁头最近的请求，所以从 53 先去 65（距离 12）。" data-no="FCFS 按到达顺序先去 98；SCAN 看方向先去 37。" data-src="原文：SSTF 优先选择距当前磁头最近的访问请求。" data-review="回到模块 8 演示 1 的第 2 步">
+    <div class="q">演示 1 中，SSTF 算法从磁头位置 53 出发，第一个服务的是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 98（最先到达）</button>
+      <button class="opt" data-val="B">B. 65（距离 53 最近）</button>
+      <button class="opt" data-val="C">C. 14（柱面号最小）</button>
+      <button class="opt" data-val="D">D. 183（柱面号最大）</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <!-- 演示 2：记录优化分布 -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 2 · 记录优化分布（旋转调度）</div>
+    <p>另一类大题：算顺序存放的总时间 vs 优化分布后的总时间。</p>
+    <div class="wt-given">已知：盘转一周 20ms，一个磁道分 10 个扇区，存放 10 个记录 A~J。<br>
+读一个记录 2ms，处理一个记录 4ms。记录<strong>按 A,B,C…顺序存放在相邻扇区</strong>。<br>
+求：(1) 顺序处理完所有记录的总时间；(2) 优化分布方案和优化后总时间。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 算每扇区旋转时间</div>
+      盘转一周 20ms，10 个扇区 → <strong>每转过一个扇区 = 20 ÷ 10 = 2ms</strong>（正好等于读一个记录的时间）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 分析顺序存放的悲剧</div>
+      • 读 A：2ms（磁头在 A 上）<br>
+      • 处理 A：4ms。<strong>此时磁头已经转过了 4÷2=2 个扇区</strong>（B、C 都过去了！）<br>
+      • 要读 B，B 已转走，必须等盘转完一整圈（20ms）再回到 B。<br>
+      • 所以<strong>除最后一个记录外，每个记录花费 = 读2 + 处理4 + 等20 − (已转的) </strong>，实际每个约 6+14=20ms 等待下一圈<br>
+      • 具体计算：第 1~9 个记录每个花费约 22ms（含等下一圈），第 10 个只需 6ms（不用等）<br>
+      <strong>总时间 ≈ 204ms</strong>（9×22 + 6 = 204，或按 6+9×22 等不同教材算法，约 200ms 量级）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 算优化间隔</div>
+      要让处理完上一个记录时下一个正好转到磁头下：<br>
+      <div class="formula">优化间隔扇区数 = (读时间 + 处理时间) ÷ 每扇区时间 = (2 + 4) ÷ 2 = <strong>3 个扇区</strong></div>
+      意思是：A 放第 1 扇区，下一个记录 <strong>隔 3 个扇区</strong>放（第 4 扇区），再下一个放第 7 扇区……
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 写出优化分布方案并算总时间</div>
+      优化分布：扇区 1=A, 4=B, 7=C, 10=D, 3=E, 6=F, 9=G, 2=H, 5=I, 8=J（每隔 3 个扇区放一个）。<br>
+      优化后：处理完 A（6ms），B 正好转到磁头下，不用等！<br>
+      每个记录花费 = 读 2 + 处理 4 = <strong>6ms</strong>，无等待。<br>
+      <strong>总时间 = 10 × 6 = 60ms</strong>
+    </div>
+
+    <div class="wt-final">✓ 答：顺序存放约 204ms；优化分布（每隔 3 扇区放一个）后仅 60ms。<br>口诀：间隔 = (读+处理) ÷ 每扇区时间；优化后每个记录 6ms 无等待。</div>
+  </div>
+
+  <div class="task" data-task="ch4-m8b" data-answer="C" data-ok="对。优化间隔 = (读2+处理4) ÷ 每扇区2 = 3 个扇区，让下一个记录正好转到磁头下。" data-no="间隔 1 会来不及处理；间隔 2 仍会错过；间隔 5 浪费空间。" data-src="原文：优化要求前一个记录处理完，下一个记录正在磁头下。" data-review="回到模块 8 演示 2 的第 3 步">
+    <div class="q">演示 2 参数下（20ms/圈，10扇区，读2ms+处理4ms），优化分布相邻记录间隔几个扇区？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 1 个扇区</button>
+      <button class="opt" data-val="B">B. 2 个扇区</button>
+      <button class="opt" data-val="C">C. 3 个扇区</button>
+      <button class="opt" data-val="D">D. 5 个扇区</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s9">
+  <h2><span class="sec-id">09</span>误解与边界</h2>
+
+  <div class="miscon">
+    <strong>误解 1：SCAN 不需要判断初始方向</strong><br>
+    <span class="badge judge">大题扣分点</span>SCAN 题必须看清磁头当前向哪个方向移动（向内/向外），方向不同服务顺序完全不同。<br>
+    <strong>原文：</strong>「磁头按一个方向移动，过程中对遇到的请求服务」——方向是前提。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 2：CSCAN 返回时也服务请求</strong><br>
+    <span class="badge fact">事实错</span>CSCAN 从最大柱面返回 0 号是"快速返回"，<strong>不服务任何请求</strong>。返回后才重新从 0 向里扫描。<br>
+    <strong>原文：</strong>「返回时不为任何的等待访问者服务」。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 3：SSTF 一定最优</strong><br>
+    <span class="badge infer">推论错</span>SSTF 只保证<strong>局部</strong>最优（每次选最近的），不保证<strong>全局</strong>最优，而且可能饥饿。<br>
+    <strong>原文：</strong>「SSTF 改善平均时间，但造成某些访问请求长期等待」。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 4：记录优化分布就是随机散开</strong><br>
+    <span class="badge fact">事实错</span>不是随机散开，是<strong>精确计算间隔</strong>，让处理完上一个时下一个正好到磁头下。间隔 = (读+处理)÷每扇区时间。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 5：位示图行列编号不影响计算</strong><br>
+    <span class="badge fact">事实错</span>从 1 编号和从 0 编号的换算公式不同，<strong>必须看清题目条件</strong>再套公式。
+  </div>
+
+  <div class="task" data-task="ch4-m9" data-answer="C" data-ok="对。CSCAN 返回起点时是快速返回，不服务任何请求。" data-no="SCAN 到头后反向会继续服务；CSCAN 返回时不服务。" data-src="原文：CSCAN 返回时不为任何等待访问者服务。" data-review="回到模块 9 看 CSCAN 误解">
+    <div class="q">CSCAN 算法从最大柱面返回 0 号时，会服务沿途的请求吗？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 会，按从大到小顺序服务</button>
+      <button class="opt" data-val="B">B. 会，但只服务最近的</button>
+      <button class="opt" data-val="C">C. 不会，快速返回不服务</button>
+      <button class="opt" data-val="D">D. 会，但服务顺序随机</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s10">
+  <h2><span class="sec-id">10</span>背景知识缺口</h2>
+  <p>读完本章如果还卡，通常缺的是：</p>
+  <ul>
+    <li><strong>磁盘物理结构细节</strong>：盘面/磁道/柱面/扇区的层级关系。理解了柱面，寻道距离计算才不会蒙。</li>
+    <li><strong>旋转延迟的直觉</strong>：转速决定转一圈时间，扇区数决定每扇区时间——这是优化分布计算的基础。</li>
+    <li><strong>位运算基础</strong>：位示图的字号=整除、位号=取余，需要熟悉 div/mod。</li>
+    <li><strong>文件物理结构</strong>：连续/链接/索引分配——本章大题不考，但选择题可能涉及。</li>
+  </ul>
+  <div class="task" data-task="ch4-m10" data-answer="B" data-ok="对。字号=块号÷字长（整除），位号=块号 mod 字长（取余）。" data-no="字号用整除，位号用取余，别搞反。" data-src="原文：位示图管理磁盘空间，每块 1 位。" data-review="回到模块 6 看位示图换算">
+    <div class="q">位示图中，已知块号求字号和位号（从 0 编号，字长 W）？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 字号=块号 mod W，位号=块号÷W</button>
+      <button class="opt" data-val="B">B. 字号=块号÷W（整除），位号=块号 mod W（取余）</button>
+      <button class="opt" data-val="C">C. 字号=块号×W，位号=块号−W</button>
+      <button class="opt" data-val="D">D. 字号=块号+W，位号=W−块号</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s11">
+  <h2><span class="sec-id">11</span>复盘与学习报告</h2>
+  <p>本章复盘问自己三件事：</p>
+  <ul>
+    <li>能不能用 FCFS / SSTF / SCAN / CSCAN 四种算法分别算出服务顺序和总移动距离？</li>
+    <li>能不能算出记录优化分布的间隔扇区数和优化前后总时间？</li>
+    <li>能不能做位示图的字号位号换算？</li>
+  </ul>
+
+  <div class="wrong-section">
+    <h3>错题回流</h3>
+    <p>答错的题会自动收集到这里，按提示回到对应模块复习。</p>
+    <ul id="wrongBox"></ul>
+  </div>
+
+  <div class="report-section">
+    <h3>生成学习报告</h3>
+    <p>点击按钮，生成你的本章学习报告（可复制到笔记）。</p>
+    <textarea id="report" readonly></textarea>
+    <div class="report-btns">
+      <button id="genReport">生成学习报告</button>
+      <button id="copyReport">复制报告</button>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="footer">
+  由 <a href="https://github.com/remi-huang/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · 强化计算演示版<br>
+  <span class="tip">这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。</span>
+</footer>
+
 <script>
 (function(){
   "use strict";
@@ -88,10 +589,14 @@
   function genReport(){
     var box=document.getElementById('report');if(!box)return;
     var all=$all('.task'),done=$all('.task[data-answered="1"]'),right=$all('.task[data-answered="1"][data-correct="1"]');
-    var lines=['=== 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
+    var lines=['=== 第4章 文件管理 · 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
     var wrong=$all('.task[data-answered="1"][data-correct="0"]');
     if(wrong.length){lines.push('我答错的题（建议复习）：');wrong.forEach(function(t){lines.push('- '+(t.getAttribute('data-task')||'')+'：'+(t.getAttribute('data-review')||''));});}
     else{lines.push('暂无错题。');}
+    lines.push('','核心自测：');
+    lines.push('- [ ] 能用四种调度算法算服务顺序和总移动距离');
+    lines.push('- [ ] 能算记录优化分布的间隔和总时间');
+    lines.push('- [ ] 能做位示图字号位号换算');
     box.textContent=lines.join('\n');
   }
   document.addEventListener('click',function(e){

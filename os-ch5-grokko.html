@@ -2,782 +2,542 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>操作系统 第5章 I/O 设备管理 - 理解地图</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>操作系统 第5章 I/O 设备管理 — 理解地图</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cream:#FAF6EB;
-  --paper:#F3EDDD;
-  --forest:#1E3A24;
-  --sky:#BCD8EE;
-  --sage:#AFCDA8;
-  --ink:#1A2018;
-  --marker:#F5E08A;
-  --brick:#B5482A;
-  --correct:#2F7D46;
-  --wrong:#B5482A;
+  --cream:#FAF6EB; --paper:#F3EDDD; --forest:#1E3A24; --sky:#BCD8EE;
+  --sage:#AFCDA8; --ink:#1A2018; --marker:#F5E08A; --brick:#B5482A;
+  --correct:#2F7D46; --wrong:#B5482A;
   --font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;
   --font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;
   --font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
   --font-mono:"Roboto Mono","JetBrains Mono",monospace;
-  --radius-pill:999px;
-  --radius-card:14px;
+  --radius-pill:999px; --radius-card:14px;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:var(--font-body);background:var(--cream);color:var(--ink);line-height:1.7;font-size:15px;}
-.layout{display:flex;min-height:100vh;}
-
-/* Sidebar */
-.sidebar{
-  width:280px;background:var(--forest);color:var(--cream);
-  position:fixed;top:0;left:0;height:100vh;overflow-y:auto;
-  padding:24px 20px;flex-shrink:0;
-}
-.sidebar h1{font-family:var(--font-display);font-size:18px;line-height:1.3;margin-bottom:6px;}
-.sidebar .subtitle{font-size:12px;opacity:0.65;margin-bottom:20px;}
-.progress-section{background:rgba(255,255,255,0.08);border-radius:var(--radius-card);padding:14px;margin-bottom:20px;}
-.progress-bar{height:8px;background:rgba(255,255,255,0.15);border-radius:var(--radius-pill);overflow:hidden;margin-top:8px;}
-.progress-fill{height:100%;background:var(--sage);width:0%;transition:width .3s ease;border-radius:var(--radius-pill);}
-.progress-text{font-family:var(--font-mono);font-size:13px;}
-.nav{list-style:none;}
-.nav li{margin-bottom:2px;}
-.nav a{display:block;padding:8px 12px;color:var(--cream);text-decoration:none;font-size:13px;border-radius:8px;transition:background .2s;}
-.nav a:hover{background:rgba(255,255,255,0.1);}
-.nav .num{font-family:var(--font-mono);opacity:0.5;margin-right:6px;}
-
-/* Main */
-.main{margin-left:280px;padding:40px 48px 80px;max-width:760px;width:100%;}
-.module{margin-bottom:48px;scroll-margin-top:20px;}
-.module-num{font-family:var(--font-mono);font-size:13px;color:var(--brick);margin-bottom:2px;}
-.module-title{font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--forest);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--sage);}
-
-/* Cards */
-.card{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage);}
-.card.hl{border-left-color:var(--marker);}
-.card.alert{border-left-color:var(--brick);}
-
-/* Labels */
-.label{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:var(--radius-pill);margin-right:6px;vertical-align:middle;}
-.label.fact{background:var(--sky);color:var(--forest);}
-.label.judge{background:var(--marker);color:var(--ink);}
-.label.infer{background:var(--sage);color:var(--forest);}
-.label.bg{background:#D4C5F0;color:#3D2B5E;}
-
-/* Source quote */
-.src-quote{background:var(--marker);padding:4px 10px;border-radius:4px;font-size:13px;margin-top:8px;display:inline-block;line-height:1.5;}
-.evidence{background:var(--marker);padding:3px 8px;border-radius:4px;font-size:13px;display:inline-block;line-height:1.5;margin-top:4px;}
-
-/* Goals */
-.goal{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;padding:12px 16px;background:var(--paper);border-radius:10px;}
-.goal-num{font-family:var(--font-mono);font-weight:700;color:var(--brick);flex-shrink:0;}
-
-/* Structure map */
-.map-node{padding:12px 18px;background:var(--paper);border-radius:10px;border-left:4px solid var(--sage);margin-bottom:4px;font-size:14px;}
-.map-node .tag{font-family:var(--font-mono);font-size:11px;color:var(--brick);margin-right:6px;}
-.map-arrow{text-align:center;color:var(--brick);font-size:16px;margin:2px 0;font-family:var(--font-mono);}
-.map-sub{padding:8px 18px 8px 36px;font-size:13px;color:#555;border-left:2px dashed var(--sage);margin-left:18px;margin-bottom:4px;}
-
-/* Concept */
-.concept{margin-bottom:16px;}
-.concept-term{font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--forest);}
-.concept-row{display:flex;gap:6px;margin:3px 0;font-size:14px;}
-.concept-row .key{font-weight:600;min-width:96px;color:var(--brick);flex-shrink:0;}
-
-/* Judgment */
-.judgment{margin-bottom:16px;}
-.judgment h4{font-size:15px;color:var(--forest);margin-bottom:4px;}
-
-/* Tasks */
-.task{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:16px;}
-.task .q{font-weight:600;margin-bottom:12px;font-size:15px;}
-.task .q .badge{font-family:var(--font-mono);font-size:11px;background:var(--forest);color:var(--cream);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;}
-.task .opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
-.opt{padding:10px 16px;border:2px solid #D5CCB8;background:var(--cream);border-radius:10px;cursor:pointer;font-size:14px;text-align:left;font-family:var(--font-body);transition:border-color .2s,background .2s;}
-.opt:hover{border-color:var(--sage);}
-.opt.selected{border-color:var(--forest);background:var(--sky);}
-.check{padding:8px 24px;background:var(--forest);color:var(--cream);border:none;border-radius:var(--radius-pill);cursor:pointer;font-size:14px;font-weight:600;font-family:var(--font-body);}
-.check:hover{background:#2A4A30;}
-.feedback{margin-top:12px;padding:12px 16px;border-radius:10px;font-size:14px;background:#EDE5D0;min-height:24px;}
-.feedback.ok{background:#D4EDDA;color:var(--correct);}
-.feedback.no{background:#F8D7DA;color:var(--wrong);}
-.feedback .src{display:block;margin-top:6px;font-size:13px;opacity:0.85;}
-
-/* Selects */
-select.match{padding:8px 14px;border:2px solid #D5CCB8;border-radius:8px;font-size:14px;background:var(--cream);margin-bottom:8px;font-family:var(--font-body);display:block;}
-.match-row{margin-bottom:6px;}
-.match-row .mlabel{font-size:14px;font-weight:600;display:block;margin-bottom:2px;}
-
-/* Wrong answers */
-.wrong-section{background:#FFF3CD;border-radius:var(--radius-card);padding:16px 20px;margin-bottom:16px;}
-.wrong-section h3{font-size:16px;margin-bottom:8px;}
-.wrong-section ul{list-style:none;padding-left:0;}
-.wrong-section li{font-size:13px;padding:4px 0;}
-
-/* Report */
-.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;}
-.report-btns{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-.report-btns button{padding:8px 20px;border:none;border-radius:var(--radius-pill);cursor:pointer;font-weight:600;font-size:14px;font-family:var(--font-body);}
-#genReport{background:var(--forest);color:var(--cream);}
-#copyReport{background:var(--sky);color:var(--forest);}
-#report{width:100%;min-height:180px;padding:14px;border:2px solid #D5CCB8;border-radius:10px;font-family:var(--font-mono);font-size:13px;background:var(--cream);resize:vertical;}
-
-/* Misc */
-.intro-tip{font-size:14px;color:#666;margin-bottom:6px;}
-.section-hint{font-size:13px;color:#888;margin-bottom:12px;}
-.list-item{padding:8px 0;font-size:14px;}
-.list-item strong{color:var(--forest);}
-.misconception{margin-bottom:14px;}
-
-/* Footer */
-.footer{margin-left:280px;padding:28px 48px;text-align:center;font-size:13px;color:#888;border-top:1px solid #D5CCB8;}
-.footer a{color:#1d70b8;text-decoration:underline;font-weight:600;}
-
-@media(max-width:768px){
-  .sidebar{position:relative;width:100%;height:auto;padding:16px;}
-  .main{margin-left:0;padding:20px;}
-  .footer{margin-left:0;padding:16px;}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.7;font-size:16px}
+.layout{display:flex;align-items:flex-start;max-width:1100px;margin:0 auto}
+.sidebar{position:sticky;top:0;height:100vh;width:270px;flex-shrink:0;background:var(--forest);color:var(--cream);padding:28px 20px;overflow-y:auto}
+.sidebar h1{font-family:var(--font-display);font-size:1.15rem;line-height:1.35;margin-bottom:6px;color:var(--marker)}
+.sidebar .sub{font-size:.78rem;color:var(--sage);margin-bottom:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-bar{background:rgba(255,255,255,.15);height:8px;border-radius:var(--radius-pill);overflow:hidden}
+.progress-fill{background:var(--marker);height:100%;width:0;transition:width .4s ease}
+.progress-num{font-family:var(--font-mono);font-size:.78rem;margin-top:6px;color:var(--sky)}
+.nav{list-style:none}
+.nav li{margin-bottom:2px}
+.nav a{display:block;padding:8px 10px;border-radius:8px;font-size:.85rem;color:var(--cream);text-decoration:none;transition:background .2s}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav .num{font-family:var(--font-mono);font-size:.72rem;color:var(--sky);margin-right:8px}
+.main{flex:1;min-width:0;padding:40px 44px;max-width:780px}
+.main section{margin-bottom:48px;scroll-margin-top:20px}
+.main h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--forest);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--sage)}
+.main h3{font-family:var(--font-head);font-size:1.05rem;color:var(--forest);margin:18px 0 10px}
+.main p{margin-bottom:12px}
+.card{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.card.warn{border-left-color:var(--brick)}
+.card.key{border-left-color:var(--marker)}
+.src-quote{background:var(--sky);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:.85rem;margin:10px 0;color:var(--ink);border-left:3px solid var(--forest)}
+.src-tag{display:inline-block;background:var(--forest);color:var(--marker);font-size:.7rem;padding:2px 8px;border-radius:var(--radius-pill);font-family:var(--font-mono);margin-bottom:6px}
+.objective{background:var(--paper);border-radius:var(--radius-card);padding:16px 20px;margin-bottom:10px;border-left:4px solid var(--forest)}
+.objective .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);font-weight:600;margin-bottom:4px}
+.bg-item{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--sky)}
+.bg-item .label{font-size:.72rem;color:var(--brick);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.concept{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.concept .term{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem}
+.concept .plain{color:var(--brick);font-style:italic;margin:6px 0}
+.miscon{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--wrong)}
+.task{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:16px}
+.task .q{font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opt{background:var(--cream);border:2px solid transparent;border-radius:8px;padding:10px 14px;cursor:pointer;font-family:var(--font-body);font-size:.92rem;text-align:left;transition:all .2s;color:var(--ink)}
+.opt:hover{border-color:var(--sky)}
+.opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
+.check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
+.check:hover{background:#2a5232}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
+.feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
+.feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
+select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-radius:8px;border:2px solid var(--sage);background:var(--cream);font-family:var(--font-body);font-size:.9rem}
+.wrong-section{background:#fce8e8;border-radius:var(--radius-card);padding:18px 22px;margin-top:20px;border-left:4px solid var(--wrong)}
+.wrong-section h3{color:var(--wrong)}
+#wrongBox{list-style:none;padding-left:0}
+#wrongBox li{padding:6px 0;font-size:.88rem;border-bottom:1px dashed rgba(181,72,42,.2)}
+.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-top:20px}
+.report-section textarea{width:100%;min-height:200px;border-radius:8px;border:2px solid var(--sage);padding:12px;font-family:var(--font-mono);font-size:.85rem;background:var(--cream);color:var(--ink);resize:vertical}
+.report-btns{display:flex;gap:10px;margin-top:10px}
+.report-btns button{background:var(--forest);color:var(--cream);border:none;padding:8px 18px;border-radius:var(--radius-pill);cursor:pointer;font-family:var(--font-head);font-size:.85rem}
+.struct-map{font-family:var(--font-mono);font-size:.85rem;line-height:2;background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;white-space:pre-wrap;color:var(--ink)}
+.formula{background:var(--forest);color:var(--marker);font-family:var(--font-mono);font-size:.95rem;padding:14px 18px;border-radius:8px;margin:10px 0;text-align:center}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+.info-table th{background:var(--forest);color:var(--marker);padding:8px 12px;text-align:left;font-family:var(--font-head);font-size:.82rem}
+.info-table td{padding:8px 12px;border-bottom:1px solid #ddd;background:var(--cream)}
+.badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.badge.fact{background:var(--sky);color:var(--forest)}
+.badge.judge{background:var(--marker);color:var(--forest)}
+.badge.infer{background:var(--sage);color:var(--forest)}
+.badge.eg{background:#E8D5C4;color:var(--brick)}
+.footer{max-width:1100px;margin:0 auto;padding:30px 44px;text-align:center;font-size:.82rem;color:#888}
+.footer a{color:#1d70b8;text-decoration:underline}
+.footer .tip{margin-top:6px;color:#aaa}
+.sec-id{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);background:var(--marker);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;vertical-align:middle}
+.walkthrough{background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:20px 24px;margin:14px 0}
+.walkthrough .wt-title{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem;margin-bottom:6px}
+.walkthrough .wt-given{background:var(--paper);border-radius:8px;padding:10px 14px;margin:8px 0;font-family:var(--font-mono);font-size:.85rem}
+.walkthrough .wt-step{margin:10px 0;padding-left:14px;border-left:3px solid var(--sage)}
+.walkthrough .wt-step .step-no{font-family:var(--font-mono);font-weight:700;color:var(--brick);font-size:.8rem}
+.walkthrough .wt-final{background:var(--marker);border-radius:8px;padding:10px 14px;margin-top:10px;font-weight:700;color:var(--forest)}
+.calc-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.82rem;font-family:var(--font-mono)}
+.calc-table th{background:var(--forest);color:var(--marker);padding:6px 8px;text-align:center;font-size:.78rem}
+.calc-table td{padding:6px 8px;border:1px solid #ccc;text-align:center;background:var(--cream)}
+@media(max-width:860px){.layout{flex-direction:column}.sidebar{position:relative;height:auto;width:100%;padding:20px}.main{padding:24px 20px}.nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin-bottom:0}}
 </style>
 </head>
 <body>
 <div class="layout">
-
-<!-- ========== SIDEBAR ========== -->
 <aside class="sidebar">
-  <h1>I/O 设备管理</h1>
-  <div class="subtitle">操作系统 · 第5章 · 理解地图</div>
-  <div class="progress-section">
-    <div class="progress-text">任务进度</div>
+  <h1>操作系统<br>第5章 I/O 设备</h1>
+  <div class="sub">考试冲刺 · 1 道大题 · 中等优先级</div>
+  <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
-    <div class="progress-text" id="barNum">0 / 10</div>
+    <div class="progress-num" id="barNum">0 / 0</div>
   </div>
   <ul class="nav">
-    <li><a href="#m01"><span class="num">01</span>学习目标与阅读路径</a></li>
-    <li><a href="#m02"><span class="num">02</span>零基础背景包</a></li>
-    <li><a href="#m03"><span class="num">03</span>原文问题定位</a></li>
-    <li><a href="#m04"><span class="num">04</span>原文结构地图</a></li>
-    <li><a href="#m05"><span class="num">05</span>核心判断与依据</a></li>
-    <li><a href="#m06"><span class="num">06</span>关键概念拆解</a></li>
-    <li><a href="#m07"><span class="num">07</span>苏格拉底式阅读关卡</a></li>
-    <li><a href="#m08"><span class="num">08</span>闯关式任务</a></li>
-    <li><a href="#m09"><span class="num">09</span>误解与边界</a></li>
-    <li><a href="#m10"><span class="num">10</span>背景知识缺口</a></li>
-    <li><a href="#m11"><span class="num">11</span>复盘与学习报告</a></li>
+    <li><a href="#s1"><span class="num">01</span>学习目标与阅读路径</a></li>
+    <li><a href="#s2"><span class="num">02</span>零基础背景包</a></li>
+    <li><a href="#s3"><span class="num">03</span>原文问题定位</a></li>
+    <li><a href="#s4"><span class="num">04</span>原文结构地图</a></li>
+    <li><a href="#s5"><span class="num">05</span>核心判断与依据</a></li>
+    <li><a href="#s6"><span class="num">06</span>关键概念拆解</a></li>
+    <li><a href="#s7"><span class="num">07</span>苏格拉底式阅读关卡</a></li>
+    <li><a href="#s8"><span class="num">08</span>手把手演示（大题）</a></li>
+    <li><a href="#s9"><span class="num">09</span>误解与边界</a></li>
+    <li><a href="#s10"><span class="num">10</span>背景知识缺口</a></li>
+    <li><a href="#s11"><span class="num">11</span>复盘与学习报告</a></li>
   </ul>
 </aside>
 
-<!-- ========== MAIN ========== -->
 <main class="main">
 
-<!-- MODULE 01 -->
-<section class="module" id="m01">
-  <div class="module-num">01</div>
-  <h2 class="module-title">学习目标与阅读路径</h2>
-  <p class="intro-tip">本章考试权重：⭐⭐ 中 —— 对应 1 道大题（设备管理）。以下是你学完后应该能做到的事：</p>
-  <div class="goal"><span class="goal-num">1</span><span>能说出四种 I/O 控制方式的核心区别，并按并行程度递增排列</span></div>
-  <div class="goal"><span class="goal-num">2</span><span>能默写 SPOOLing 的三部分组成和三大特点，并解释它如何把独占设备变共享</span></div>
-  <div class="goal"><span class="goal-num">3</span><span>能列出设备分配的四张数据结构，并说明它们的层级关系</span></div>
-  <div class="goal"><span class="goal-num">4</span><span>能把 I/O 完成的 5 个步骤按正确顺序排列</span></div>
-  <div class="goal"><span class="goal-num">5</span><span>能指出至少 2 个关于 DMA 和 SPOOLing 的常见误解，并说明为什么错</span></div>
-  <div class="card hl" style="margin-top:18px;">
-    <strong>阅读路径：</strong> 先补背景 → 理解本章在回答什么问题 → 看结构地图 → 逐个过核心判断与概念 → 做苏格拉底关卡 → 挑战闯关任务 → 查漏补缺 → 生成学习报告
-  </div>
+<section id="s1">
+  <h2><span class="sec-id">01</span>学习目标与阅读路径</h2>
+  <p>本章对应考试 <strong>1 道大题</strong>（设备管理），最常见题型是<strong>I/O 完成 5 步骤排序</strong>，也可能考 SPOOLing 组成原理、设备分配四张表。复习时间约 2 小时。</p>
+  <div class="objective"><div class="tag">目标 1 · 四种 I/O 控制方式</div>能说清程序查询/中断/DMA/通道四种方式的区别，并行程度递增。</div>
+  <div class="objective"><div class="tag">目标 2 · SPOOLing</div>能默写 SPOOLing 三部分组成和三大特点，解释它如何把独占设备变共享。</div>
+  <div class="objective"><div class="tag">目标 3 · 设备分配四表</div>能列出 DCB/SDT/COCB/CHCB 四张表，说明层级关系。</div>
+  <div class="objective"><div class="tag">目标 4 · I/O 完成 5 步骤排序（大题）</div>能把 I/O 完成的 5 个步骤按正确顺序排列，说清每步谁干什么。</div>
+  <p><strong>阅读路径</strong>：模块 2 唤醒 CPU 与外设速度差 → 模块 3-6 过概念 → <span style="background:var(--marker);padding:2px 6px;border-radius:4px;font-weight:700">模块 8 手把手做 I/O 步骤排序大题</span> → 模块 9 避坑。</p>
+  <div class="src-quote">原文定位：考试权重⭐⭐中，对应 1 道大题（设备管理），题型含 I/O 控制方式、SPOOLing、设备分配、I/O 完成步骤排序。</div>
 </section>
 
-<!-- MODULE 02 -->
-<section class="module" id="m02">
-  <div class="module-num">02</div>
-  <h2 class="module-title">零基础背景包</h2>
-  <p class="section-hint">以下概念不是本章原文的观点，而是帮助你读懂本章的预备知识。</p>
+<section id="s2">
+  <h2><span class="sec-id">02</span>零基础背景包</h2>
+  <p>学过但生疏？下面 5 个概念用一句话唤醒。</p>
 
-  <div class="card">
-    <span class="label bg">背景补充</span>
-    <p><strong>CPU 与外设的速度差距</strong></p>
-    <p style="font-size:14px;margin-top:4px;">CPU 每秒执行数十亿条指令，而机械硬盘、打印机等外设的响应时间在毫秒级。一条 CPU 指令约 1 纳秒，一次磁盘 I/O 约 10 毫秒——速度差了 10⁷ 倍。</p>
-    <p style="font-size:13px;margin-top:4px;color:#666;">为什么现在需要知道：本章所有控制方式的演进，本质上都在解决这个速度不匹配的问题。</p>
+  <div class="bg-item">
+    <div class="label">背景补充 ① · CPU 与外设的速度差（唤醒）</div>
+    CPU 每秒执行数十亿条指令，而打印机、机械硬盘等外设响应在毫秒级——<strong>速度差了 10⁷ 倍</strong>。<br>
+    <em>一句话记忆：</em>本章所有 I/O 控制方式的演进，本质上都在解决<strong>"CPU 等外设太亏"</strong>这个问题。
   </div>
 
-  <div class="card">
-    <span class="label bg">背景补充</span>
-    <p><strong>中断（Interrupt）</strong></p>
-    <p style="font-size:14px;margin-top:4px;">CPU 正在执行程序时，硬件设备发出一个信号通知 CPU"某件事完成了"，CPU 暂停当前工作去处理这个通知，然后返回原来的程序。</p>
-    <p style="font-size:13px;margin-top:4px;color:#666;">为什么现在需要知道：中断方式是四种控制方式的第二种，也是理解 DMA 和通道的基础。</p>
+  <div class="bg-item">
+    <div class="label">背景补充 ② · 中断（唤醒）</div>
+    CPU 正跑程序，外设发信号说"我做完了"，CPU 暂停当前工作去处理，处理完回来继续。<br>
+    <em>一句话记忆：</em>中断 = <strong>外设主动打电话告诉 CPU "我好了"</strong>，不用 CPU 一直傻等。
   </div>
 
-  <div class="card">
-    <span class="label bg">背景补充</span>
-    <p><strong>总线（Bus）</strong></p>
-    <p style="font-size:14px;margin-top:4px;">计算机各部件之间的公共数据通道。CPU、内存、I/O 设备都连在总线上，谁使用总线谁就"占用"它。</p>
-    <p style="font-size:13px;margin-top:4px;color:#666;">为什么现在需要知道：DMA 的"周期窃取总线"就是在 CPU 不用总线的间隙，DMA 控制器偷偷使用总线传数据。</p>
+  <div class="bg-item">
+    <div class="label">背景补充 ③ · 总线（唤醒）</div>
+    计算机各部件的公共数据通道。CPU、内存、I/O 设备都连在总线上，谁用谁占。<br>
+    <em>一句话记忆：</em>DMA 的"周期窃取"就是<strong>CPU 不用总线的间隙，DMA 控制器偷偷用</strong>。
   </div>
 
-  <div class="card">
-    <span class="label bg">背景补充</span>
-    <p><strong>独占 vs 共享</strong></p>
-    <p style="font-size:14px;margin-top:4px;">独占设备：同一时刻只能被一个进程使用（如打印机）。共享设备：多个进程可以交替使用（如磁盘）。独占设备如果分配不当会死锁。</p>
-    <p style="font-size:13px;margin-top:4px;color:#666;">为什么现在需要知道：SPOOLing 的核心价值就是把独占设备"改造"成共享设备。</p>
-  </div>
-</section>
-
-<!-- MODULE 03 -->
-<section class="module" id="m03">
-  <div class="module-num">03</div>
-  <h2 class="module-title">原文问题定位</h2>
-
-  <div class="card">
-    <p><strong>表面在讲什么：</strong>操作系统的 I/O 设备管理——设备怎么分类、怎么控制、怎么分配。</p>
-  </div>
-  <div class="card">
-    <p><strong>深层在回答什么：</strong>如何弥合高速 CPU 与慢速外设之间的鸿沟，让两者尽可能并行工作？</p>
-  </div>
-  <div class="card hl">
-    <p><strong>如果只记一个问题：</strong></p>
-    <p style="font-size:16px;font-weight:600;color:var(--forest);margin-top:6px;">操作系统怎样让 I/O 更高效，同时让设备更易用？</p>
-  </div>
-  <div class="judgment">
-    <span class="src-quote">原文依据：I/O 管理四目标——"方便性、并行性（CPU 和 I/O 同时工作）、均衡性、独立性（物理特性对用户透明）"</span>
-  </div>
-</section>
-
-<!-- MODULE 04 -->
-<section class="module" id="m04">
-  <div class="module-num">04</div>
-  <h2 class="module-title">原文结构地图</h2>
-  <p class="section-hint">本章属于「机制流程型」结构，有两条主线，内部各有递进关系。</p>
-
-  <div class="map-node"><span class="tag">主线A</span><strong>I/O 管理概述</strong>：为什么要管？怎么管？</div>
-  <div class="map-sub">设备分类（并列：从属关系 / 信息组织 / 资源分配）</div>
-  <div class="map-sub">管理四目标（并列：方便性 / 并行性 / 均衡性 / 独立性）</div>
-  <div class="map-sub">↓ 进入核心：控制方式</div>
-  <div class="map-sub" style="border-left-color:var(--brick);">I/O 控制方式（<strong>递进</strong>：轮询 → 中断 → DMA → 通道，并行程度递增）</div>
-
-  <div class="map-arrow">↓</div>
-
-  <div class="map-node"><span class="tag">主线B</span><strong>I/O 核心子系统</strong>：具体怎么实现高效 I/O？</div>
-  <div class="map-sub">缓冲区管理（缓解速度差）</div>
-  <div class="map-sub">设备分配（四张表，层级结构：SDT → DCT → COCT → CHCT）</div>
-  <div class="map-sub">SPOOLing 技术（把独占变共享的关键机制）</div>
-  <div class="map-sub">I/O 完成 5 步骤（流程：请求 → 驱动启动 → 中断 → 驱动收尾 → 请求者恢复）</div>
-</section>
-
-<!-- MODULE 05 -->
-<section class="module" id="m05">
-  <div class="module-num">05</div>
-  <h2 class="module-title">核心判断与依据</h2>
-
-  <div class="judgment card">
-    <h4><span class="label fact">事实</span> 判断1：四种控制方式的并行程度递增</h4>
-    <p style="font-size:14px;margin-top:6px;">从轮询到中断到 DMA 到通道，CPU 从"全程盯着"变成"完全不管"，并行程度逐步提高。</p>
-    <p style="font-size:14px;"><strong>为什么重要：</strong>这是整章的骨架，所有其他知识点都挂在这条演进线上。</p>
-    <div class="evidence">原文依据：四种方式的演进——"并行程度递增（轮询→中断→DMA→通道）"</div>
+  <div class="bg-item">
+    <div class="label">背景补充 ④ · 独占 vs 共享设备（唤醒）</div>
+    <strong>独占设备</strong>：同一时刻只能一个进程用（打印机，分配不当会死锁）。<strong>共享设备</strong>：多个进程交替用（磁盘）。<strong>虚拟设备</strong>=用 SPOOLing 把独占变共享。
   </div>
 
-  <div class="judgment card">
-    <h4><span class="label fact">事实</span> 判断2：轮询方式下 CPU 与外设完全串行</h4>
-    <p style="font-size:14px;margin-top:6px;">CPU 发出启动命令后必须循环测试设备状态，期间无法做其他事。不仅效率低，还无法发现和处理硬件错误。</p>
-    <p style="font-size:14px;"><strong>可能的误读：</strong>不要以为"轮询就是定时检查"——轮询是持续循环测试，CPU 完全被占用。</p>
-    <div class="evidence">原文依据："CPU 发启动命令后循环测试""CPU 和外设串行工作"</div>
+  <div class="bg-item">
+    <div class="label">背景补充 ⑤ · 缓冲区（唤醒）</div>
+    两个速度不匹配的设备之间用一块内存暂存数据，弥补速度差。如 CPU（快）和打印机（慢）之间放缓冲区，CPU 写完就走，打印机慢慢取。
   </div>
 
-  <div class="judgment card">
-    <h4><span class="label fact">事实</span> 判断3：DMA 实现块传输，CPU 仅首尾参与</h4>
-    <p style="font-size:14px;margin-top:6px;">DMA 控制器增加字节计数器和内存地址寄存器，在内存与 I/O 间直接成块传送。CPU 只在开始发"传送一块"命令和结束时处理。DMA 可周期窃取总线。</p>
-    <p style="font-size:14px;"><strong>可能的误读：</strong>"DMA 完全不需要 CPU"是错的。CPU 仍需启动和收尾。</p>
-    <div class="evidence">原文依据："内存与 I/O 设备间直接成块传送""CPU 仅开始发命令，结束处理"</div>
-  </div>
-
-  <div class="judgment card">
-    <h4><span class="label judge">判断</span> 判断4：SPOOLing 把独占设备改造成共享设备</h4>
-    <p style="font-size:14px;margin-top:6px;">SPOOLing 用大容量磁盘作缓冲，将慢速独占设备（如打印机）虚拟化，让多个进程"同时"使用。</p>
-    <div class="evidence">原文依据："用大容量磁盘作缓冲，把独占设备改造成共享设备，I/O 与 CPU 并行"</div>
-  </div>
-
-  <div class="judgment card">
-    <h4><span class="label fact">事实</span> 判断5：动态分配效率高但可能死锁</h4>
-    <p style="font-size:14px;margin-top:6px;">静态分配在运行前完成，利用率低但安全。动态分配在运行中按需分配，效率好但可能死锁。</p>
-    <div class="evidence">原文依据："静态=运行前分配结束收回（利用率低）；动态=运行中按需分配停用即收（效率好但可能死锁）"</div>
-  </div>
-</section>
-
-<!-- MODULE 06 -->
-<section class="module" id="m06">
-  <div class="module-num">06</div>
-  <h2 class="module-title">关键概念拆解</h2>
-
-  <div class="concept card">
-    <div class="concept-term">概念1：程序直接控制（轮询）</div>
-    <div class="concept-row"><span class="key">定义</span><span>用户程序直接控制 I/O 传送，CPU 发启动命令后循环测试设备状态</span></div>
-    <div class="concept-row"><span class="key">人话</span><span>CPU 全程守着设备，反复问"好了没？好了没？"</span></div>
-    <div class="concept-row"><span class="key">不要误解</span><span>不是"定时检查"，是"持续循环测试"</span></div>
-    <div class="evidence">原文依据："用户程序直接控制传送，CPU 发启动命令后循环测试"</div>
-  </div>
-
-  <div class="concept card">
-    <div class="concept-term">概念2：中断方式</div>
-    <div class="concept-row"><span class="key">定义</span><span>设备完成后主动发中断请求，CPU 响应并唤醒等待进程</span></div>
-    <div class="concept-row"><span class="key">人话</span><span>CPU 不再傻等，设备好了会主动"敲门"通知</span></div>
-    <div class="concept-row"><span class="key">缺点</span><span>每次 I/O 都要 CPU 干预，多设备时利用率仍会下降</span></div>
-    <div class="evidence">原文依据："控制寄存器有中断位，设备完成后发中断请求，CPU 响应唤醒等待进程"</div>
-  </div>
-
-  <div class="concept card">
-    <div class="concept-term">概念3：DMA 方式</div>
-    <div class="concept-row"><span class="key">定义</span><span>内存与 I/O 设备间直接成块传送，DMA 控制器有字节计数器+内存地址寄存器</span></div>
-    <div class="concept-row"><span class="key">人话</span><span>派一个"搬运工"（DMA 控制器）整批搬数据，CPU 只管开头下令和结尾收货</span></div>
-    <div class="concept-row"><span class="key">不要误解</span><span>DMA 不是完全不需要 CPU，CPU 仍需首尾参与</span></div>
-    <div class="evidence">原文依据："内存与 I/O 设备间直接成块传送""DMA 可周期窃取总线"</div>
-  </div>
-
-  <div class="concept card">
-    <div class="concept-term">概念4：通道方式</div>
-    <div class="concept-row"><span class="key">定义</span><span>独立于 CPU 的专门处理机，统一管理外设，实现 I/O 与 CPU 并行</span></div>
-    <div class="concept-row"><span class="key">人话</span><span>雇一个"专职经理"（通道），CPU 把整个 I/O 任务外包出去</span></div>
-    <div class="concept-row"><span class="key">与 DMA 区别</span><span>DMA 只管一块数据的传送；通道能管理多台外设的完整 I/O 流程</span></div>
-    <div class="evidence">原文依据："独立于 CPU 的专门处理机，统一管理外设，实现 I/O 与 CPU 并行"</div>
-  </div>
-
-  <div class="concept card">
-    <div class="concept-term">概念5：SPOOLing（假脱机操作）</div>
-    <div class="concept-row"><span class="key">定义</span><span>Simultaneous Peripheral Operation On Line，用磁盘作缓冲把独占设备改造成共享设备</span></div>
-    <div class="concept-row"><span class="key">三组成</span><span>① 输入井/输出井（磁盘） ② 输入缓冲区/输出缓冲区（内存） ③ 输入进程/输出进程</span></div>
-    <div class="concept-row"><span class="key">三特点</span><span>① 提高 I/O 速度 ② 独占→共享 ③ 实现虚拟设备</span></div>
-    <div class="concept-row"><span class="key">不要误解</span><span>SPOOLing ≠ 简单缓冲。它用磁盘模拟多台设备，是系统级的虚拟化方案</span></div>
-    <div class="evidence">原文依据："用大容量磁盘作缓冲，把独占设备改造成共享设备"</div>
-  </div>
-
-  <div class="concept card">
-    <div class="concept-term">概念6：设备分配四张表</div>
-    <div class="concept-row"><span class="key">DCT/DCB</span><span>设备控制表 —— 记录每个设备的详细信息（设备级）</span></div>
-    <div class="concept-row"><span class="key">SDT</span><span>系统设备表 —— 记录系统中所有设备（系统级总表）</span></div>
-    <div class="concept-row"><span class="key">COCT/COCB</span><span>控制器控制表 —— 记录每个控制器信息（控制器级）</span></div>
-    <div class="concept-row"><span class="key">CHCT/CHCB</span><span>通道控制表 —— 记录每个通道信息（通道级）</span></div>
-    <div class="concept-row"><span class="key">层级关系</span><span>SDT → DCT → COCT → CHCT，从设备到通道逐级找到完整数据通路</span></div>
-    <div class="evidence">原文依据："DCB/DCT 设备控制块；SDT 系统设备表；COCB/COCT 控制器控制块；CHCB/CHCT 通道控制块"</div>
-  </div>
-</section>
-
-<!-- MODULE 07 -->
-<section class="module" id="m07">
-  <div class="module-num">07</div>
-  <h2 class="module-title">苏格拉底式阅读关卡</h2>
-  <p class="section-hint">先自己思考，再选择。每题都有原文依据和反馈。</p>
-
-  <!-- s1 -->
-  <div class="task" data-task="s1-核心问题" data-answer="B"
-       data-ok="正确。本章表面讲设备管理流程，深层在回答：如何让 CPU 不被慢速外设拖累。四种控制方式的演进、缓冲、SPOOLing 都在解决这个问题。"
-       data-no="这只是子问题。本章所有内容——控制方式演进、缓冲、SPOOLing——都在回答更大的问题：如何弥合 CPU 与外设的速度鸿沟，让两者并行工作。回到「03 原文问题定位」再看一遍。"
-       data-src="原文依据：I/O 管理四目标之一"并行性（CPU 和 I/O 同时工作）"，四种控制方式"并行程度递增""
-       data-review="回到「03 原文问题定位」复习">
-    <div class="q"><span class="badge">S1</span>本章深层在回答的核心问题是？</div>
+  <div class="task" data-task="ch5-m2" data-answer="C" data-ok="对。中断方式下，外设完成后发中断信号通知 CPU，CPU 不用循环测试。" data-no="程序查询方式才需要 CPU 循环测试；DMA 和通道由专门硬件负责。" data-src="原文：中断方式要求控制寄存器有中断位；设备完成后发中断请求。" data-review="回到模块 2 看中断概念">
+    <div class="q">「中断方式」相比「程序查询方式」的最大改进是？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. I/O 设备有哪些分类标准</button>
-      <button class="opt" data-val="B">B. 操作系统如何弥合高速 CPU 与慢速外设之间的鸿沟</button>
-      <button class="opt" data-val="C">C. 为什么要使用 SPOOLing 技术</button>
-      <button class="opt" data-val="D">D. 设备分配需要哪些数据结构</button>
+      <button class="opt" data-val="A">A. CPU 速度更快了</button>
+      <button class="opt" data-val="B">B. 外设速度更快了</button>
+      <button class="opt" data-val="C">C. CPU 不用循环测试，外设完成后主动通知 CPU</button>
+      <button class="opt" data-val="D">D. 不需要内存了</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
+</section>
 
-  <!-- s2 -->
-  <div class="task" data-task="s2-信息类型辨别" data-answer="D"
-       data-ok="正确。原文明确说 DMA'CPU 仅开始发命令，结束处理'——CPU 在首尾仍需参与。说'完全不需要'是与原文矛盾的曲解。"
-       data-no="仔细看原文对 DMA 的描述：CPU 仅开始发命令、结束处理。'完全不需要'与原文矛盾，这不是事实或判断，而是对原文的误读。"
-       data-src="原文依据：'CPU 仅开始发传送一块命令，结束处理'"
-       data-review="回到「09 误解与边界」复习">
-    <div class="q"><span class="badge">S2</span>"DMA 方式下 CPU 完全不需要参与 I/O 过程"——这句话属于什么？</div>
+<section id="s3">
+  <h2><span class="sec-id">03</span>原文问题定位</h2>
+  <div class="card">
+    <span class="src-tag">表面问题</span>
+    I/O 设备的分类、管理目标、控制方式、设备分配、SPOOLing。
+  </div>
+  <div class="card key">
+    <span class="src-tag">深层问题</span>
+    <strong>CPU 快、外设慢，怎么让 CPU 少等？</strong>三个子问题：<br>
+    ① <strong>怎么传数据？</strong>（四种 I/O 控制方式：查询→中断→DMA→通道，并行程度递增）<br>
+    ② <strong>设备怎么分？</strong>（设备分配四张表）<br>
+    ③ <strong>独占设备怎么共享？</strong>（SPOOLing 把独占变共享）
+  </div>
+  <div class="src-quote"><span class="badge fact">事实</span>原文：「I/O 管理目标：方便性、并行性、均衡性、独立性」</div>
+</section>
+
+<section id="s4">
+  <h2><span class="sec-id">04</span>原文结构地图</h2>
+  <p><span class="badge judge">结构判断</span>本章是<strong>机制型</strong>，从"怎么控制 I/O"到"怎么分配设备"到"怎么共享独占设备"。</p>
+  <div class="struct-map">I/O 设备管理
+├── 一、I/O 管理概述
+│   ├── 设备分类（块/字符、独占/共享/虚拟）
+│   ├── 管理四目标（方便/并行/均衡/独立）
+│   └── I/O 控制方式 ★选择考点
+│       ├── 程序查询（轮询）
+│       ├── 中断方式
+│       ├── DMA 方式
+│       └── 通道方式
+├── 二、I/O 核心子系统
+│   ├── 缓冲区管理
+│   ├── 设备分配（四张表：DCB/SDT/COCB/CHCB）
+│   └── SPOOLing（假脱机）★大题
+└── 三、I/O 完成 5 步骤 ★大题
+    └── 请求→驱动→中断→驱动→请求者</div>
+  <div class="task" data-task="ch5-m4" data-answer="C" data-ok="对。四种方式并行程度递增：查询（CPU 全程参与）→中断（CPU 间歇参与）→DMA（CPU 只管首尾）→通道（CPU 完全交给通道）。" data-no="四种方式的演进方向就是 CPU 越来越不参与数据传输。" data-src="原文：主要差别在于 CPU 和外围设备并行工作的程度不同。" data-review="回到模块 6 看四种方式对比">
+    <div class="q">四种 I/O 控制方式的演进方向是？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. 事实（原文明确说了）</button>
-      <button class="opt" data-val="B">B. 判断（作者的学术观点）</button>
-      <button class="opt" data-val="C">C. 推论（从原文可以推出，但原文没直接说）</button>
-      <button class="opt" data-val="D">D. 错误理解（与原文明确矛盾）</button>
+      <button class="opt" data-val="A">A. CPU 参与越来越多</button>
+      <button class="opt" data-val="B">B. 外设速度越来越慢</button>
+      <button class="opt" data-val="C">C. CPU 参与越来越少，并行程度递增</button>
+      <button class="opt" data-val="D">D. 内存需求越来越大</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
+</section>
 
-  <!-- s3 -->
-  <div class="task" data-task="s3-通道引入原因" data-answer="B"
-       data-ok="正确。DMA 虽然减少了 CPU 干预，但每次 I/O 仍需 CPU 启动和收尾。通道是独立处理机，能统一管理多台外设的完整 I/O 流程，进一步解放 CPU。"
-       data-no="DMA 的速度和容量不是引入通道的原因。关键在于：DMA 每次仍需 CPU 首尾参与，多设备时 CPU 负担仍重。通道能完全接管 I/O 流程。"
-       data-src="原文依据：DMA'CPU 仅开始发命令，结束处理'；通道是'独立于 CPU 的专门处理机，统一管理外设'"
-       data-review="回到「05 核心判断与依据」复习">
-    <div class="q"><span class="badge">S3</span>有了 DMA 为什么还要通道方式？最核心原因是？</div>
+<section id="s5">
+  <h2><span class="sec-id">05</span>核心判断与依据</h2>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 1：四种 I/O 控制方式，并行程度递增</div>
+    程序查询（CPU 与外设串行）→ 中断（CPU 与外设并行，但每传一个字要 CPU 干预）→ DMA（CPU 只管开始和结束，中间由 DMA 硬件成块传）→ 通道（通道是独立处理机，完全代替 CPU 管 I/O）。<br>
+    <strong>原文依据：</strong>「主要差别在于中央处理器和外围设备并行工作的方式不同，并行工作的程度不同」
+  </div>
+
+  <div class="concept">
+    <span class="badge judge">判断</span>
+    <div class="term">判断 2：SPOOLing 把独占设备改造成共享设备</div>
+    SPOOLing 用大容量磁盘作缓冲，把独占设备（打印机）改造成共享设备，实现 I/O 与 CPU 并行。输入井/输出井暂存多个进程的 I/O 请求，按队列依次服务。<br>
+    <strong>原文依据：</strong>「SPOOLING 系统的特点：提高了 I/O 速度、将独占设备改造为共享设备、实现了虚拟设备功能」
+  </div>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 3：设备分配需要四张表层层查找</div>
+    设备分配按 <strong>DCB(设备) → COCB(控制器) → CHCB(通道)</strong> 层级查找，形成一条数据传输通路。SDT（系统设备表）是总入口。<br>
+    <strong>原文依据：</strong>「数据结构：设备控制块 DCB、系统设备表 SDT、控制器控制块 COCB、通道控制块 CHCB」
+  </div>
+
+  <div class="task" data-task="ch5-m5" data-answer="B" data-ok="对。DMA 直接在内存和 I/O 间成块传数据，CPU 只在开始和结束时参与，中间由 DMA 硬件完成。" data-no="程序查询要 CPU 全程参与；中断方式每次传一个字都要 CPU 干预；通道是独立处理机。" data-src="原文：DMA 数据在内存与 I/O 设备间的直接成块传送，CPU 仅开始时发命令。" data-review="回到模块 6 看 DMA">
+    <div class="q">DMA 方式的核心特点是？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. DMA 传输速度不够快</button>
-      <button class="opt" data-val="B">B. DMA 每次 I/O 仍需 CPU 启动和收尾，多设备时 CPU 负担仍重</button>
-      <button class="opt" data-val="C">C. DMA 不能传送大数据块</button>
-      <button class="opt" data-val="D">D. 通道比 DMA 成本更低</button>
+      <button class="opt" data-val="A">A. CPU 全程循环测试设备状态</button>
+      <button class="opt" data-val="B">B. 数据直接在内存与 I/O 间成块传送，CPU 只管开始和结束</button>
+      <button class="opt" data-val="C">C. 每传一个字都要 CPU 干预</button>
+      <button class="opt" data-val="D">D. 不需要任何硬件支持</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
+</section>
 
-  <!-- s4 -->
-  <div class="task" data-task="s4-SPOOLing特点" data-answer="A,B,C" data-multi="true"
-       data-ok="正确。SPOOLing 三大特点：①提高 I/O 速度 ②独占设备改造为共享设备 ③实现虚拟设备功能。D 和 E 不是 SPOOLing 的特点。"
-       data-no="SPOOLing 用磁盘做缓冲（实际增加了磁盘使用），它的三大特点是原文明确列出的。D'减少内存使用'和 E'防止死锁'都不在其中。"
-       data-src="原文依据：'SPOOLing 三大特点：① 提高 I/O 速度 ② 独占设备改造为共享设备 ③ 实现虚拟设备功能'"
-       data-review="回到「06 关键概念拆解 · 概念5」复习">
-    <div class="q"><span class="badge">S4</span>SPOOLing 技术的三大特点包括哪些？（多选）</div>
+<section id="s6">
+  <h2><span class="sec-id">06</span>关键概念拆解</h2>
+
+  <div class="concept">
+    <div class="term">四种 I/O 控制方式对比</div>
+    <table class="info-table">
+      <tr><th>方式</th><th>谁传数据</th><th>CPU 参与度</th><th>并行程度</th></tr>
+      <tr><td>程序查询（轮询）</td><td>CPU</td><td>全程（循环测试）</td><td>最低（CPU 外设串行）</td></tr>
+      <tr><td>中断方式</td><td>CPU</td><td>间歇（每次中断参与）</td><td>中（CPU 外设并行，但每字干预）</td></tr>
+      <tr><td>DMA 方式</td><td>DMA 控制器</td><td>少（仅首尾）</td><td>较高（成块传，CPU 几乎不参与）</td></tr>
+      <tr><td>通道方式</td><td>通道（独立处理机）</td><td>极少（发指令即可）</td><td>最高（通道完全代管）</td></tr>
+    </table>
+  </div>
+
+  <div class="concept">
+    <div class="term">SPOOLing（假脱机操作）</div>
+    <strong>原文定义：</strong>Simultaneous Peripheral Operation On Line，用大容量磁盘作缓冲，把独占设备改造成共享设备。<br>
+    <strong>三部分组成</strong>（必背）：<br>
+    ① <strong>输入井 / 输出井</strong>（磁盘上，暂存多个进程的 I/O 数据）<br>
+    ② <strong>输入缓冲区 / 输出缓冲区</strong>（内存中，中转）<br>
+    ③ <strong>输入进程 / 输出进程</strong>（管理模块，负责调度）<br>
+    <strong>三大特点</strong>（必背）：① 提高 I/O 速度 ② 独占设备改造为共享设备 ③ 实现虚拟设备功能。
+  </div>
+
+  <div class="concept">
+    <div class="term">设备分配四张表</div>
+    <table class="info-table">
+      <tr><th>表</th><th>全称</th><th>作用</th></tr>
+      <tr><td>SDT</td><td>系统设备表</td><td>总入口，记录系统所有设备</td></tr>
+      <tr><td>DCB/DCT</td><td>设备控制块（表）</td><td>每个设备一张，记录设备状态</td></tr>
+      <tr><td>COCB/COCT</td><td>控制器控制块（表）</td><td>设备连到哪个控制器</td></tr>
+      <tr><td>CHCB/CHCT</td><td>通道控制块（表）</td><td>控制器连到哪个通道</td></tr>
+    </table>
+    <strong>分配路径</strong>：SDT → DCB → COCB → CHCB，形成一条从内存到设备的通路。
+  </div>
+
+  <div class="task" data-task="ch5-m6" data-answer="A" data-ok="对。SPOOLing 三特点：提高 I/O 速度、独占变共享、实现虚拟设备。" data-no="SPOOLing 的特点不是"降低速度"或"增加设备数量"。" data-src="原文：SPOOLing 三大特点：提高 I/O 速度、独占设备改造为共享设备、实现虚拟设备功能。" data-review="回到模块 6 看 SPOOLing">
+    <div class="q">下列哪项<strong>不是</strong> SPOOLing 的特点？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. 提高 I/O 速度</button>
-      <button class="opt" data-val="B">B. 独占设备改造为共享设备</button>
-      <button class="opt" data-val="C">C. 实现虚拟设备功能</button>
-      <button class="opt" data-val="D">D. 减少内存使用</button>
-      <button class="opt" data-val="E">E. 防止设备死锁</button>
+      <button class="opt" data-val="A">A. 降低 I/O 速度以节省资源</button>
+      <button class="opt" data-val="B">B. 提高 I/O 速度</button>
+      <button class="opt" data-val="C">C. 独占设备改造为共享设备</button>
+      <button class="opt" data-val="D">D. 实现虚拟设备功能</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
+</section>
 
-  <!-- s5 -->
-  <div class="task" data-task="s5-最低利用率" data-answer="A"
-       data-ok="正确。轮询方式下 CPU 必须循环测试设备状态，与外设完全串行工作，是四种方式中 CPU 利用率最低的。"
-       data-no="中断方式已经能让 CPU 在等待 I/O 时做其他事，利用率远高于轮询。轮询才是 CPU 利用率最低的——CPU 完全被 I/O 占用。"
-       data-src="原文依据：'缺点：CPU 和外设串行工作；无法发现处理硬件错误'"
-       data-review="回到「05 核心判断与依据 · 判断2」复习">
-    <div class="q"><span class="badge">S5</span>在四种 I/O 控制方式中，CPU 利用率最低的是？</div>
+<section id="s7">
+  <h2><span class="sec-id">07</span>苏格拉底式阅读关卡</h2>
+  <p>下面几道题逼你想清楚概念边界。</p>
+
+  <div class="task" data-task="ch5-m7a" data-answer="C" data-ok="对。通道是独立于 CPU 的专门处理机，能完全代替 CPU 管理 I/O，并行程度最高。" data-no="程序查询最低，中断和 DMA 中间，通道最高。" data-src="原文：通道是独立于 CPU 的专门负责数据输入/输出传输工作的处理机。" data-review="回到模块 6 看通道">
+    <div class="q">四种 I/O 控制方式中，并行程度最高的是？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. 程序直接控制（轮询）</button>
+      <button class="opt" data-val="A">A. 程序查询</button>
       <button class="opt" data-val="B">B. 中断方式</button>
-      <button class="opt" data-val="C">C. DMA 方式</button>
-      <button class="opt" data-val="D">D. 通道方式</button>
-    </div>
-    <button class="check">检查</button>
-    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-  </div>
-</section>
-
-<!-- MODULE 08 -->
-<section class="module" id="m08">
-  <div class="module-num">08</div>
-  <h2 class="module-title">闯关式任务</h2>
-  <p class="section-hint">以下是综合应用题，需要你把概念关联起来。</p>
-
-  <!-- t1: matching control methods -->
-  <div class="task" data-task="t1-控制方式匹配" data-type="selects"
-       data-ok="全部正确。四种方式并行程度递增：轮询（串行）→ 中断（中断驱动）→ DMA（块传输）→ 通道（独立处理机）。"
-       data-no="注意每种方式的关键区别。轮询是 CPU 主动循环测试；中断是设备主动通知；DMA 是整块传送只需首尾参与；通道是完全独立的处理机。"
-       data-src="原文依据：四种控制方式各自的特征描述"
-       data-review="回到「06 关键概念拆解 · 概念1-4」复习">
-    <div class="q"><span class="badge">T1</span>将每种 I/O 控制方式与其核心特征匹配：</div>
-    <div class="match-row">
-      <span class="mlabel">程序直接控制（轮询）</span>
-      <select class="match" data-correct="A">
-        <option value="">请选择</option>
-        <option value="A">CPU 循环测试设备状态，与外设串行工作</option>
-        <option value="B">设备完成后发中断请求，CPU 响应唤醒进程</option>
-        <option value="C">直接成块传送，CPU 仅首尾参与，可周期窃取总线</option>
-        <option value="D">独立处理机，统一管理多台外设</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">中断方式</span>
-      <select class="match" data-correct="B">
-        <option value="">请选择</option>
-        <option value="A">CPU 循环测试设备状态，与外设串行工作</option>
-        <option value="B">设备完成后发中断请求，CPU 响应唤醒进程</option>
-        <option value="C">直接成块传送，CPU 仅首尾参与，可周期窃取总线</option>
-        <option value="D">独立处理机，统一管理多台外设</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">DMA 方式</span>
-      <select class="match" data-correct="C">
-        <option value="">请选择</option>
-        <option value="A">CPU 循环测试设备状态，与外设串行工作</option>
-        <option value="B">设备完成后发中断请求，CPU 响应唤醒进程</option>
-        <option value="C">直接成块传送，CPU 仅首尾参与，可周期窃取总线</option>
-        <option value="D">独立处理机，统一管理多台外设</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">通道方式</span>
-      <select class="match" data-correct="D">
-        <option value="">请选择</option>
-        <option value="A">CPU 循环测试设备状态，与外设串行工作</option>
-        <option value="B">设备完成后发中断请求，CPU 响应唤醒进程</option>
-        <option value="C">直接成块传送，CPU 仅首尾参与，可周期窃取总线</option>
-        <option value="D">独立处理机，统一管理多台外设</option>
-      </select>
+      <button class="opt" data-val="C">C. 通道方式</button>
+      <button class="opt" data-val="D">D. DMA 方式</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
 
-  <!-- t2: matching device allocation tables -->
-  <div class="task" data-task="t2-设备分配表匹配" data-type="selects"
-       data-ok="全部正确。四张表形成层级关系：SDT 是系统总表，DCT 是每设备一张，COCT 是每控制器一张，CHCT 是每通道一张，从设备到通道逐级查找。"
-       data-no="注意区分层级：SDT 记录全系统设备（总表），DCT 记录单个设备，COCT 记录控制器，CHCT 记录通道。不要把 DCT 和 SDT 搞反。"
-       data-src="原文依据：设备分配数据结构四张表"
-       data-review="回到「06 关键概念拆解 · 概念6」复习">
-    <div class="q"><span class="badge">T2</span>将设备分配数据结构与其描述匹配：</div>
-    <div class="match-row">
-      <span class="mlabel">DCT / DCB（设备控制表）</span>
-      <select class="match" data-correct="A">
-        <option value="">请选择</option>
-        <option value="A">记录每个设备的详细信息（设备级）</option>
-        <option value="B">记录系统中所有设备（系统级总表）</option>
-        <option value="C">记录每个控制器信息（控制器级）</option>
-        <option value="D">记录每个通道信息（通道级）</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">SDT（系统设备表）</span>
-      <select class="match" data-correct="B">
-        <option value="">请选择</option>
-        <option value="A">记录每个设备的详细信息（设备级）</option>
-        <option value="B">记录系统中所有设备（系统级总表）</option>
-        <option value="C">记录每个控制器信息（控制器级）</option>
-        <option value="D">记录每个通道信息（通道级）</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">COCT / COCB（控制器控制表）</span>
-      <select class="match" data-correct="C">
-        <option value="">请选择</option>
-        <option value="A">记录每个设备的详细信息（设备级）</option>
-        <option value="B">记录系统中所有设备（系统级总表）</option>
-        <option value="C">记录每个控制器信息（控制器级）</option>
-        <option value="D">记录每个通道信息（通道级）</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">CHCT / CHCB（通道控制表）</span>
-      <select class="match" data-correct="D">
-        <option value="">请选择</option>
-        <option value="A">记录每个设备的详细信息（设备级）</option>
-        <option value="B">记录系统中所有设备（系统级总表）</option>
-        <option value="C">记录每个控制器信息（控制器级）</option>
-        <option value="D">记录每个通道信息（通道级）</option>
-      </select>
-    </div>
-    <button class="check">检查</button>
-    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-  </div>
-
-  <!-- t3: I/O completion ordering -->
-  <div class="task" data-task="t3-IO步骤排序" data-type="selects"
-       data-ok="全部正确。完整流程：请求者发请求 → 驱动进程启动 I/O → I/O 完成后 CPU 中断 → 驱动进程收尾 → 请求者恢复运行。注意驱动进程运行有两次（启动和收尾）。"
-       data-no="关键逻辑：请求 → 驱动启动 → 硬件完成中断 → 驱动收尾 → 请求者继续。注意磁盘驱动进程运行出现了两次：第 2 步启动和第 4 步收尾。"
-       data-src="原文依据：I/O 完成步骤排序 5 个步骤"
-       data-review="回到「08 闯关式任务」复习，重点看 I/O 完成流程">
-    <div class="q"><span class="badge">T3</span>将以下 I/O 完成步骤按正确执行顺序排列（1 = 最先，5 = 最后）：</div>
-    <div class="match-row">
-      <span class="mlabel">请求者发出 I/O 请求</span>
-      <select class="match" data-correct="1">
-        <option value="">请选择</option>
-        <option value="1">第 1 步</option>
-        <option value="2">第 2 步</option>
-        <option value="3">第 3 步</option>
-        <option value="4">第 4 步</option>
-        <option value="5">第 5 步</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">磁盘驱动进程运行（第一次：启动 I/O）</span>
-      <select class="match" data-correct="2">
-        <option value="">请选择</option>
-        <option value="1">第 1 步</option>
-        <option value="2">第 2 步</option>
-        <option value="3">第 3 步</option>
-        <option value="4">第 4 步</option>
-        <option value="5">第 5 步</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">I/O 完成，CPU 响应中断</span>
-      <select class="match" data-correct="3">
-        <option value="">请选择</option>
-        <option value="1">第 1 步</option>
-        <option value="2">第 2 步</option>
-        <option value="3">第 3 步</option>
-        <option value="4">第 4 步</option>
-        <option value="5">第 5 步</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">磁盘驱动进程运行（第二次：收尾处理）</span>
-      <select class="match" data-correct="4">
-        <option value="">请选择</option>
-        <option value="1">第 1 步</option>
-        <option value="2">第 2 步</option>
-        <option value="3">第 3 步</option>
-        <option value="4">第 4 步</option>
-        <option value="5">第 5 步</option>
-      </select>
-    </div>
-    <div class="match-row">
-      <span class="mlabel">请求者进程恢复运行</span>
-      <select class="match" data-correct="5">
-        <option value="">请选择</option>
-        <option value="1">第 1 步</option>
-        <option value="2">第 2 步</option>
-        <option value="3">第 3 步</option>
-        <option value="4">第 4 步</option>
-        <option value="5">第 5 步</option>
-      </select>
-    </div>
-    <button class="check">检查</button>
-    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
-  </div>
-
-  <!-- t4: SPOOLing composition multi -->
-  <div class="task" data-task="t4-SPOOLing组成" data-answer="A,B,C" data-multi="true"
-       data-ok="正确。SPOOLing 三部分：①输入/输出井（磁盘上）②输入/输出缓冲区（内存中）③输入/输出进程。通道控制器和中断处理程序是操作系统的其他机制，不属于 SPOOLing。"
-       data-no="SPOOLing 的三部分组成是原文明确列出的。通道控制器（属于设备分配）和中断处理程序（属于 CPU 机制）都不是 SPOOLing 的组成部分。"
-       data-src="原文依据：'SPOOLing 组成三部分：输入井和输出井（磁盘上）；输入缓冲区和输出缓冲区（内存）；输入进程和输出进程'"
-       data-review="回到「06 关键概念拆解 · 概念5」复习">
-    <div class="q"><span class="badge">T4</span>SPOOLing 系统由哪些部分组成？（多选）</div>
+  <div class="task" data-task="ch5-m7b" data-answer="A" data-ok="对。打印机是独占设备，SPOOLing 用磁盘的输入井/输出井暂存多个进程的打印请求，让打印机"看起来"被多个进程同时用。" data-no="磁盘本来就是共享设备，不需要 SPOOLing；键盘是独占但不值得改造。" data-src="原文：SPOOLing 把独占设备改造为共享设备（典型应用：打印机）。" data-review="回到模块 6 看 SPOOLing 应用">
+    <div class="q">SPOOLing 最典型的应用场景是？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. 输入井和输出井（磁盘上）</button>
-      <button class="opt" data-val="B">B. 输入缓冲区和输出缓冲区（内存）</button>
-      <button class="opt" data-val="C">C. 输入进程和输出进程</button>
-      <button class="opt" data-val="D">D. 通道控制器</button>
-      <button class="opt" data-val="E">E. 中断处理程序</button>
+      <button class="opt" data-val="A">A. 把打印机（独占）改造成多个进程"同时"使用</button>
+      <button class="opt" data-val="B">B. 让磁盘读写更快</button>
+      <button class="opt" data-val="C">C. 让 CPU 速度提升</button>
+      <button class="opt" data-val="D">D. 增加内存容量</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
+</section>
 
-  <!-- t5: static vs dynamic allocation -->
-  <div class="task" data-task="t5-分配方式判断" data-answer="B"
-       data-ok="正确。动态分配在运行中按需分配、停用即收，效率好但可能死锁。静态分配在运行前就分配完毕，利用率低但不会死锁。"
-       data-no="注意区分：静态=运行前分配（利用率低但安全）；动态=运行中按需分配（效率好但可能死锁）。不要把两者说反。"
-       data-src="原文依据：'静态=运行前分配结束收回（利用率低）；动态=运行中按需分配停用即收（效率好但可能死锁）'"
-       data-review="回到「05 核心判断与依据 · 判断5」复习">
-    <div class="q"><span class="badge">T5</span>关于设备分配，以下说法正确的是？</div>
+<section id="s8">
+  <h2><span class="sec-id">08</span>手把手演示（大题）</h2>
+  <p style="background:var(--marker);padding:10px 14px;border-radius:8px;border:2px solid var(--forest)">本章大题的<strong>两大题型</strong>：I/O 完成 5 步骤排序 + SPOOLing 原理说明。下面手把手演示。</p>
+
+  <div class="walkthrough">
+    <div class="wt-title">演示 1 · I/O 完成 5 步骤排序（大题标准题型）</div>
+    <p>这是本章<strong>最典型的大题</strong>：给你一堆语句，让你按 I/O 从请求到完成的正确顺序排列。</p>
+    <div class="wt-given">场景：请求者进程要读磁盘上某文件的第 N 号记录。涉及请求者进程、磁盘驱动进程、通道、CPU 中断处理。<br>
+请把 I/O 完成的 5 个步骤按正确顺序排列，并说清每步谁在干什么。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 理解角色</div>
+      参与的有四方：<br>
+      • <strong>请求者进程</strong>（要数据的一方）<br>
+      • <strong>磁盘驱动进程</strong>（管磁盘设备的中间人，<strong>出现两次</strong>）<br>
+      • <strong>通道 + 磁盘硬件</strong>（实际干活的）<br>
+      • <strong>CPU 中断处理程序</strong>（完成后收尾的）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 5 步骤正确顺序</div>
+      <table class="calc-table">
+        <tr><th>步骤</th><th>谁</th><th>干什么</th></tr>
+        <tr><td><strong>① 请求</strong></td><td>请求者进程</td><td>发出读第 N 号记录的请求，求逻辑块号，阻塞自己等结果</td></tr>
+        <tr><td><strong>② 启动</strong></td><td>磁盘驱动进程（第1次）</td><td>把逻辑块号转物理地址，组织通道程序，启动通道，然后自己阻塞</td></tr>
+        <tr><td><strong>③ 传送+中断</strong></td><td>通道+磁盘</td><td>通道指挥磁盘把数据传到内存缓冲区，完成后向 CPU 发完成中断</td></tr>
+        <tr><td><strong>④ 中断处理</strong></td><td>CPU 中断处理程序</td><td>响应中断，分析原因，唤醒磁盘驱动进程（第2次运行）</td></tr>
+        <tr><td><strong>⑤ 交付</strong></td><td>磁盘驱动进程→请求者</td><td>把缓冲区的数据分离出来传给请求者，唤醒请求者进程</td></tr>
+      </table>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 记忆口诀</div>
+      <div class="formula">请求 → 启动 → 传送中断 → 中断处理 → 交付</div>
+      关键：<strong>请求者只管提需求和等结果（首尾），中间三步由驱动进程（两次）和 CPU 完成</strong>。注意磁盘驱动进程<strong>运行了两次</strong>（第②步启动、第④步后收尾）。
+    </div>
+
+    <div class="wt-final">✓ 答：① 请求者发请求 → ② 驱动进程启动通道 → ③ 通道传送并完成后中断 → ④ CPU 中断处理唤醒驱动 → ⑤ 驱动把数据交付请求者。<br>口诀：请求-启动-中断-处理-交付；请求者首尾出现，驱动进程两次运行。</div>
+  </div>
+
+  <div class="task" data-task="ch5-m8a" data-answer="B" data-ok="对。启动通道、组织通道程序是磁盘驱动进程的职责，它把逻辑块号转成物理地址后启动设备。" data-no="请求者不直接启动设备；CPU 不组织通道程序；通道是被启动的对象。" data-src="原文：磁盘驱动进程运行：组织通道程序、启动通道与设备。" data-review="回到模块 8 演示 1 的第 2 步">
+    <div class="q">I/O 完成 5 步骤中，"把逻辑块号转成物理地址、组织通道程序、启动通道"是第几步、由谁完成？</div>
     <div class="opts">
-      <button class="opt" data-val="A">A. 静态分配效率高，不会死锁</button>
-      <button class="opt" data-val="B">B. 动态分配利用率高，但可能死锁</button>
-      <button class="opt" data-val="C">C. 静态分配在运行中按需分配</button>
-      <button class="opt" data-val="D">D. 动态分配在运行前就分配完毕</button>
+      <button class="opt" data-val="A">A. 第1步，请求者进程</button>
+      <button class="opt" data-val="B">B. 第2步，磁盘驱动进程</button>
+      <button class="opt" data-val="C">C. 第3步，CPU 中断处理</button>
+      <button class="opt" data-val="D">D. 第4步，通道硬件</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch5-m8b" data-answer="C" data-ok="对。磁盘驱动进程运行了两次：第②步启动通道，第④步被中断处理唤醒后交付数据。" data-no="请求者首尾各一次（共2次），但驱动进程才是中间出现两次的角色。" data-src="原文：5步骤里磁盘驱动进程运行出现两次。" data-review="回到模块 8 演示 1 的第 3 步">
+    <div class="q">I/O 完成 5 步骤中，哪个角色<strong>运行了两次</strong>？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 请求者进程</button>
+      <button class="opt" data-val="B">B. CPU</button>
+      <button class="opt" data-val="C">C. 磁盘驱动进程（第②步启动、第④步收尾）</button>
+      <button class="opt" data-val="D">D. 通道</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="walkthrough">
+    <div class="wt-title">演示 2 · SPOOLing 原理（以打印机为例）</div>
+    <p>另一类大题：解释 SPOOLing 如何把独占设备变共享。</p>
+    <div class="wt-given">场景：多个进程都要用打印机打印。打印机是独占设备，直接分配会死锁或低效。<br>用 SPOOLing 解决，说明原理。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 不用 SPOOLing 的问题</div>
+      打印机一次只能服务一个进程。进程 A 打印时，进程 B、C 只能等。如果 A 申请到打印机后阻塞了不释放，B、C 会死锁。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · SPOOLing 的做法</div>
+      在磁盘上辟一块"<strong>输出井</strong>"，每个进程要打印时：<br>
+      ① 进程的打印数据先写到输出井（<strong>假装打印完了</strong>，进程立即返回干别的事）<br>
+      ② 输出井里排起打印队列<br>
+      ③ SPOOLing 的输出进程从队列里取数据，<strong>慢慢</strong>送到真正的打印机打印<br>
+      <span class="badge eg">关键</span>对进程来说，"打印"瞬间完成（其实只是写到磁盘）；真正的打印在后台慢慢做。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 为什么算"共享"</div>
+      多个进程的打印请求都进了输出井排队，打印机<strong>物理上还是一次打一个</strong>，但<strong>逻辑上多个进程"同时"在用</strong>——这就是"虚拟设备"。<br>
+      <strong>三大特点</strong>：① 提高 I/O 速度（进程不用等）② 独占变共享 ③ 实现虚拟设备。
+    </div>
+
+    <div class="wt-final">✓ 答：SPOOLing 用磁盘输出井做缓冲，进程的打印请求先入井排队，后台进程慢慢送到打印机。物理独占，逻辑共享，实现虚拟设备。</div>
+  </div>
+
+  <div class="task" data-task="ch5-m8c" data-answer="A" data-ok="对。SPOOLing 三部分：输入井/输出井（磁盘）、输入/输出缓冲区（内存）、输入/输出进程（管理模块）。" data-no="CPU 和总线不是 SPOOLing 的组成部分。" data-src="原文：SPOOLING 系统的组成：输入井和输出井、输入缓冲区和输出缓冲区、输入进程和输出进程。" data-review="回到模块 8 演示 2 的第 2 步">
+    <div class="q">SPOOLing 系统的三个组成部分是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 输入井/输出井 + 输入/输出缓冲区 + 输入/输出进程</button>
+      <button class="opt" data-val="B">B. CPU + 内存 + 总线</button>
+      <button class="opt" data-val="C">C. 打印机 + 磁盘 + 显示器</button>
+      <button class="opt" data-val="D">D. 设备 + 控制器 + 通道</button>
     </div>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
 </section>
 
-<!-- MODULE 09 -->
-<section class="module" id="m09">
-  <div class="module-num">09</div>
-  <h2 class="module-title">误解与边界</h2>
+<section id="s9">
+  <h2><span class="sec-id">09</span>误解与边界</h2>
 
-  <div class="misconception card alert">
-    <h4>❌ 误解1："DMA 完全不需要 CPU 参与"</h4>
-    <p style="font-size:14px;margin-top:6px;"><strong>为什么容易误解：</strong> DMA 的核心卖点是"直接传送"，听起来像 CPU 完全不参与。</p>
-    <p style="font-size:14px;"><strong>原文真正说了什么：</strong> CPU 仅开始发"传送一块"命令，结束时处理。中间的数据传输不需要 CPU，但首尾仍需 CPU。</p>
-    <p style="font-size:14px;"><strong>原文没有说什么：</strong> 原文从没说 CPU 完全不参与 DMA 流程。</p>
-    <p style="font-size:14px;"><strong>如何避免：</strong> 记住 DMA 的公式——"CPU 管开头和结尾，中间交给 DMA 控制器"。</p>
+  <div class="miscon">
+    <strong>误解 1：SPOOLing 就是缓冲技术</strong><br>
+    <span class="badge infer">推论错</span>SPOOLing <strong>用了</strong>缓冲（缓冲区是它的一部分），但它本质是"<strong>用磁盘把独占设备虚拟成共享设备</strong>"，不只是缓冲。缓冲只暂存数据，SPOOLing 还涉及进程管理和设备改造。
   </div>
 
-  <div class="misconception card alert">
-    <h4>❌ 误解2：SPOOLing 的输入井和输出井搞反</h4>
-    <p style="font-size:14px;margin-top:6px;"><strong>为什么容易误解：</strong> "输入"和"输出"的视角容易混淆——是从 CPU 角度还是从设备角度？</p>
-    <p style="font-size:14px;"><strong>原文真正说了什么：</strong> 输入井是预输入程序把作业读到磁盘上（外设→磁盘，供 CPU 读取）；输出井是缓输出程序把数据写到打印机等设备（CPU→磁盘→外设）。</p>
-    <p style="font-size:14px;"><strong>如何避免：</strong> 以"数据的流向"为准：输入井=数据从外面进来暂存的地方；输出井=数据要输出到外面之前暂存的地方。</p>
-    <div class="evidence">原文依据："预输入程序读作业到输入井→主存装入作业→井管理程序读写→缓输出程序在打印机输出"</div>
+  <div class="miscon">
+    <strong>误解 2：DMA 不需要任何 CPU 参与</strong><br>
+    <span class="badge fact">事实错</span>DMA 只是<strong>减少</strong>了 CPU 参与（中间传数据不用 CPU），但<strong>开始时 CPU 要发"传送一块"命令，结束时要做处理</strong>。完全不需要 CPU 的是通道方式。
   </div>
 
-  <div class="misconception card alert">
-    <h4>❌ 误解3："中断方式已经是最佳方案了"</h4>
-    <p style="font-size:14px;margin-top:6px;"><strong>为什么容易误解：</strong> 中断方式确实"大大提高 CPU 利用率"，听起来已经很好了。</p>
-    <p style="font-size:14px;"><strong>原文真正说了什么：</strong> 中断方式的缺点是"每次 I/O 都要 CPU 干预，多设备时利用率仍降"。DMA 和通道进一步减少了 CPU 干预。</p>
-    <p style="font-size:14px;"><strong>如何避免：</strong> 记住演进链——每种方式解决了前一种的缺点，没有"最好"只有"更好"。</p>
+  <div class="miscon">
+    <strong>误解 3：SPOOLing 的输入井/输出井在内存</strong><br>
+    <span class="badge fact">事实错</span>输入井/输出井在<strong>磁盘</strong>上（容量大、能暂存多个进程的数据）；内存里的是<strong>输入缓冲区/输出缓冲区</strong>（容量小，做中转）。别搞混。
   </div>
 
-  <div class="misconception card alert">
-    <h4>❌ 误解4："SPOOLing 就是缓冲技术"</h4>
-    <p style="font-size:14px;margin-top:6px;"><strong>为什么容易误解：</strong> SPOOLing 确实用到了缓冲区。</p>
-    <p style="font-size:14px;"><strong>原文真正说了什么：</strong> 缓冲区只是 SPOOLing 三组成之一。SPOOLing 是一个完整的系统——磁盘缓冲 + 内存缓冲 + 进程管理，实现独占→共享的虚拟化。</p>
-    <p style="font-size:14px;"><strong>如何避免：</strong> SPOOLing ≠ Buffer。Buffer 只缓解速度差，SPOOLing 还改变了设备的使用方式（独占变共享）。</p>
-  </div>
-</section>
-
-<!-- MODULE 10 -->
-<section class="module" id="m10">
-  <div class="module-num">10</div>
-  <h2 class="module-title">背景知识缺口</h2>
-
-  <div class="card">
-    <p><strong>1. 中断处理的完整机制</strong></p>
-    <p style="font-size:14px;margin-top:4px;">本章提到"CPU 响应中断"但没有展开中断向量、中断服务程序等细节。考试一般不深入考，但理解中断处理流程能帮你更好理解 I/O 完成步骤。</p>
-    <p style="font-size:13px;color:#666;"><em>可以先不补，如果时间紧。</em></p>
+  <div class="miscon">
+    <strong>误解 4：I/O 完成步骤里请求者进程全程参与</strong><br>
+    <span class="badge judge">大题扣分点</span>请求者进程<strong>只参与第 1 步（发请求）和第 5 步（拿结果）</strong>，中间 3 步（启动、传送、中断处理）由驱动进程和 CPU 完成，请求者在阻塞等待。
   </div>
 
-  <div class="card">
-    <p><strong>2. 总线仲裁机制</strong></p>
-    <p style="font-size:14px;margin-top:4px;">DMA 的"周期窃取总线"涉及总线控制权切换。理解总线仲裁能帮你理解为什么 DMA 不能完全取代 CPU。</p>
-    <p style="font-size:13px;color:#666;"><em>建议了解，考试不太直接考但有助于理解。</em></p>
-  </div>
-
-  <div class="card">
-    <p><strong>3. 死锁与设备分配安全性</strong></p>
-    <p style="font-size:14px;margin-top:4px;">动态分配"可能死锁"——具体怎么死锁？这需要第 4 章的死锁知识。如果还没学死锁，先记住"动态分配需要安全性检查"即可。</p>
-    <p style="font-size:13px;color:#666;"><em>如果已学死锁章，回顾一下死锁必要条件。</em></p>
-  </div>
-
-  <div class="card">
-    <p><strong>4. 磁盘调度算法</strong></p>
-    <p style="font-size:14px;margin-top:4px;">本章提到"I/O 调度：确定好的顺序执行请求"，但具体算法（FCFS、SSTF、SCAN 等）可能在其他章节。大题可能结合磁盘调度出。</p>
-    <p style="font-size:13px;color:#666;"><em>建议结合文件管理章一起看。</em></p>
-  </div>
-
-  <div class="card hl">
-    <p><strong>推荐下一步追问：</strong></p>
-    <ul style="font-size:14px;margin-left:20px;margin-top:6px;">
-      <li>如果通道比 DMA 更强，为什么现代 PC 主要用 DMA 而不是通道？</li>
-      <li>SPOOLing 的"虚拟设备"和虚拟机的"虚拟"有什么本质区别？</li>
-      <li>缓冲区的单缓冲、双缓冲、循环缓冲各有什么适用场景？</li>
-    </ul>
+  <div class="task" data-task="ch5-m9" data-answer="B" data-ok="对。输入井/输出井在磁盘上，缓冲区在内存里。别搞混。" data-no="井在磁盘（大），缓冲区在内存（小）。" data-src="原文：输入井和输出井（磁盘）、输入缓冲区和输出缓冲区（内存）。" data-review="回到模块 9 看 SPOOLing 误解">
+    <div class="q">SPOOLing 的"输入井/输出井"位于哪里？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 内存</button>
+      <button class="opt" data-val="B">B. 磁盘</button>
+      <button class="opt" data-val="C">C. CPU 寄存器</button>
+      <button class="opt" data-val="D">D. 缓存</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
 </section>
 
-<!-- MODULE 11 -->
-<section class="module" id="m11">
-  <div class="module-num">11</div>
-  <h2 class="module-title">复盘与学习报告</h2>
+<section id="s10">
+  <h2><span class="sec-id">10</span>背景知识缺口</h2>
+  <p>读完本章如果还卡，通常缺的是：</p>
+  <ul>
+    <li><strong>中断的完整机制</strong>：中断向量、中断服务程序——第1章运行环境讲过，这里只是应用。</li>
+    <li><strong>通道的工作原理</strong>：通道是独立处理机，有自己的指令（通道指令）。考试只需知道它"代替 CPU 管 I/O"。</li>
+    <li><strong>缓冲区的分类</strong>：单缓冲、双缓冲、循环缓冲——本章大题不深考，了解即可。</li>
+    <li><strong>死锁与设备分配</strong>：独占设备分配不当会死锁（第2章死锁的源头之一）。</li>
+  </ul>
+  <div class="task" data-task="ch5-m10" data-answer="C" data-ok="对。通道是独立处理机，有自己的通道指令，能完全代替 CPU 管理 I/O。" data-no="通道不是缓冲区、不是寄存器、也不是总线，是独立处理机。" data-src="原文：通道是独立于 CPU 的专门负责数据输入/输出传输工作的处理机。" data-review="回到模块 10 看通道">
+    <div class="q">「通道」的本质是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 一种特殊的缓冲区</button>
+      <button class="opt" data-val="B">B. CPU 内部的寄存器</button>
+      <button class="opt" data-val="C">C. 独立于 CPU 的专门处理机，能代替 CPU 管 I/O</button>
+      <button class="opt" data-val="D">D. 一种总线类型</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s11">
+  <h2><span class="sec-id">11</span>复盘与学习报告</h2>
+  <p>本章复盘问自己三件事：</p>
+  <ul>
+    <li>能不能说清四种 I/O 控制方式的区别（查询/中断/DMA/通道，并行递增）？</li>
+    <li>能不能默写 SPOOLing 的三组成和三大特点？</li>
+    <li>能不能按正确顺序排出 I/O 完成的 5 个步骤？</li>
+  </ul>
 
   <div class="wrong-section">
-    <h3>📋 错题回流区</h3>
-    <ul id="wrongBox">
-      <li style="color:#888">还没有错题。答错的题会自动收集到这里。</li>
-    </ul>
+    <h3>错题回流</h3>
+    <p>答错的题会自动收集到这里，按提示回到对应模块复习。</p>
+    <ul id="wrongBox"></ul>
   </div>
 
   <div class="report-section">
+    <h3>生成学习报告</h3>
+    <p>点击按钮，生成你的本章学习报告（可复制到笔记）。</p>
+    <textarea id="report" readonly></textarea>
     <div class="report-btns">
       <button id="genReport">生成学习报告</button>
       <button id="copyReport">复制报告</button>
     </div>
-    <textarea id="report" readonly placeholder="点击「生成学习报告」查看你的学习情况……"></textarea>
-  </div>
-
-  <div class="card hl" style="margin-top:20px;">
-    <p><strong>复盘检查点：</strong></p>
-    <ul style="font-size:14px;margin-left:20px;margin-top:8px;">
-      <li>我能按并行程度排列四种 I/O 控制方式吗？</li>
-      <li>我能默写 SPOOLing 的三组成和三特点吗？</li>
-      <li>我能列出设备分配四张表并说明层级关系吗？</li>
-      <li>我能排出 I/O 完成的 5 个步骤吗？</li>
-      <li>我知道 DMA "不完全不需要 CPU"的原因吗？</li>
-      <li>我能区分 SPOOLing 输入井和输出井的方向吗？</li>
-    </ul>
   </div>
 </section>
 
 </main>
-</div><!-- /layout -->
+</div>
 
-<!-- ========== FOOTER ========== -->
 <footer class="footer">
-  <p>由 <a href="https://github.com" target="_blank" rel="noopener">Grokko</a> 生成 · 这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快</p>
+  由 <a href="https://github.com/remi-huang/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · 强化计算演示版<br>
+  <span class="tip">这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。</span>
 </footer>
 
-<!-- ========== FIXED INTERACTIVE ENGINE (DO NOT MODIFY) ========== -->
 <script>
 (function(){
   "use strict";
@@ -819,10 +579,14 @@ select.match{padding:8px 14px;border:2px solid #D5CCB8;border-radius:8px;font-si
   function genReport(){
     var box=document.getElementById('report');if(!box)return;
     var all=$all('.task'),done=$all('.task[data-answered="1"]'),right=$all('.task[data-answered="1"][data-correct="1"]');
-    var lines=['=== 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
+    var lines=['=== 第5章 I/O 设备管理 · 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
     var wrong=$all('.task[data-answered="1"][data-correct="0"]');
     if(wrong.length){lines.push('我答错的题（建议复习）：');wrong.forEach(function(t){lines.push('- '+(t.getAttribute('data-task')||'')+'：'+(t.getAttribute('data-review')||''));});}
     else{lines.push('暂无错题。');}
+    lines.push('','核心自测：');
+    lines.push('- [ ] 能说清四种 I/O 控制方式区别');
+    lines.push('- [ ] 能默写 SPOOLing 三组成三特点');
+    lines.push('- [ ] 能排出 I/O 完成 5 步骤顺序');
     box.textContent=lines.join('\n');
   }
   document.addEventListener('click',function(e){

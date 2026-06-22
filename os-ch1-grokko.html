@@ -3,26 +3,466 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>操作系统第 1 章：概述 - Grokko 理解地图</title>
+<title>操作系统 第1章 操作系统概述 — 理解地图</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--cream:#FAF6EB;--paper:#F3EDDD;--forest:#1E3A24;--sky:#BCD8EE;--sage:#AFCDA8;--ink:#1A2018;--marker:#F5E08A;--brick:#B5482A;--correct:#2F7D46;--wrong:#B5482A;--font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;--font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;--font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Roboto Mono","JetBrains Mono",monospace;--radius-pill:999px;--radius-card:14px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.72}.layout{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:100vh}.side{position:sticky;top:0;height:100vh;background:var(--forest);color:var(--cream);padding:26px 20px;overflow:auto}.brand{font-family:var(--font-display);font-size:30px;line-height:1;letter-spacing:0;margin-bottom:10px}.sub{font-size:13px;color:rgba(250,246,235,.76);margin-bottom:20px}.progress{background:rgba(250,246,235,.12);border:1px solid rgba(250,246,235,.2);border-radius:var(--radius-card);padding:14px;margin-bottom:18px}.bar{height:10px;background:rgba(250,246,235,.25);border-radius:var(--radius-pill);overflow:hidden}.bar span{display:block;width:0;height:100%;background:var(--marker);transition:.25s}.bar-meta{display:flex;justify-content:space-between;margin-top:9px;font-family:var(--font-mono);font-size:12px}.nav{display:grid;gap:8px}.nav a{color:var(--cream);text-decoration:none;display:grid;grid-template-columns:38px 1fr;gap:9px;align-items:center;padding:10px;border-radius:10px;background:rgba(250,246,235,.08);border:1px solid transparent}.nav a:hover{background:rgba(188,216,238,.18);border-color:rgba(188,216,238,.38)}.nav b{font-family:var(--font-mono);color:var(--marker);font-size:12px}.main{padding:42px 5vw 64px;max-width:1080px}.hero{padding:34px 0 28px;border-bottom:4px solid var(--forest);margin-bottom:28px}.eyebrow{display:inline-block;background:var(--marker);border:2px solid var(--forest);border-radius:var(--radius-pill);padding:5px 12px;font-weight:700;font-size:13px;margin-bottom:14px}h1{font-family:var(--font-display);font-size:clamp(34px,5vw,66px);line-height:1.03;letter-spacing:0;color:var(--forest);margin-bottom:14px}h2{font-family:var(--font-head);font-size:26px;color:var(--forest);margin-bottom:14px}h3{font-family:var(--font-head);font-size:18px;color:var(--forest);margin:18px 0 8px}.lead{font-size:18px;max-width:850px}.path{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.path div,.note,.source,.formula{background:var(--paper);border:2px solid var(--forest);border-radius:var(--radius-card);padding:14px}.path strong{display:block;color:var(--brick);margin-bottom:4px}.module{padding:28px 0;border-bottom:1px solid rgba(30,58,36,.25)}.module-kicker{font-family:var(--font-mono);font-size:12px;color:var(--brick);font-weight:700;text-transform:uppercase;margin-bottom:5px}ul{padding-left:22px;margin:10px 0}li{margin:5px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.card{background:#fffaf0;border:2px solid rgba(30,58,36,.9);border-radius:var(--radius-card);padding:14px}.card h3{margin-top:0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chips span{background:var(--sage);border:1px solid var(--forest);border-radius:var(--radius-pill);padding:5px 10px;font-weight:700;font-size:13px}.quote{border-left:6px solid var(--brick);background:#fffaf0;padding:12px 14px;margin:12px 0}.task{background:var(--sky);border:3px solid var(--forest);border-radius:var(--radius-card);padding:16px;margin-top:16px;box-shadow:5px 5px 0 rgba(30,58,36,.2)}.q{font-weight:800;margin-bottom:10px}.opts{display:grid;gap:8px}.opt,.check,#genReport,#copyReport{font:inherit;font-weight:700;border:2px solid var(--forest);background:#fffaf0;color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left}.opt.selected{background:var(--marker)}.check,#genReport,#copyReport{display:inline-block;margin-top:12px;background:var(--forest);color:var(--cream);text-align:center}.feedback{margin-top:10px;background:rgba(255,250,240,.72);border-radius:10px;padding:10px}.feedback.ok{border-left:6px solid var(--correct)}.feedback.no{border-left:6px solid var(--wrong)}.match-grid{display:grid;gap:8px}.match-grid label{display:grid;grid-template-columns:1fr 230px;gap:10px;align-items:center}.match{font:inherit;border:2px solid var(--forest);border-radius:10px;padding:8px;background:#fffaf0}.wrong-list{display:grid;gap:8px}.wrong-list a{color:var(--brick);font-weight:700}.report-box{white-space:pre-wrap;background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:14px;margin-top:12px}.footer{padding-top:30px;color:rgba(26,32,24,.75);font-size:14px}.footer a{color:#1d70b8;text-decoration:underline;font-weight:700}@media(max-width:880px){.layout{display:block}.side{position:relative;height:auto}.main{padding:28px 18px 50px}.path,.grid{grid-template-columns:1fr}.match-grid label{grid-template-columns:1fr}h1{font-size:36px}}
+:root{
+  --cream:#FAF6EB; --paper:#F3EDDD; --forest:#1E3A24; --sky:#BCD8EE;
+  --sage:#AFCDA8; --ink:#1A2018; --marker:#F5E08A; --brick:#B5482A;
+  --correct:#2F7D46; --wrong:#B5482A;
+  --font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;
+  --font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;
+  --font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+  --font-mono:"Roboto Mono","JetBrains Mono",monospace;
+  --radius-pill:999px; --radius-card:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.7;font-size:16px}
+.layout{display:flex;align-items:flex-start;max-width:1100px;margin:0 auto}
+.sidebar{position:sticky;top:0;height:100vh;width:270px;flex-shrink:0;background:var(--forest);color:var(--cream);padding:28px 20px;overflow-y:auto}
+.sidebar h1{font-family:var(--font-display);font-size:1.15rem;line-height:1.35;margin-bottom:6px;color:var(--marker)}
+.sidebar .sub{font-size:.78rem;color:var(--sage);margin-bottom:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-bar{background:rgba(255,255,255,.15);height:8px;border-radius:var(--radius-pill);overflow:hidden}
+.progress-fill{background:var(--marker);height:100%;width:0;transition:width .4s ease}
+.progress-num{font-family:var(--font-mono);font-size:.78rem;margin-top:6px;color:var(--sky)}
+.nav{list-style:none}
+.nav li{margin-bottom:2px}
+.nav a{display:block;padding:8px 10px;border-radius:8px;font-size:.85rem;color:var(--cream);text-decoration:none;transition:background .2s}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav .num{font-family:var(--font-mono);font-size:.72rem;color:var(--sky);margin-right:8px}
+.main{flex:1;min-width:0;padding:40px 44px;max-width:780px}
+.main section{margin-bottom:48px;scroll-margin-top:20px}
+.main h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--forest);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--sage)}
+.main h3{font-family:var(--font-head);font-size:1.05rem;color:var(--forest);margin:18px 0 10px}
+.main p{margin-bottom:12px}
+.card{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.card.warn{border-left-color:var(--brick)}
+.card.key{border-left-color:var(--marker)}
+.src-quote{background:var(--sky);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:.85rem;margin:10px 0;color:var(--ink);border-left:3px solid var(--forest)}
+.src-tag{display:inline-block;background:var(--forest);color:var(--marker);font-size:.7rem;padding:2px 8px;border-radius:var(--radius-pill);font-family:var(--font-mono);margin-bottom:6px}
+.objective{background:var(--paper);border-radius:var(--radius-card);padding:16px 20px;margin-bottom:10px;border-left:4px solid var(--forest)}
+.objective .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);font-weight:600;margin-bottom:4px}
+.bg-item{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--sky)}
+.bg-item .label{font-size:.72rem;color:var(--brick);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.concept{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.concept .term{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.05rem}
+.concept .plain{color:var(--brick);font-style:italic;margin:6px 0}
+.miscon{background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;margin-bottom:12px;border-left:4px solid var(--wrong)}
+.task{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:16px}
+.task .q{font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opt{background:var(--cream);border:2px solid transparent;border-radius:8px;padding:10px 14px;cursor:pointer;font-family:var(--font-body);font-size:.92rem;text-align:left;transition:all .2s;color:var(--ink)}
+.opt:hover{border-color:var(--sky)}
+.opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
+.check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
+.check:hover{background:#2a5232}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
+.feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
+.feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
+select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-radius:8px;border:2px solid var(--sage);background:var(--cream);font-family:var(--font-body);font-size:.9rem}
+.wrong-section{background:#fce8e8;border-radius:var(--radius-card);padding:18px 22px;margin-top:20px;border-left:4px solid var(--wrong)}
+.wrong-section h3{color:var(--wrong)}
+#wrongBox{list-style:none;padding-left:0}
+#wrongBox li{padding:6px 0;font-size:.88rem;border-bottom:1px dashed rgba(181,72,42,.2)}
+.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-top:20px}
+.report-section textarea{width:100%;min-height:200px;border-radius:8px;border:2px solid var(--sage);padding:12px;font-family:var(--font-mono);font-size:.85rem;background:var(--cream);color:var(--ink);resize:vertical}
+.report-btns{display:flex;gap:10px;margin-top:10px}
+.report-btns button{background:var(--forest);color:var(--cream);border:none;padding:8px 18px;border-radius:var(--radius-pill);cursor:pointer;font-family:var(--font-head);font-size:.85rem}
+.struct-map{font-family:var(--font-mono);font-size:.85rem;line-height:2;background:var(--paper);border-radius:var(--radius-card);padding:18px 22px;white-space:pre-wrap;color:var(--ink)}
+.formula{background:var(--forest);color:var(--marker);font-family:var(--font-mono);font-size:.95rem;padding:14px 18px;border-radius:8px;margin:10px 0;text-align:center}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+.info-table th{background:var(--forest);color:var(--marker);padding:8px 12px;text-align:left;font-family:var(--font-head);font-size:.82rem}
+.info-table td{padding:8px 12px;border-bottom:1px solid #ddd;background:var(--cream)}
+.badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.badge.fact{background:var(--sky);color:var(--forest)}
+.badge.judge{background:var(--marker);color:var(--forest)}
+.badge.infer{background:var(--sage);color:var(--forest)}
+.badge.eg{background:#E8D5C4;color:var(--brick)}
+.footer{max-width:1100px;margin:0 auto;padding:30px 44px;text-align:center;font-size:.82rem;color:#888}
+.footer a{color:#1d70b8;text-decoration:underline}
+.footer .tip{margin-top:6px;color:#aaa}
+.sec-id{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);background:var(--marker);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;vertical-align:middle}
+@media(max-width:860px){.layout{flex-direction:column}.sidebar{position:relative;height:auto;width:100%;padding:20px}.main{padding:24px 20px}.nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin-bottom:0}}
 </style>
 </head>
 <body>
-<div class="layout"><aside class="side"><div class="brand">Grokko</div><div class="sub">第1章 操作系统概述 · 11 模块理解地图</div><div class="progress"><div class="bar"><span id="barFill"></span></div><div class="bar-meta"><span>已完成</span><span id="barNum">0 / 0</span></div></div><nav class="nav"><a href="#m1"><b>01</b><span>学习目标与阅读路径</span></a><a href="#m2"><b>02</b><span>零基础背景包</span></a><a href="#m3"><b>03</b><span>原文问题定位</span></a><a href="#m4"><b>04</b><span>原文结构地图</span></a><a href="#m5"><b>05</b><span>核心判断与依据</span></a><a href="#m6"><b>06</b><span>关键概念拆解</span></a><a href="#m7"><b>07</b><span>苏格拉底式阅读关卡</span></a><a href="#m8"><b>08</b><span>闯关式任务包装</span></a><a href="#m9"><b>09</b><span>误解与边界</span></a><a href="#m10"><b>10</b><span>背景知识缺口</span></a><a href="#m11"><b>11</b><span>复盘与学习报告</span></a></nav></aside><main class="main"><section class="hero"><span class="eyebrow">考试权重低 · 选择题为主</span><h1>操作系统第 1 章：概述</h1><p class="lead">本章是操作系统的入口：先把 OS 的两句话精髓、四大特征、五大功能和五大类型记牢，再用管态/用户态与中断把“为什么 OS 能管机器”连起来。</p><div class="path"><div><strong>先抓主线</strong>定义与特征先定框架：OS 是系统软件，核心是方便用户并管理资源。</div><div><strong>再练题型</strong>按选择题口径辨析四大特征、五大功能、五大类型和分时/实时差异。</div><div><strong>最后避坑</strong>运行环境不要背散点，要抓特权指令、中断、状态切换这条控制链。</div></div></section><section id="m1" class="module"><div class="module-kicker">模块 1</div><h2>学习目标与阅读路径</h2><p>这一章不追求大题推导，目标是把选择题会混淆的词组拆开。</p><div class="chips"><span>两句话精髓</span><span>四大特征</span><span>五大功能</span><span>五大类型</span><span>管态/用户态</span><span>中断向量</span></div><div class="quote">原文定位：考试权重低，不出大题，以选择题为主，是 20 道选择题的背景知识来源。</div><div class="task" data-task="ch1-m1" data-answer="B" data-ok="本章原文明确是低权重、选择题为主，所以核心是辨析概念。" data-no="把本章当成大题章会错配时间；页面置换和磁盘调度属于后续章节。" data-src="原文：不出大题，以选择题为主。" data-review="回到模块 1 看复习定位"><div class="q">本章最适合的复习策略是什么？</div><div class="opts"><button class="opt" data-val="A">A. 把每个概念背成完整论述题</button><button class="opt" data-val="B">B. 抓定义、分类和易混特征，服务选择题判断</button><button class="opt" data-val="C">C. 只练页面置换表</button><button class="opt" data-val="D">D. 只背磁盘调度算法</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m2" class="module"><div class="module-kicker">模块 2</div><h2>零基础背景包</h2><p>OS 可以理解成用户、应用程序和硬件之间的管理层。它既向上提供接口，也向下控制资源。</p><div class="grid"><div class="card"><h3>向上</h3><p>让用户方便地运行程序、操作文件、做 I/O 和通信。</p></div><div class="card"><h3>向下</h3><p>管理处理机、存储器、设备、文件等资源，处理保护、统计和差错。</p></div></div><div class="task" data-task="ch1-m2" data-answer="A" data-ok="系统调用是用户程序进入 OS 服务的入口。" data-no="系统调用不是磁盘、Cache 或文件块算法。" data-src="原文：OS 的服务包括公共服务类型 + 系统调用。" data-review="回到模块 2 看 OS 的上下接口"><div class="q">“系统调用”更接近 OS 的哪一侧功能？</div><div class="opts"><button class="opt" data-val="A">A. 用户/程序请求 OS 服务的接口</button><button class="opt" data-val="B">B. 磁盘柱面移动规则</button><button class="opt" data-val="C">C. Cache 替换算法</button><button class="opt" data-val="D">D. 文件物理块编号</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m3" class="module"><div class="module-kicker">模块 3</div><h2>原文问题定位</h2><p>原文把本章分成三块：概念/特征/功能和服务，发展与分类，运行环境。每块都服务于“判断题式识别”。</p><ul><li>概念块：OS 定义、四大特征、五大功能、服务。</li><li>分类块：批处理、分时、实时、网络、分布式。</li><li>环境块：管态/用户态、特权指令、存储体系、中断。</li></ul><div class="task" data-task="ch1-m3" data-answer="C" data-ok="管态/用户态、特权指令和中断都在运行环境部分。" data-no="A/B/D 都属于系统类型或发展分类的辨析。" data-src="原文：（三）运行环境：管态/用户态、特权指令。" data-review="回到模块 3 看三块结构"><div class="q">哪一项属于“运行环境”而不是“发展与分类”？</div><div class="opts"><button class="opt" data-val="A">A. 分时系统四特点</button><button class="opt" data-val="B">B. 批处理吞吐率高</button><button class="opt" data-val="C">C. 管态/用户态与特权指令</button><button class="opt" data-val="D">D. 网络操作系统能力</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m4" class="module"><div class="module-kicker">模块 4</div><h2>原文结构地图</h2><div class="grid"><div class="card"><h3>概念层</h3><ul><li>OS 定义</li><li>并发/共享/虚拟/异步</li><li>五大功能</li><li>服务与系统调用</li></ul></div><div class="card"><h3>类型层</h3><ul><li>批处理</li><li>分时</li><li>实时</li><li>网络</li><li>分布式</li></ul></div><div class="card"><h3>机制层</h3><ul><li>管态/用户态</li><li>特权指令</li><li>ROM/RAM/Cache</li><li>中断向量</li></ul></div><div class="card"><h3>考试层</h3><ul><li>选择题识别</li><li>概念配对</li><li>优缺点辨析</li><li>状态切换判断</li></ul></div></div><div class="task" data-task="ch1-m4" data-type="selects" data-ok="四大特征的通俗解释与原文一致。" data-no="这些词容易按日常语义误配，回去重看四大特征。" data-src="原文：并发“大家一起前进了”、虚拟“一个物理实体变成若干逻辑事物”、异步性“你走我停”。" data-review="回到模块 4 看结构地图"><div class="q">把概念与对应解释配对。</div><div class="match-grid"><label><span>并发</span><select class="match" data-correct="大家一起前进了"><option value="">选择</option><option value="一个物理实体变多个逻辑事物">一个物理实体变多个逻辑事物</option><option value="大家一起前进了">大家一起前进了</option><option value="你走我停">你走我停</option></select></label><label><span>虚拟</span><select class="match" data-correct="一个物理实体变多个逻辑事物"><option value="">选择</option><option value="一件东西大家用">一件东西大家用</option><option value="一个物理实体变多个逻辑事物">一个物理实体变多个逻辑事物</option><option value="响应时间毫秒级">响应时间毫秒级</option></select></label><label><span>异步性</span><select class="match" data-correct="你走我停"><option value="">选择</option><option value="你走我停">你走我停</option><option value="全网统一记账">全网统一记账</option><option value="吞吐率高">吞吐率高</option></select></label></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m5" class="module"><div class="module-kicker">模块 5</div><h2>核心判断与依据</h2><p>本章有几条必须稳定的判断。</p><ul><li>OS 是方便用户、管理和控制软硬件资源的系统软件。</li><li>四大特征不是功能：并发、共享、虚拟、异步性。</li><li>五大功能才是管理对象：存储器、处理机、设备、文件、用户接口。</li><li>服务是 OS 对用户和程序开放的能力，系统调用是入口。</li></ul><div class="task" data-task="ch1-m5" data-answer="B" data-ok="B 是原文列出的五大功能。" data-no="A 是四大特征，C 是五大类型，D 是运行环境相关术语。" data-src="原文：五大主要功能：存储器管理、处理机管理、设备管理、文件管理、用户接口管理。" data-review="回到模块 5 区分特征/功能/类型"><div class="q">下列哪组全是 OS 的五大主要功能？</div><div class="opts"><button class="opt" data-val="A">A. 并发、共享、虚拟、异步性</button><button class="opt" data-val="B">B. 存储器管理、处理机管理、设备管理、文件管理、用户接口管理</button><button class="opt" data-val="C">C. 批处理、分时、实时、网络、分布式</button><button class="opt" data-val="D">D. ROM、RAM、Cache、中断向量</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m6" class="module"><div class="module-kicker">模块 6</div><h2>关键概念拆解</h2><div class="grid"><div class="card"><h3>批处理</h3><p>吞吐率高，但响应时间长，用户不能及时控制。</p></div><div class="card"><h3>分时</h3><p>多路性、独占性、交互性、及时性。</p></div><div class="card"><h3>实时</h3><p>响应时间毫秒/微秒级，高可靠性优先于效率，交互弱。</p></div><div class="card"><h3>网络 OS</h3><p>远程如本地、访问控制、统一记账等网络资源管理能力。</p></div></div><div class="task" data-task="ch1-m6" data-answer="C" data-ok="实时系统强调严格响应时间和高可靠性。" data-no="批处理重吞吐，分时重交互及时，单用户不是这里的五大类型重点。" data-src="原文：实时系统响应时间毫秒/微秒级，高可靠性优先于效率。" data-review="回到模块 6 看五大类型差异"><div class="q">“高可靠性优先于效率、响应时间毫秒/微秒级”最符合哪类系统？</div><div class="opts"><button class="opt" data-val="A">A. 批处理系统</button><button class="opt" data-val="B">B. 分时系统</button><button class="opt" data-val="C">C. 实时系统</button><button class="opt" data-val="D">D. 单用户系统</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m7" class="module"><div class="module-kicker">模块 7</div><h2>苏格拉底式阅读关卡</h2><p>用三个追问检查自己是不是真懂：</p><ul><li>如果 OS 是“方便用户”，为什么还要有管态和特权指令？</li><li>如果分时也强调及时，为什么实时系统还要单独分类？</li><li>如果网络 OS 能共享资源，它和多用户 OS 的 CPU/内存关系有什么差别？</li></ul><div class="task" data-task="ch1-m7" data-answer="B" data-ok="特权指令涉及中断、进程切换、I/O、保护寄存器等全局控制，必须受保护。" data-no="用户态能运行普通程序；限制的是高风险控制指令。" data-src="原文：特权指令包括允许/禁止中断、进程切换、I/O 操作、停止处理机等。" data-review="回到模块 7 看运行环境追问"><div class="q">为什么特权指令通常只能在管态执行？</div><div class="opts"><button class="opt" data-val="A">A. 为了让普通程序随意停止处理机</button><button class="opt" data-val="B">B. 为了防止用户程序直接破坏全局资源和系统控制</button><button class="opt" data-val="C">C. 因为用户态不能运行任何程序</button><button class="opt" data-val="D">D. 因为 Cache 只能在管态访问</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m8" class="module"><div class="module-kicker">模块 8</div><h2>闯关式任务包装</h2><p>建议把本章压成 4 轮，每轮 10 分钟。</p><ul><li>第 1 轮：默写 OS 定义、四特征、五功能。</li><li>第 2 轮：用表格对比五大类型。</li><li>第 3 轮：圈出管态/用户态能做什么。</li><li>第 4 轮：做选择题，只记录混淆点。</li></ul><div class="task" data-task="ch1-m8" data-answer="A" data-ok="本章发展与分类中五大类型差异最适合表格化。" data-no="B/C/D 属于其他章节或大题内容。" data-src="原文：五大类型及批处理/分时/实时等特点。" data-review="回到模块 8 看闯关安排"><div class="q">复习本章时，最该做成对比表的是哪组？</div><div class="opts"><button class="opt" data-val="A">A. 五大类型的特点与优缺点</button><button class="opt" data-val="B">B. 页面置换算法</button><button class="opt" data-val="C">C. 磁盘移臂算法</button><button class="opt" data-val="D">D. 银行家算法安全序列</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m9" class="module"><div class="module-kicker">模块 9</div><h2>误解与边界</h2><ul><li>不要把“四大特征”背成“五大功能”。</li><li>不要把分时的“及时性”和实时的“硬响应时间”混为一谈。</li><li>不要把网络 OS 与多用户 OS 都简单理解成“很多人用一台机器”。</li><li>不要把中断向量理解成普通数组名，它指向中断服务程序入口。</li></ul><div class="task" data-task="ch1-m9" data-answer="D" data-ok="四大特征与五大功能是两组不同考点。" data-no="A/B/C 都符合原文对系统类型的描述。" data-src="原文分别列出四大特征和五大主要功能。" data-review="回到模块 9 看易错边界"><div class="q">下列哪种说法是误解？</div><div class="opts"><button class="opt" data-val="A">A. 批处理吞吐率高但响应时间长</button><button class="opt" data-val="B">B. 分时系统强调交互性</button><button class="opt" data-val="C">C. 实时系统一定比效率更重视可靠和响应</button><button class="opt" data-val="D">D. 四大特征就是五大功能的另一种叫法</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m10" class="module"><div class="module-kicker">模块 10</div><h2>背景知识缺口</h2><p>如果读到这里还卡，通常缺的是硬件执行环境常识。</p><ul><li>CPU 有不同状态，状态决定能否执行特权指令。</li><li>中断让 CPU 暂停当前流程，转向服务程序，再返回。</li><li>ROM/RAM/Cache/辅存处在不同速度和容量层级。</li><li>系统调用常常触发从用户态到管态的受控切换。</li></ul><div class="task" data-task="ch1-m10" data-answer="B" data-ok="中断向量用于定位中断服务程序入口。" data-no="其余选项分别属于文件、内存分配和分页地址变换。" data-src="原文：中断向量/向量中断（中断服务程序）。" data-review="回到模块 10 补运行环境"><div class="q">“中断向量”的核心作用更接近哪一项？</div><div class="opts"><button class="opt" data-val="A">A. 保存所有用户文件名</button><button class="opt" data-val="B">B. 指出对应中断服务程序入口</button><button class="opt" data-val="C">C. 决定分区大小</button><button class="opt" data-val="D">D. 计算页面号和页内位移</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section>
-<section id="m11" class="module"><div class="module-kicker">模块 11</div><h2>复盘与学习报告</h2><p>本章复盘只问三件事：能否分清四特征/五功能/五类型；能否说出分时和实时差异；能否解释管态为什么存在。</p><div class="chips"><span>选择题底盘</span><span>概念辨析</span><span>运行环境</span></div><div class="task" data-task="ch1-m11" data-answer="C" data-ok="这正对应本章选择题背景知识的定位。" data-no="A/B/D 是第 3/4/5 章更偏大题的目标。" data-src="原文：口诀目标是把两句话精髓、四大特征、五大功能、五大类型背熟。" data-review="回到模块 11 做最终复盘"><div class="q">本章最后的自测标准是什么？</div><div class="opts"><button class="opt" data-val="A">A. 能完整推导 LRU 缺页率</button><button class="opt" data-val="B">B. 能算 SCAN 磁头移动距离</button><button class="opt" data-val="C">C. 能稳定区分特征、功能、类型和运行环境概念</button><button class="opt" data-val="D">D. 能写设备分配安全性算法</button></div><button class="check">检查</button><div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div></div></section><section class="module" id="reportZone"><div class="module-kicker">学习报告</div><h2>错题回流与复盘</h2><p>做完题后生成报告，把错题带回对应模块复看。</p><div id="wrongBox" class="wrong-list"></div><button id="genReport">生成学习报告</button> <button id="copyReport">复制报告</button><pre id="report" class="report-box"></pre></section><footer class="footer">由 <a href="https://github.com/&lt;your-username&gt;/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · github.com/&lt;your-username&gt;/grokko<br>这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。</footer></main></div>
+<div class="layout">
+<aside class="sidebar">
+  <h1>操作系统<br>第1章 概述</h1>
+  <div class="sub">考试冲刺 · 选择题为主 · 低权重</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
+    <div class="progress-num" id="barNum">0 / 0</div>
+  </div>
+  <ul class="nav">
+    <li><a href="#s1"><span class="num">01</span>学习目标与阅读路径</a></li>
+    <li><a href="#s2"><span class="num">02</span>零基础背景包</a></li>
+    <li><a href="#s3"><span class="num">03</span>原文问题定位</a></li>
+    <li><a href="#s4"><span class="num">04</span>原文结构地图</a></li>
+    <li><a href="#s5"><span class="num">05</span>核心判断与依据</a></li>
+    <li><a href="#s6"><span class="num">06</span>关键概念对比表</a></li>
+    <li><a href="#s7"><span class="num">07</span>苏格拉底式阅读关卡</a></li>
+    <li><a href="#s8"><span class="num">08</span>选择题易混点专项</a></li>
+    <li><a href="#s9"><span class="num">09</span>误解与边界</a></li>
+    <li><a href="#s10"><span class="num">10</span>背景知识缺口</a></li>
+    <li><a href="#s11"><span class="num">11</span>复盘与学习报告</a></li>
+  </ul>
+</aside>
+
+<main class="main">
+
+<section id="s1">
+  <h2><span class="sec-id">01</span>学习目标与阅读路径</h2>
+  <p>本章对应考试 <strong>20 道选择题的背景知识</strong>，不出大题。核心任务是把几组<strong>容易混淆的名词</strong>分清楚。复习时间约 1 小时，安排在 6.25 总复习时。</p>
+  <div class="objective"><div class="tag">目标 1 · 两句话精髓</div>能 30 秒默写 OS 定义（方便用户、管理控制软硬件资源的系统软件）。</div>
+  <div class="objective"><div class="tag">目标 2 · 三组分清</div>能稳定区分"四大特征 / 五大功能 / 五大类型"这三组高频混淆概念。</div>
+  <div class="objective"><div class="tag">目标 3 · 分时 vs 实时</div>能说清分时系统（交互+及时）和实时系统（硬响应+高可靠）的差异。</div>
+  <div class="objective"><div class="tag">目标 4 · 运行环境</div>能说清管态/用户态、特权指令、中断向量为什么存在。</div>
+  <p><strong>阅读路径</strong>：模块 2 唤醒 → 模块 3-5 过概念 → <span style="background:var(--marker);padding:2px 6px;border-radius:4px;font-weight:700">模块 6 的三张对比表是核心</span> → 模块 8 做选择题。</p>
+  <div class="src-quote">原文定位：考试权重低，不出大题，以选择题为主，是 20 道选择题的背景知识来源。</div>
+</section>
+
+<section id="s2">
+  <h2><span class="sec-id">02</span>零基础背景包</h2>
+  <p>学过但生疏？下面 4 个概念用一句话唤醒。</p>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ① · OS 是什么（唤醒）</div>
+    OS 是夹在<strong>硬件</strong>和<strong>用户/应用</strong>之间的管理层。向上让用户方便用电脑，向下管理 CPU、内存、设备、文件。<br>
+    <em>一句话记忆：</em>OS = <strong>电脑的大管家</strong>，对上服务、对下管理。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ② · 为什么有管态和用户态（唤醒）</div>
+    如果用户程序能直接操作硬件（比如停止 CPU、改内存保护），系统会被搞崩。所以 CPU 分两种状态：<strong>管态</strong>（OS 内核运行，能干任何事）和<strong>用户态</strong>（用户程序运行，受限）。<br>
+    <em>一句话记忆：</em>管态是<strong>管家</strong>（全权），用户态是<strong>客人</strong>（受限）。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ③ · 中断是什么（唤醒）</div>
+    CPU 正跑程序，硬件发信号说"有事"，CPU 暂停当前流程去处理，处理完回来继续。<strong>中断向量</strong>=中断服务程序的入口地址。<br>
+    <em>一句话记忆：</em>中断 = <strong>硬件敲门</strong>；中断向量 = <strong>门牌号</strong>。
+  </div>
+
+  <div class="bg-item">
+    <div class="label">背景补充 ④ · 系统调用（唤醒）</div>
+    用户程序想用 OS 的服务（读文件、申请内存），不能直接做，要<strong>系统调用</strong>——这会触发从用户态到管态的受控切换。<br>
+    <em>一句话记忆：</em>系统调用 = <strong>客人按铃叫管家帮忙</strong>。
+  </div>
+
+  <div class="task" data-task="ch1-m2" data-answer="A" data-ok="对。系统调用是用户程序请求 OS 服务的入口，会触发用户态→管态切换。" data-no="系统调用不是磁盘、Cache 或文件块算法。" data-src="原文：OS 的服务包括公共服务类型 + 系统调用。" data-review="回到模块 2 看系统调用">
+    <div class="q">「系统调用」更接近 OS 的哪一侧功能？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 用户/程序请求 OS 服务的接口</button>
+      <button class="opt" data-val="B">B. 磁盘柱面移动规则</button>
+      <button class="opt" data-val="C">C. Cache 替换算法</button>
+      <button class="opt" data-val="D">D. 文件物理块编号</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s3">
+  <h2><span class="sec-id">03</span>原文问题定位</h2>
+  <div class="card">
+    <span class="src-tag">表面问题</span>
+    操作系统的概念、发展、分类、运行环境。
+  </div>
+  <div class="card key">
+    <span class="src-tag">深层问题</span>
+    <strong>OS 是什么？它怎么管机器？</strong>三个子问题：<br>
+    ① <strong>它本质上是什么？</strong>（定义、特征、功能）<br>
+    ② <strong>它有哪些类型？</strong>（批处理/分时/实时/网络/分布式）<br>
+    ③ <strong>它凭什么能管？</strong>（管态/特权指令/中断）
+  </div>
+  <div class="src-quote"><span class="badge fact">事实</span>原文：「操作系统是方便用户、管理和控制计算机软硬件资源的系统（或程序集合）」</div>
+</section>
+
+<section id="s4">
+  <h2><span class="sec-id">04</span>原文结构地图</h2>
+  <p><span class="badge judge">结构判断</span>本章是<strong>并列型</strong>（概念 / 分类 / 环境），但内部层层铺垫。</p>
+  <div class="struct-map">操作系统概述
+├── 一、概念特征功能（OS 是什么）
+│   ├── OS 定义（两句话精髓）
+│   ├── 四大特征（并发/共享/虚拟/异步）
+│   ├── 五大功能（存储/处理机/设备/文件/用户接口）
+│   └── 服务 + 系统调用
+├── 二、发展与分类（OS 有哪些类型）
+│   ├── 五大类型（批处理/分时/实时/网络/分布式）
+│   ├── 四个发展阶段（对应四代计算机）
+│   └── 分时 vs 实时差异 ★高频考点
+└── 三、运行环境（OS 凭什么能管）
+    ├── 管态/用户态、特权指令
+    ├── 存储体系（ROM/RAM/Cache/辅存）
+    └── 中断与中断向量</div>
+  <div class="task" data-task="ch1-m4" data-answer="C" data-ok="对。管态/用户态、特权指令、中断都在运行环境部分。" data-no="A/B/D 都属于发展与分类的辨析。" data-src="原文：（三）运行环境：管态/用户态、特权指令。" data-review="回到模块 4 看三块结构">
+    <div class="q">哪一项属于"运行环境"而不是"发展与分类"？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 分时系统四特点</button>
+      <button class="opt" data-val="B">B. 批处理吞吐率高</button>
+      <button class="opt" data-val="C">C. 管态/用户态与特权指令</button>
+      <button class="opt" data-val="D">D. 网络操作系统能力</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2><span class="sec-id">05</span>核心判断与依据</h2>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 1：OS 定义（两句话精髓，必背）</div>
+    <div class="formula">OS = 方便用户、管理和控制计算机软硬件资源的系统软件（或程序集合）<br>+ 有五大类型 + 五大功能</div>
+    <strong>原文依据：</strong>「计算机操作系统使方便用户、管理和控制计算机软硬件资源的系统软件；操作系统目前有五大类型和五大功能」
+  </div>
+
+  <div class="concept">
+    <span class="badge judge">判断</span>
+    <div class="term">判断 2：四大特征 ≠ 五大功能（最高频混淆点）</div>
+    <strong>四大特征</strong>是 OS 的<strong>性质</strong>（形容词）：并发、共享、虚拟、异步性。<br>
+    <strong>五大功能</strong>是 OS <strong>做什么</strong>（动词）：存储器管理、处理机管理、设备管理、文件管理、用户接口管理。<br>
+    <strong>原文依据：</strong>「四大特征：并发、共享、虚拟、异步性」「五大功能：存储器/处理机/设备/文件/用户接口管理」<br>
+    <span class="plain">口诀：特征是形容词，功能是动词。千万别混！</span>
+  </div>
+
+  <div class="concept">
+    <span class="badge judge">判断</span>
+    <div class="term">判断 3：分时 vs 实时（高频选择考点）</div>
+    <strong>分时</strong>：通用、交互强、及时响应要求一般（秒级）。<br>
+    <strong>实时</strong>：专用、可靠性优先于效率、响应时间毫秒/微秒级、交互弱。<br>
+    <strong>原文依据：</strong>「分时系统通用性强，交互性强；实时系统关心及时响应性（毫秒或微秒）、可靠性」
+  </div>
+
+  <div class="concept">
+    <span class="badge fact">事实</span>
+    <div class="term">判断 4：特权指令只能在管态执行</div>
+    特权指令包括：允许/禁止中断、进程切换、存取保护寄存器、I/O 操作、停止处理机。这些会破坏全局资源，必须限制在管态。<br>
+    <strong>原文依据：</strong>「特权指令是指计算机中不允许用户直接使用的指令」
+  </div>
+
+  <div class="task" data-task="ch1-m5" data-answer="B" data-ok="对。B 是原文列出的五大功能（管理对象）。" data-no="A 是四大特征（性质），C 是五大类型（分类），D 是运行环境术语。" data-src="原文：五大主要功能：存储器、处理机、设备、文件、用户接口管理。" data-review="回到模块 5 区分特征/功能/类型">
+    <div class="q">下列哪组全是 OS 的五大主要功能？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 并发、共享、虚拟、异步性</button>
+      <button class="opt" data-val="B">B. 存储器管理、处理机管理、设备管理、文件管理、用户接口管理</button>
+      <button class="opt" data-val="C">C. 批处理、分时、实时、网络、分布式</button>
+      <button class="opt" data-val="D">D. ROM、RAM、Cache、中断向量</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="sec-id">06</span>关键概念对比表（本章核心）</h2>
+  <p>本章选择题的<strong>三张救命对比表</strong>，看懂这三张表，选择题就稳了。</p>
+
+  <div class="concept">
+    <div class="term">对比表 1 · 四大特征口诀（原文比喻）</div>
+    <table class="info-table">
+      <tr><th>特征</th><th>原文比喻</th><th>人话解释</th></tr>
+      <tr><td><strong>并发</strong></td><td>"大家一起前进了"</td><td>多个事件在同一时间段内发生</td></tr>
+      <tr><td><strong>共享</strong></td><td>"一件东西大家用"</td><td>多个进程共用同一资源</td></tr>
+      <tr><td><strong>虚拟</strong></td><td>"一个物理实体变成若干逻辑事物"</td><td>一个变多个（如虚拟内存、虚拟 CPU）</td></tr>
+      <tr><td><strong>异步性</strong></td><td>"你走我停"</td><td>进程按各自速度推进，走走停停</td></tr>
+    </table>
+    <strong>原文依据：</strong>「并发"大家一起前进了"、共享"一件东西大家用"、虚拟"一个物理实体变成若干逻辑事物"、异步性"你走我停"」
+  </div>
+
+  <div class="concept">
+    <div class="term">对比表 2 · 四大特征 vs 五大功能 vs 五大类型（千万别混）</div>
+    <table class="info-table">
+      <tr><th>分类</th><th>性质</th><th>包含</th><th>记忆</th></tr>
+      <tr><td><strong>四大特征</strong></td><td>OS 的性质（形容词）</td><td>并发/共享/虚拟/异步</td><td>"性"字结尾</td></tr>
+      <tr><td><strong>五大功能</strong></td><td>OS 做什么（动词）</td><td>存储器/处理机/设备/文件/用户接口<strong>管理</strong></td><td>都带"管理"</td></tr>
+      <tr><td><strong>五大类型</strong></td><td>OS 的分类（名词）</td><td>批处理/分时/实时/网络/分布式</td><td>系统类型</td></tr>
+    </table>
+    <span class="plain">这是选择题最高频的陷阱：题干问"特征"，选项混入"功能"或"类型"。</span>
+  </div>
+
+  <div class="concept">
+    <div class="term">对比表 3 · 五大系统类型对比</div>
+    <table class="info-table">
+      <tr><th>类型</th><th>核心特点</th><th>优缺点</th></tr>
+      <tr><td><strong>批处理</strong></td><td>批量处理作业</td><td>吞吐率高；响应慢、不能交互</td></tr>
+      <tr><td><strong>分时</strong></td><td>时间片轮转</td><td>多路/独占/交互/及时；通用性强</td></tr>
+      <tr><td><strong>实时</strong></td><td>严格响应时间</td><td>毫秒/微秒级响应、高可靠优先于效率</td></tr>
+      <tr><td><strong>网络</strong></td><td>网络资源管理</td><td>远程如本地、访问控制、统一记账</td></tr>
+      <tr><td><strong>分布式</strong></td><td>多机协同</td><td>统一界面、资源全局共享</td></tr>
+    </table>
+    <strong>分时 vs 实时</strong>是最高频考点：<strong>分时</strong>交互强响应秒级、<strong>实时</strong>响应毫秒/微秒级可靠性优先。
+  </div>
+
+  <div class="task" data-task="ch1-m6" data-answer="C" data-ok="对。实时系统强调严格响应时间（毫秒/微秒级）和高可靠性优先于效率。" data-no="批处理重吞吐，分时重交互，单用户不是五大类型重点。" data-src="原文：实时系统响应时间毫秒/微秒级，高可靠性优先于效率。" data-review="回到模块 6 对比表 3">
+    <div class="q">"高可靠性优先于效率、响应时间毫秒/微秒级"最符合哪类系统？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 批处理系统</button>
+      <button class="opt" data-val="B">B. 分时系统</button>
+      <button class="opt" data-val="C">C. 实时系统</button>
+      <button class="opt" data-val="D">D. 单用户系统</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="sec-id">07</span>苏格拉底式阅读关卡</h2>
+  <p>用三个追问检查自己是不是真懂。</p>
+
+  <div class="task" data-task="ch1-m7a" data-answer="A" data-ok="对。原文说"异步性"就是"你走我停"——进程按各自速度推进，走走停停。" data-no="并发是"大家一起前进了"；共享是"一件东西大家用"。" data-src="原文：异步性"你走我停"。" data-review="回到模块 6 对比表 1">
+    <div class="q">"你走我停"形容的是四大特征的哪一个？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 异步性</button>
+      <button class="opt" data-val="B">B. 并发</button>
+      <button class="opt" data-val="C">C. 共享</button>
+      <button class="opt" data-val="D">D. 虚拟</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch1-m7b" data-answer="B" data-ok="对。特权指令涉及中断、进程切换、I/O、保护寄存器等全局控制，必须受保护，只能在管态执行。" data-no="用户态能运行普通程序；限制的是高风险控制指令。" data-src="原文：特权指令包括允许/禁止中断、进程切换、I/O 操作、停止处理机等。" data-review="回到模块 5 看判断 4">
+    <div class="q">为什么特权指令只能在管态执行？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 为了让普通程序随意停止处理机</button>
+      <button class="opt" data-val="B">B. 为了防止用户程序直接破坏全局资源和系统控制</button>
+      <button class="opt" data-val="C">C. 因为用户态不能运行任何程序</button>
+      <button class="opt" data-val="D">D. 因为 Cache 只能在管态访问</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s8">
+  <h2><span class="sec-id">08</span>选择题易混点专项</h2>
+  <p>把选择题爱考的<strong>易混对</strong>集中练。</p>
+
+  <div class="task" data-task="ch1-m8a" data-answer="D" data-ok="对。"四大特征就是五大功能"是经典误解——特征是性质，功能是动作。" data-no="A/B/C 都符合原文对系统类型的描述。" data-src="原文：四大特征和五大功能是两组不同的考点。" data-review="回到模块 6 对比表 2">
+    <div class="q">下列哪种说法是<strong>误解</strong>？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 批处理吞吐率高但响应时间长</button>
+      <button class="opt" data-val="B">B. 分时系统强调交互性</button>
+      <button class="opt" data-val="C">C. 实时系统一定比效率更重视可靠和响应</button>
+      <button class="opt" data-val="D">D. 四大特征就是五大功能的另一种叫法</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch1-m8b" data-answer="B" data-ok="对。分时系统通用、交互强、及时响应秒级；实时系统专用、可靠性优先、毫秒/微秒级响应。" data-no="分时和实时的差异是最高频考点，务必记牢。" data-src="原文：分时通用性强交互性强；实时关心及时响应（毫秒或微秒）、可靠性。" data-review="回到模块 6 对比表 3">
+    <div class="q">分时系统和实时系统的关键区别是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 分时系统响应更快</button>
+      <button class="opt" data-val="B">B. 分时交互强响应秒级，实时可靠性优先响应毫秒/微秒级</button>
+      <button class="opt" data-val="C">C. 实时系统吞吐率更高</button>
+      <button class="opt" data-val="D">D. 分时系统不需要 CPU</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s9">
+  <h2><span class="sec-id">09</span>误解与边界</h2>
+
+  <div class="miscon">
+    <strong>误解 1：四大特征 = 五大功能</strong><br>
+    <span class="badge judge">最高频混淆</span>特征是<strong>性质</strong>（并发/共享/虚拟/异步），功能是<strong>动作</strong>（存储器/处理机/设备/文件/用户接口管理）。<br>
+    <strong>口诀：</strong>特征是形容词（"性"字结尾），功能是动词（都带"管理"）。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 2：分时的"及时"和实时的"快"是一回事</strong><br>
+    <span class="badge fact">事实错</span>分时的"及时性"是<strong>秒级</strong>（用户体验好就行）；实时的响应是<strong>毫秒/微秒级</strong>（硬性要求，关乎安全，如导弹制导）。量级差 1000~1000000 倍。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 3：中断向量是普通数组</strong><br>
+    <span class="badge fact">事实错</span>中断向量不是数据数组，它<strong>指向中断服务程序的入口地址</strong>（像门牌号指向房间）。
+  </div>
+
+  <div class="miscon">
+    <strong>误解 4：引入多道程序是为了实时响应</strong><br>
+    <span class="badge fact">事实错</span>引入多道程序是为了<strong>充分利用 CPU，减少 CPU 等待时间</strong>，不是为了实时。实时性是实时系统的追求。
+  </div>
+
+  <div class="task" data-task="ch1-m9" data-answer="B" data-ok="对。中断向量指向中断服务程序入口地址，不是普通数据数组。" data-no="中断向量是地址指针，不是数据集合。" data-src="原文：中断向量用来存放该类型中断的中断服务例行服务程序的入口地址。" data-review="回到模块 9 看中断向量误解">
+    <div class="q">关于"中断向量"，下列说法正确的是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 是存放所有中断数据的数组</button>
+      <button class="opt" data-val="B">B. 指向中断服务程序的入口地址</button>
+      <button class="opt" data-val="C">C. 是 CPU 的寄存器名</button>
+      <button class="opt" data-val="D">D. 是文件系统的目录</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s10">
+  <h2><span class="sec-id">10</span>背景知识缺口</h2>
+  <p>读完本章如果还卡，通常缺的是：</p>
+  <ul>
+    <li><strong>硬件基础</strong>：CPU 怎么工作、寄存器是什么——有助于理解管态/用户态。</li>
+    <li><strong>计算机发展史</strong>：四代计算机对应四个 OS 发展阶段，了解即可，不深考。</li>
+    <li><strong>网络基础</strong>：理解网络 OS 的"远程如本地"需要一点网络常识。</li>
+    <li><strong>系统调用实现</strong>：第5章 I/O 会用到，这里先知道"会触发管态切换"即可。</li>
+  </ul>
+  <div class="task" data-task="ch1-m10" data-answer="B" data-ok="对。中断向量指向中断服务程序入口。" data-no="其余选项属于文件、内存分配和分页地址变换。" data-src="原文：中断向量/向量中断（中断服务程序入口地址）。" data-review="回到模块 10 补运行环境">
+    <div class="q">"中断向量"的核心作用更接近哪一项？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 保存所有用户文件名</button>
+      <button class="opt" data-val="B">B. 指出对应中断服务程序入口</button>
+      <button class="opt" data-val="C">C. 决定分区大小</button>
+      <button class="opt" data-val="D">D. 计算页面号和页内位移</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s11">
+  <h2><span class="sec-id">11</span>复盘与学习报告</h2>
+  <p>本章复盘问自己三件事：</p>
+  <ul>
+    <li>能不能默写 OS 两句话精髓？</li>
+    <li>能不能稳定区分四大特征 / 五大功能 / 五大类型？</li>
+    <li>能不能说清分时 vs 实时、管态 vs 用户态？</li>
+  </ul>
+
+  <div class="wrong-section">
+    <h3>错题回流</h3>
+    <p>答错的题会自动收集到这里，按提示回到对应模块复习。</p>
+    <ul id="wrongBox"></ul>
+  </div>
+
+  <div class="report-section">
+    <h3>生成学习报告</h3>
+    <p>点击按钮，生成你的本章学习报告（可复制到笔记）。</p>
+    <textarea id="report" readonly></textarea>
+    <div class="report-btns">
+      <button id="genReport">生成学习报告</button>
+      <button id="copyReport">复制报告</button>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="footer">
+  由 <a href="https://github.com/remi-huang/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · 强化概念对比版<br>
+  <span class="tip">这个工具能帮你预习难啃的干货，但不能代替完整学习。学习愉快。</span>
+</footer>
+
 <script>
 (function(){
   "use strict";
@@ -64,10 +504,14 @@
   function genReport(){
     var box=document.getElementById('report');if(!box)return;
     var all=$all('.task'),done=$all('.task[data-answered="1"]'),right=$all('.task[data-answered="1"][data-correct="1"]');
-    var lines=['=== 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
+    var lines=['=== 第1章 操作系统概述 · 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
     var wrong=$all('.task[data-answered="1"][data-correct="0"]');
     if(wrong.length){lines.push('我答错的题（建议复习）：');wrong.forEach(function(t){lines.push('- '+(t.getAttribute('data-task')||'')+'：'+(t.getAttribute('data-review')||''));});}
     else{lines.push('暂无错题。');}
+    lines.push('','核心自测：');
+    lines.push('- [ ] 能默写 OS 两句话精髓');
+    lines.push('- [ ] 能区分四大特征/五大功能/五大类型');
+    lines.push('- [ ] 能说清分时 vs 实时、管态 vs 用户态');
     box.textContent=lines.join('\n');
   }
   document.addEventListener('click',function(e){
