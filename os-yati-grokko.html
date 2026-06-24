@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>操作系统 · 提纲原题手把手精讲 — 理解地图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EB; --paper:#F3EDDD; --forest:#1E3A24; --sky:#BCD8EE;
+  --sage:#AFCDA8; --ink:#1A2018; --marker:#F5E08A; --brick:#B5482A;
+  --correct:#2F7D46; --wrong:#B5482A;
+  --font-display:"Archivo Black","Noto Sans SC","PingFang SC",sans-serif;
+  --font-head:"Poppins","Noto Sans SC","PingFang SC",sans-serif;
+  --font-body:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+  --font-mono:"Roboto Mono","JetBrains Mono",monospace;
+  --radius-pill:999px; --radius-card:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-height:1.7;font-size:16px}
+.layout{display:flex;align-items:flex-start;max-width:1100px;margin:0 auto}
+.sidebar{position:sticky;top:0;height:100vh;width:270px;flex-shrink:0;background:var(--forest);color:var(--cream);padding:28px 20px;overflow-y:auto}
+.sidebar h1{font-family:var(--font-display);font-size:1.15rem;line-height:1.35;margin-bottom:6px;color:var(--marker)}
+.sidebar .sub{font-size:.78rem;color:var(--sage);margin-bottom:20px}
+.progress-wrap{margin-bottom:22px}
+.progress-bar{background:rgba(255,255,255,.15);height:8px;border-radius:var(--radius-pill);overflow:hidden}
+.progress-fill{background:var(--marker);height:100%;width:0;transition:width .4s ease}
+.progress-num{font-family:var(--font-mono);font-size:.78rem;margin-top:6px;color:var(--sky)}
+.nav{list-style:none}
+.nav li{margin-bottom:2px}
+.nav a{display:block;padding:8px 10px;border-radius:8px;font-size:.85rem;color:var(--cream);text-decoration:none;transition:background .2s}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav .num{font-family:var(--font-mono);font-size:.72rem;color:var(--sky);margin-right:8px}
+.main{flex:1;min-width:0;padding:40px 44px;max-width:780px}
+.main section{margin-bottom:48px;scroll-margin-top:20px}
+.main h2{font-family:var(--font-head);font-size:1.35rem;font-weight:700;color:var(--forest);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--sage)}
+.main h3{font-family:var(--font-head);font-size:1.05rem;color:var(--forest);margin:18px 0 10px}
+.main p{margin-bottom:12px}
+.card{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:14px;border-left:4px solid var(--sage)}
+.card.warn{border-left-color:var(--brick)}
+.card.key{border-left-color:var(--marker)}
+.src-quote{background:var(--sky);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:.85rem;margin:10px 0;color:var(--ink);border-left:3px solid var(--forest)}
+.task{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:16px}
+.task .q{font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opt{background:var(--cream);border:2px solid transparent;border-radius:8px;padding:10px 14px;cursor:pointer;font-family:var(--font-body);font-size:.92rem;text-align:left;transition:all .2s;color:var(--ink)}
+.opt:hover{border-color:var(--sky)}
+.opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
+.check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
+.check:hover{background:#2a5232}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
+.feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
+.feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
+.wrong-section{background:#fce8e8;border-radius:var(--radius-card);padding:18px 22px;margin-top:20px;border-left:4px solid var(--wrong)}
+.wrong-section h3{color:var(--wrong)}
+#wrongBox{list-style:none;padding-left:0}
+#wrongBox li{padding:6px 0;font-size:.88rem;border-bottom:1px dashed rgba(181,72,42,.2)}
+.report-section{background:var(--paper);border-radius:var(--radius-card);padding:20px 24px;margin-top:20px}
+.report-section textarea{width:100%;min-height:200px;border-radius:8px;border:2px solid var(--sage);padding:12px;font-family:var(--font-mono);font-size:.85rem;background:var(--cream);color:var(--ink);resize:vertical}
+.report-btns{display:flex;gap:10px;margin-top:10px}
+.report-btns button{background:var(--forest);color:var(--cream);border:none;padding:8px 18px;border-radius:var(--radius-pill);cursor:pointer;font-family:var(--font-head);font-size:.85rem}
+.formula{background:var(--forest);color:var(--marker);font-family:var(--font-mono);font-size:.95rem;padding:14px 18px;border-radius:8px;margin:10px 0;text-align:center}
+.badge{display:inline-block;padding:2px 10px;border-radius:var(--radius-pill);font-size:.72rem;font-weight:600;font-family:var(--font-mono)}
+.badge.eg{background:#E8D5C4;color:var(--brick)}
+.badge.judge{background:var(--marker);color:var(--forest)}
+.footer{max-width:1100px;margin:0 auto;padding:30px 44px;text-align:center;font-size:.82rem;color:#888}
+.footer a{color:#1d70b8;text-decoration:underline}
+.footer .tip{margin-top:6px;color:#aaa}
+.sec-id{font-family:var(--font-mono);font-size:.72rem;color:var(--brick);background:var(--marker);padding:2px 8px;border-radius:var(--radius-pill);margin-right:8px;vertical-align:middle}
+.walkthrough{background:#fffaf0;border:2px solid var(--forest);border-radius:var(--radius-card);padding:24px;margin:20px 0}
+.walkthrough .wt-title{font-family:var(--font-head);font-weight:700;color:var(--forest);font-size:1.2rem;margin-bottom:8px}
+.walkthrough .wt-tag{display:inline-block;background:var(--brick);color:var(--marker);font-size:.72rem;font-family:var(--font-mono);padding:2px 10px;border-radius:var(--radius-pill);margin-bottom:10px}
+.walkthrough .wt-given{background:var(--paper);border-radius:8px;padding:14px 16px;margin:10px 0;font-family:var(--font-mono);font-size:.85rem;line-height:1.8}
+.walkthrough .wt-step{margin:12px 0;padding-left:16px;border-left:3px solid var(--sage)}
+.walkthrough .wt-step .step-no{font-family:var(--font-mono);font-weight:700;color:var(--brick);font-size:.85rem;margin-bottom:4px}
+.walkthrough .wt-final{background:var(--marker);border-radius:8px;padding:12px 16px;margin-top:14px;font-weight:700;color:var(--forest);line-height:1.8}
+.calc-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem;font-family:var(--font-mono)}
+.calc-table th{background:var(--forest);color:var(--marker);padding:8px 10px;text-align:center;font-size:.8rem}
+.calc-table td{padding:8px 10px;border:1px solid #ccc;text-align:center;background:var(--cream)}
+.calc-table td.miss{background:#fce8e8;color:var(--wrong);font-weight:700}
+.calc-table td.hit{background:#e8f5e9;font-weight:700}
+.tip-box{background:var(--sky);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.88rem;border-left:3px solid var(--forest)}
+.intro-banner{background:linear-gradient(135deg,var(--marker),#F5C76E);border:2px solid var(--forest);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:30px}
+.intro-banner h3{font-family:var(--font-head);color:var(--forest);font-size:1.1rem;margin-bottom:6px}
+@media(max-width:860px){.layout{flex-direction:column}.sidebar{position:relative;height:auto;width:100%;padding:20px}.main{padding:24px 20px}.nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin-bottom:0}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h1>提纲原题<br>手把手精讲</h1>
+  <div class="sub">押题精讲 · 4 道必练大题</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
+    <div class="progress-num" id="barNum">0 / 0</div>
+  </div>
+  <ul class="nav">
+    <li><a href="#s1"><span class="num">★</span>说明：怎么用这份精讲</a></li>
+    <li><a href="#s2"><span class="num">题1</span>调度：SJF 单道批处理（3作业）</a></li>
+    <li><a href="#s3"><span class="num">题2</span>调度：两道作业平分CPU</a></li>
+    <li><a href="#s4"><span class="num">题3</span>银行家：10台打印机（3进程）</a></li>
+    <li><a href="#s5"><span class="num">题4</span>银行家：12磁带机（3进程）</a></li>
+    <li><a href="#s6"><span class="num">✓</span>检验与学习报告</a></li>
+  </ul>
+</aside>
+
+<main class="main">
+
+<section id="s1">
+  <h2><span class="sec-id">★</span>怎么用这份精讲</h2>
+  <div class="intro-banner">
+    <h3>🎯 这 4 道题出自桑庆兵老师复习提纲，数据是原汤</h3>
+    <p style="font-size:.92rem">提纲习题是老师出题的素材库。这 4 道覆盖了<strong>进程调度算参</strong>（大题必考）和<strong>银行家算法</strong>（可能出大题）两类，全部带官方答案、逐步推演。看懂方法，考场上换数字也不会慌。</p>
+  </div>
+  <div class="card key">
+    <strong>用法</strong>：先盖住答案自己推一遍 → 推不动再看"分步解"的对应步骤 → 最后做每题末尾的检验题确认真懂。<br>
+    <strong>口诀</strong>：调度题"画时间轴 + 填表 + 套公式"；银行家"算 Need → 算 Available → 逐轮扫描 Need≤Work 找序列"。
+  </div>
+  <div class="tip-box">💡 每道题都标了提纲原行号，方便你去 md 提纲里对照原文（答案见提纲第 122、216、510 行附近）。</div>
+</section>
+
+<!-- ============ 题1：SJF 单道批处理 ============ -->
+<section id="s2">
+  <h2><span class="sec-id">题1</span>SJF 单道批处理 · 3 作业调度</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 110~122 行（含官方答案）｜题型：进程调度算参 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">单道批处理系统，短作业优先（SJF）</div>
+    <div class="wt-given">单道批处理系统，采用短作业优先调度算法。当第一个作业进入后开始调度，现有 3 个作业，进入和计算时间如下：<br><br>
+作业1：进入 9:00，需计算 60 分钟<br>
+作业2：进入 9:10，需计算 45 分钟<br>
+作业3：进入 9:15，需计算 25 分钟<br><br>
+求：(1) 每个作业的开始时间、完成时间、周转时间；(2) 平均周转时间。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 理解 SJF：CPU 空闲时，从"已到达"的作业里挑最短的</div>
+      SJF 不是全局找最短，而是<strong>每个调度时刻</strong>看哪些作业<strong>已经到达</strong>，从中挑计算时间最短的。<br>
+      9:00 只有作业1到达 → 它最长也得先跑（没别的选）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 画时间轴（关键）</div>
+      • <strong>9:00</strong>：作业1到达，CPU 空 → 作业1开始跑<br>
+      • <strong>9:10</strong>：作业2到达，但作业1在跑，作业2等待<br>
+      • <strong>9:15</strong>：作业3到达，作业1在跑，作业3等待<br>
+      • <strong>10:00</strong>：作业1跑完（9:00+60分）。此时等待队列有作业2(45分)和作业3(25分) → <strong>SJF 选短的作业3</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 填表</div>
+      <table class="calc-table">
+        <tr><th>作业号</th><th>进入时间</th><th>需计算时间</th><th>开始时间</th><th>完成时间</th><th>周转时间</th></tr>
+        <tr><td>1</td><td>9:00</td><td>60 分</td><td>9:00</td><td>10:00</td><td><strong>60 分</strong></td></tr>
+        <tr><td>3</td><td>9:15</td><td>25 分</td><td>10:00</td><td>10:25</td><td><strong>70 分</strong></td></tr>
+        <tr><td>2</td><td>9:10</td><td>45 分</td><td>10:25</td><td>11:10</td><td><strong>120 分</strong></td></tr>
+      </table>
+      <span class="badge eg">易错</span>完成顺序是 <strong>1→3→2</strong>，不是到达顺序 1→2→3！因为作业3比作业2短，作业1完成后作业3先跑。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 算平均周转时间</div>
+      <div class="formula">平均周转时间 = (60 + 70 + 120) / 3 = 250 / 3 ≈ <strong>83.3 分钟</strong></div>
+      （官方答案：83 分 20 秒，250÷3=83.33）
+    </div>
+
+    <div class="wt-final">✓ 答：(1) 见上表，执行顺序 1→3→2；<br>(2) 平均周转时间 ≈ 83 分 20 秒。<br>核心：SJF 在每个调度点挑"已到达中最短"的，不是全局最短。</div>
+  </div>
+
+  <div class="task" data-task="q1" data-answer="C" data-ok="对！10:00 时作业1完成，等待队列有作业2(45分)和作业3(25分)，SJF 选更短的作业3先跑。" data-no="FCFS 才选作业2（先到达）；SJF 比的是计算时间长短，不是到达顺序。" data-src="提纲：SJF 总是优先调度要求运行时间最短的作业。" data-review="回到题1第2步看时间轴">
+    <div class="q">检验：作业1在 10:00 完成后，SJF 下一个调度谁？为什么？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 作业2，因为它比作业3先到达</button>
+      <button class="opt" data-val="B">B. 作业2，因为它计算时间长</button>
+      <button class="opt" data-val="C">C. 作业3，因为它计算时间(25分)比作业2(45分)短</button>
+      <button class="opt" data-val="D">D. 随机选一个</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题2：两道作业批处理平分CPU ============ -->
+<section id="s3">
+  <h2><span class="sec-id">题2</span>两道作业批处理 · 就绪进程平分 CPU</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 208~218 行（含官方答案）｜题型：多道+时间片平分 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">两道作业的批处理系统，FCFS 作业调度 + 内存就绪进程平分 CPU</div>
+    <div class="wt-given">一个具有两道作业的批处理系统中，作业调度采用先来先服务（FCFS），作业一旦被调度运行就不再退出，作业对应的进程调度采用<strong>内存中的就绪进程平分 CPU 时间</strong>，不计作业对换及其他系统开销。作业序列：<br><br>
+作业号 | 进入时刻 | 估计运行时间<br>
+JOB1 | 8:00 | 25 分钟<br>
+JOB2 | 8:20 | 30 分钟<br>
+JOB3 | 8:25 | 25 分钟<br>
+JOB4 | 8:30 | 15 分钟<br><br>
+求：(1) 各作业开始/结束/周转时间；(2) 平均周转时间、平均带权周转时间。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 理解"两道"和"平分 CPU"</div>
+      <strong>两道</strong>＝内存最多同时放 2 个作业。作业调度 FCFS：作业到达且内存有空位就调入。<br>
+      <strong>平分 CPU</strong>＝内存里有几个就绪进程，CPU 就被几个进程平分（相当于轮转，2 个进程各得 50% CPU 速度）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 逐时刻调度分析</div>
+      • <strong>8:00</strong>：JOB1 到达，内存空，调入。内存={JOB1}，只有1个进程，CPU 全给 JOB1（速度 100%）。<br>
+      • <strong>8:20</strong>：JOB2 到达，内存有1空位，调入。内存={JOB1,JOB2}，<strong>平分 CPU</strong>，各得 50%。<br>
+      　　注意：JOB1 在 8:00~8:20 独占 CPU 跑了 20 分钟（满速），<strong>还剩 25−20=5 分钟</strong>工作量。<br>
+      • <strong>8:25</strong>：JOB3 到达，但内存满（2道），JOB3 在外存等待。<br>
+      　　8:20~8:25 这 5 分钟，JOB1、JOB2 各分到 2.5 分钟。JOB1 剩余 5 分钟工作量跑完 → <strong>JOB1 在 8:30 完成</strong>（5÷0.5=10分，8:20+10分=8:30）。<br>
+      • <strong>8:30</strong>：JOB1 完成，内存空出 1 位；同时 JOB4 到达。FCFS 作业调度 → JOB3 先于 JOB4（JOB3 8:25 到达更早），调入 JOB3。内存={JOB2,JOB3}。<br>
+      • 此后 JOB2、JOB3 平分 CPU（各 50%），直到有进程完成……（后续类似推演）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 完整时间表（官方答案）</div>
+      <table class="calc-table">
+        <tr><th>作业号</th><th>进入</th><th>实际运行</th><th>开始</th><th>结束</th><th>周转</th><th>带权周转</th></tr>
+        <tr><td>1</td><td>8:00</td><td>25分</td><td>8:00</td><td>8:30</td><td>30分</td><td>30/25</td></tr>
+        <tr><td>2</td><td>8:20</td><td>30分</td><td>8:20</td><td>9:20</td><td>60分</td><td>60/30</td></tr>
+        <tr><td>3</td><td>8:25</td><td>25分</td><td>8:30</td><td>9:20</td><td>55分</td><td>55/25</td></tr>
+        <tr><td>4</td><td>8:30</td><td>15分</td><td>9:20</td><td>9:35</td><td>65分</td><td>65/15</td></tr>
+      </table>
+      <span class="badge eg">关键</span>实际运行时间是工作量，但因平分 CPU，<strong>墙钟时间（实际经过）= 工作量 ÷ 当前进程数</strong>。如 JOB2 从 8:20 开始还有 30 分工作量，前 10 分钟独占(JOB1 还在但即将完成)…复杂处在于进程数随完成事件变化。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 算平均周转和带权周转</div>
+      <div class="formula">周转总和 = 30 + 60 + 55 + 65 = 210 分<br>平均周转 = 210 / 4 = <strong>52.5 分</strong></div>
+      <div class="formula">带权周转 = 30/25 + 60/30 + 55/25 + 65/15<br>= 1.2 + 2.0 + 2.2 + 4.33 ≈ 9.73<br>平均带权周转 = 9.73 / 4 ≈ <strong>2.43</strong></div>
+    </div>
+
+    <div class="wt-final">✓ 答：(1) 见上表；(2) 平均周转 52.5 分，平均带权周转 ≈ 2.43（官方答 2.425）。<br>核心难点：进程数变化导致 CPU 分配比例变化，要分时段算。</div>
+  </div>
+
+  <div class="task" data-task="q2" data-answer="B" data-ok="对！内存里 2 个就绪进程平分 CPU，每个实际 CPU 速度只有 50%，墙钟时间=工作量÷进程数。" data-no="100% 是独占；平分 CPU 时每个进程的 CPU 有效速度被进程数稀释。" data-src="提纲：作业对应的进程调度采用内存中的就绪进程平分 CPU 时间。" data-review="回到题2第1步看平分CPU">
+    <div class="q">检验：内存里有 2 个就绪进程平分 CPU 时，每个进程的实际 CPU 速度是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 100%（独占）</button>
+      <button class="opt" data-val="B">B. 50%（被另一个进程分走一半）</button>
+      <button class="opt" data-val="C">C. 200%（加速）</button>
+      <button class="opt" data-val="D">D. 0%（全部等待）</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题3：银行家 10台打印机 ============ -->
+<section id="s4">
+  <h2><span class="sec-id">题3</span>银行家算法 · 10 台打印机 3 进程</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 506~516 行（含官方答案）｜题型：银行家安全性分析 ★可能考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">某系统中有 10 台打印机，3 进程竞争</div>
+    <div class="wt-given">某系统中有 10 台打印机，有 3 个进程 P1、P2、P3 分别需要 8 台、7 台、4 台。若 P1、P2、P3 已经申请到 4 台、2 台和 2 台。<br>
+问：按银行家算法能安全分配吗？请说明分配的过程。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 算 Need（每个进程还差多少）</div>
+      Need = Max − Allocation<br>
+      • P1：8 − 4 = <strong>4</strong><br>
+      • P2：7 − 2 = <strong>5</strong><br>
+      • P3：4 − 2 = <strong>2</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 算当前可用 Available</div>
+      总共 10 台，已分 4+2+2 = 8 台<br>
+      Available = 10 − 8 = <strong>2 台</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 安全性检查：逐轮找 Need ≤ Work 的进程</div>
+      设 Work = Available = 2，Finish 全为 false。<br><br>
+      <strong>第 1 轮</strong>（Work=2）：<br>
+      • P1：Need 4 &gt; 2 ✗<br>
+      • P2：Need 5 &gt; 2 ✗<br>
+      • <strong>P3：Need 2 ≤ 2 ✓</strong> → P3 跑完，归还它的 2 台。Work = 2+2 = <strong>4</strong>；Finish[P3]=true<br><br>
+      <strong>第 2 轮</strong>（Work=4）：<br>
+      • <strong>P1：Need 4 ≤ 4 ✓</strong> → P1 跑完，归还 4 台。Work = 4+4 = <strong>8</strong>；Finish[P1]=true<br><br>
+      <strong>第 3 轮</strong>（Work=8）：<br>
+      • <strong>P2：Need 5 ≤ 8 ✓</strong> → P2 跑完，归还 2 台。Work = 8+2 = 10；Finish[P2]=true
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 判定</div>
+      所有 Finish = true → <strong>系统安全</strong>。<br>
+      安全序列 = <strong>&lt;P3, P1, P2&gt;</strong>。
+    </div>
+
+    <div class="wt-final">✓ 答：系统是安全的，安全序列 &lt;P3, P1, P2&gt;。<br>分配过程：剩余 2 台先给 P3（满足其全部需求）→ P3 完成归还 4 台 → 给 P1 → P1 完成归还 8 台 → 给 P2。每个进程都能完成。<br><strong>注意</strong>：归还的是该进程的 <strong>Allocation</strong>（已分到的），不是 Need！</div>
+  </div>
+
+  <div class="task" data-task="q3" data-answer="B" data-ok="对！归还的是 Allocation（进程已分到手的），Need 是它还没拿到的，谈不上归还。" data-no="Need 是还需要的，本来就没拿到；Max 是总需求；归还的是已经占有的那部分。" data-src="提纲：Work = Work + Allocation；进程完成后释放分配给它的资源。" data-review="回到题3第3步看Work累加">
+    <div class="q">检验：安全性算法中，一个进程跑完后，Work（可用资源）应该加上该进程的哪个值？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 它的 Need</button>
+      <button class="opt" data-val="B">B. 它的 Allocation</button>
+      <button class="opt" data-val="C">C. 它的 Max</button>
+      <button class="opt" data-val="D">D. 系统总资源数</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题4：银行家 12磁带机 ============ -->
+<section id="s5">
+  <h2><span class="sec-id">题4</span>银行家算法 · 12 磁带机 3 进程</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 420~422 行（官方举例）｜题型：银行家安全状态判断 ★可能考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">3 进程 12 台磁带机的安全状态判定</div>
+    <div class="wt-given">假定系统有 3 个进程 P1、P2、P3，共有 12 台磁带机。进程 P1 总共要求 10 台，P2 和 P3 分别要求 4 台和 9 台。设在 T0 时刻，P1、P2、P3 已经获得 5 台、2 台和 2 台。<br>
+问：T0 时刻系统是否安全？</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 算 Need</div>
+      • P1：10 − 5 = <strong>5</strong><br>
+      • P2：4 − 2 = <strong>2</strong><br>
+      • P3：9 − 2 = <strong>7</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 算 Available</div>
+      总共 12 台，已分 5+2+2 = 9 台<br>
+      Available = 12 − 9 = <strong>3 台</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 安全性检查</div>
+      Work = 3，Finish 全 false。<br><br>
+      <strong>第 1 轮</strong>（Work=3）：<br>
+      • P1：Need 5 &gt; 3 ✗<br>
+      • <strong>P2：Need 2 ≤ 3 ✓</strong> → P2 完成，归还 2 台。Work = 3+2 = <strong>5</strong>；Finish[P2]=true<br>
+      • P3：Need 7 &gt; 3 ✗（用 Work=5 比也 &gt;5，仍不满足）<br><br>
+      <strong>第 2 轮</strong>（Work=5）：<br>
+      • <strong>P1：Need 5 ≤ 5 ✓</strong> → P1 完成，归还 5 台。Work = 5+5 = <strong>10</strong>；Finish[P1]=true<br><br>
+      <strong>第 3 轮</strong>（Work=10）：<br>
+      • <strong>P3：Need 7 ≤ 10 ✓</strong> → P3 完成，归还 2 台。Work=10+2=12；Finish[P3]=true
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 判定</div>
+      所有 Finish = true → <strong>T0 时刻系统安全</strong>。<br>
+      安全序列 = <strong>&lt;P2, P1, P3&gt;</strong>。
+    </div>
+
+    <div class="wt-final">✓ 答：T0 时刻系统是安全的，存在安全序列 &lt;P2, P1, P3&gt;。<br>这道是提纲讲"安全状态"概念时的标准举例，方法与题3完全一样，只是数据不同。<br><strong>对比记忆</strong>：两道银行家题套路相同——算 Need → 算 Available → 逐轮贪心找 Need≤Work。</div>
+  </div>
+
+  <div class="task" data-task="q4" data-answer="B" data-ok="对！不安全只是找不到安全序列，但进程未必按最坏方式申请，所以不一定真死锁。" data-no="安全状态必不死锁，但不安全状态只是"有死锁风险"，不等于已经死锁。" data-src="提纲：并非所有不安全状态都是死锁状态。" data-review="回到题4看安全状态概念">
+    <div class="q">检验：如果算下来找不到任何安全序列（系统不安全），意味着？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 系统已经死锁</button>
+      <button class="opt" data-val="B">B. 系统可能进入死锁，但不一定已经死锁</button>
+      <button class="opt" data-val="C">C. 系统永远不会死锁</button>
+      <button class="opt" data-val="D">D. 所有进程都已结束</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 检验汇总 ============ -->
+<section id="s6">
+  <h2><span class="sec-id">✓</span>检验汇总与学习报告</h2>
+  <div class="card key">
+    <strong>做完 4 道检验题后，生成报告看看你的薄弱点。</strong><br>
+    核心自测（考场上问自己）：<br>
+    ☐ 调度题：会不会画时间轴、区分 SJF/FCFS/平分CPU？<br>
+    ☐ 银行家：会不会算 Need、逐轮贪心找安全序列？<br>
+    ☐ 易错：归还是 Allocation 不是 Need；SJF 看"已到达中最短"。
+  </div>
+
+  <div class="wrong-section">
+    <h3>错题回流</h3>
+    <p>答错的题会自动收集到这里。</p>
+    <ul id="wrongBox"></ul>
+  </div>
+
+  <div class="report-section">
+    <h3>生成学习报告</h3>
+    <p>点击按钮，生成你的押题精讲学习报告。</p>
+    <textarea id="report" readonly></textarea>
+    <div class="report-btns">
+      <button id="genReport">生成学习报告</button>
+      <button id="copyReport">复制报告</button>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="footer">
+  由 <a href="https://github.com/remi-huang/grokko" target="_blank" rel="noopener">Grokko</a> 生成 · 提纲原题手把手精讲<br>
+  <span class="tip">题目来自桑庆兵老师复习提纲，数据是原汤。方法懂了，换数字也不怕。</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function selectedVals(t){return $all('.opt.selected',t).map(function(o){return o.getAttribute('data-val');}).sort();}
+  function setFb(t,state,html){var fb=t.querySelector('.feedback');if(!fb)return;fb.className='feedback'+(state?(' '+state):'');fb.innerHTML=html;}
+  function updateBar(){
+    var all=$all('.task'),done=$all('.task[data-answered="1"]');
+    var fill=document.getElementById('barFill'),num=document.getElementById('barNum');
+    if(fill)fill.style.width=all.length?(done.length/all.length*100)+'%':'0%';
+    if(num)num.textContent=done.length+' / '+all.length;
+  }
+  function renderWrong(){
+    var box=document.getElementById('wrongBox');if(!box)return;
+    var wrong=$all('.task[data-answered="1"][data-correct="0"]');
+    if(!wrong.length){box.innerHTML='<li style="color:#888">还没有错题。答错的题会自动收集到这里。</li>';return;}
+    box.innerHTML='';
+    wrong.forEach(function(t){var li=document.createElement('li');li.textContent='【'+(t.getAttribute('data-task')||'')+'】'+(t.getAttribute('data-review')||'回到对应题复习');box.appendChild(li);});
+  }
+  function check(t){
+    var type=t.getAttribute('data-type'),ok=false;
+    if(type==='selects'){
+      var sels=$all('select.match',t),allok=true,empty=false;
+      sels.forEach(function(s){if(!s.value)empty=true;if(s.value!==s.getAttribute('data-correct'))allok=false;});
+      if(empty){setFb(t,'no','请先把每一项都选好再检查。');return;}
+      ok=allok;
+    }else{
+      var sel=selectedVals(t);
+      if(!sel.length){setFb(t,'no','请先选择一个选项再检查。');return;}
+      var ans=(t.getAttribute('data-answer')||'').split(',').map(function(x){return x.trim();}).sort();
+      ok=(sel.join('|')===ans.join('|'));
+    }
+    var body=ok?(t.getAttribute('data-ok')||'回答正确。'):(t.getAttribute('data-no')||'再想想。');
+    var src=t.getAttribute('data-src');
+    setFb(t,ok?'ok':'no',(ok?'✅ ':'❌ ')+body+(src?('<span class="src">'+src+'</span>'):''));
+    t.setAttribute('data-answered','1');t.setAttribute('data-correct',ok?'1':'0');
+    updateBar();renderWrong();
+  }
+  function genReport(){
+    var box=document.getElementById('report');if(!box)return;
+    var all=$all('.task'),done=$all('.task[data-answered="1"]'),right=$all('.task[data-answered="1"][data-correct="1"]');
+    var lines=['=== 押题精讲 · 学习报告 ===','完成题目：'+done.length+' / '+all.length,'答对：'+right.length+' 题',''];
+    var wrong=$all('.task[data-answered="1"][data-correct="0"]');
+    if(wrong.length){lines.push('我答错的题（建议回看）：');wrong.forEach(function(t){lines.push('- '+(t.getAttribute('data-task')||'')+'：'+(t.getAttribute('data-review')||''));});}
+    else{lines.push('暂无错题。');}
+    lines.push('','核心自测：');
+    lines.push('- [ ] 调度题会画时间轴、区分SJF/FCFS/平分CPU');
+    lines.push('- [ ] 银行家会算Need、逐轮找安全序列');
+    lines.push('- [ ] 记牢：归还是Allocation不是Need');
+    box.textContent=lines.join('\n');
+  }
+  document.addEventListener('click',function(e){
+    var c=e.target.closest?e.target:null;
+    var opt=c&&e.target.closest('.opt');
+    if(opt){var t=opt.closest('.task');if(!t)return;
+      if(t.getAttribute('data-multi')==='true'){opt.classList.toggle('selected');}
+      else{$all('.opt',t).forEach(function(o){o.classList.remove('selected');});opt.classList.add('selected');}
+      return;}
+    var btn=c&&e.target.closest('.check');
+    if(btn){var tk=btn.closest('.task');if(tk)check(tk);return;}
+    if(e.target&&e.target.id==='genReport'){genReport();return;}
+    if(e.target&&e.target.id==='copyReport'){var r=document.getElementById('report');if(r&&navigator.clipboard)navigator.clipboard.writeText(r.textContent);return;}
+  });
+  function init(){updateBar();renderWrong();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
