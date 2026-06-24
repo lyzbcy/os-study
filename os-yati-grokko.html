@@ -91,7 +91,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 <div class="layout">
 <aside class="sidebar">
   <h1>提纲原题<br>手把手精讲</h1>
-  <div class="sub">押题精讲 · 4 道必练大题</div>
+  <div class="sub">押题精讲 · 6 道必练大题</div>
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
     <div class="progress-num" id="barNum">0 / 0</div>
@@ -102,7 +102,9 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
     <li><a href="#s3"><span class="num">题2</span>调度：两道作业平分CPU</a></li>
     <li><a href="#s4"><span class="num">题3</span>银行家：10台打印机（3进程）</a></li>
     <li><a href="#s5"><span class="num">题4</span>银行家：12磁带机（3进程）</a></li>
-    <li><a href="#s6"><span class="num">✓</span>检验与学习报告</a></li>
+    <li><a href="#s6"><span class="num">题5</span>内存：页面置换 FIFO/LRU（7页4块）</a></li>
+    <li><a href="#s7"><span class="num">题6</span>内存：页式地址变换（64KB/16块）</a></li>
+    <li><a href="#s8"><span class="num">✓</span>检验与学习报告</a></li>
   </ul>
 </aside>
 
@@ -369,14 +371,165 @@ JOB4 | 8:30 | 15 分钟<br><br>
 </section>
 
 <!-- ============ 检验汇总 ============ -->
+<!-- ============ 题5：页面置换 FIFO/LRU ============ -->
 <section id="s6">
+  <h2><span class="sec-id">题5</span>页面置换 · FIFO / LRU（7 页 4 块）</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 666~676 行（含官方答案）｜题型：页面置换画表 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">页式存储管理 · FIFO 与 LRU 缺页对比</div>
+    <div class="wt-given">某采用页式存储管理的系统，接收了一共 7 页的作业，作业执行时依次访问的页为：<br>
+<strong>1、2、3、4、2、1、5、6、2、1、2、3、7、6、3、2、1、2、3、6</strong><br>
+分别用 FIFO 与 LRU 页面调度算法，在得到 4 块主存空间情况下，分别列出各自的页面淘汰顺序和缺页中断次数，以及最后留驻主存 4 页的顺序。<br>
+<strong>（假定前面四页 1 2 3 4 已在主存）</strong></div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 理解前提："前四页已在主存"</div>
+      访问序列前 4 个是 1、2、3、4，题目假定它们<strong>已在主存</strong>——所以这 4 次访问<strong>不产生缺页</strong>（不调入也不淘汰）。<br>
+      内存初始状态：{1, 2, 3, 4}。后续从第 5 个访问（页2）开始算缺页。<br>
+      <span class="badge eg">关键</span>这是最容易算错的点：有些题"从空内存开始"每个新页都缺页，本题"前四页已装入"前四次不算！
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · FIFO 推演（淘汰最早进来的）</div>
+      FIFO 用<strong>队列</strong>，淘汰队首（最先进入的）。内存初始队列：[1,2,3,4]（1最早）。<br>
+      • 访问 <strong>2</strong>：在内存，命中。队列不变 [1,2,3,4]<br>
+      • 访问 <strong>1</strong>：在内存，命中。[1,2,3,4]<br>
+      • 访问 <strong>5</strong>：不在内存，<strong class="miss">缺页①</strong>！淘汰队首 1 → [2,3,4,5]<br>
+      • 访问 <strong>6</strong>：不在，<strong class="miss">缺页②</strong>！淘汰 2 → [3,4,5,6]<br>
+      • 访问 <strong>2</strong>：不在，<strong class="miss">缺页③</strong>！淘汰 3 → [4,5,6,2]<br>
+      • 访问 <strong>1</strong>：不在，<strong class="miss">缺页④</strong>！淘汰 4 → [5,6,2,1]<br>
+      • 访问 <strong>2</strong>：在（队列有2），命中。[5,6,2,1]<br>
+      • 访问 <strong>3</strong>：不在，<strong class="miss">缺页⑤</strong>！淘汰 5 → [6,2,1,3]<br>
+      • 访问 <strong>7</strong>：不在，<strong class="miss">缺页⑥</strong>！淘汰 6 → [2,1,3,7]<br>
+      • 访问 <strong>6</strong>：不在，<strong class="miss">缺页⑦</strong>！淘汰 2 → [1,3,7,6]<br>
+      • 访问 <strong>3</strong>：在，命中。[1,3,7,6]<br>
+      • 访问 <strong>2</strong>：不在，<strong class="miss">缺页⑧</strong>！淘汰 1 → [3,7,6,2]<br>
+      • 访问 <strong>1</strong>：不在，<strong class="miss">缺页⑨</strong>！淘汰 3 → [7,6,2,1]<br>
+      • 访问 <strong>2</strong>：在，命中。[7,6,2,1]<br>
+      • 访问 <strong>3</strong>：不在，<strong class="miss">缺页⑩</strong>！淘汰 7 → [6,2,1,3]<br>
+      • 访问 <strong>6</strong>：在，命中。[6,2,1,3]<br>
+      <strong>淘汰顺序：1, 2, 3, 4, 5, 6, 2, 1, 3, 7 → 共 10 次</strong>（官方答案 10 次）<br>
+      最后驻留：<strong>6, 2, 1, 3</strong>（官方答 1 3 6 2）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · LRU 推演（淘汰最近最久未用）</div>
+      LRU 每次淘汰"<strong>最久没被访问</strong>"的页。用"最近访问时间"排序。<br>
+      • 访问 2、1：命中，更新它们的"最近访问时间"<br>
+      • 访问 <strong>5</strong>：不在，缺页①！此时最久没用的是 3（1和2刚用过）→ 淘汰 3 → {1,2,4,5}<br>
+      • 访问 <strong>6</strong>：不在，缺页②！最久没用是 4 → 淘汰 4 → {1,2,5,6}<br>
+      • 访问 2、1、2：命中<br>
+      • 访问 <strong>3</strong>：不在，缺页③！最久没用是 5 → 淘汰 5 → {1,2,6,3}<br>
+      • 访问 <strong>7</strong>：不在，缺页④！最久没用是 6 → 淘汰 6 → {1,2,3,7}<br>
+      • 访问 <strong>6</strong>：不在，缺页⑤！最久没用是 1 → 淘汰 1 → {2,3,7,6}<br>
+      • 访问 3、2、1：3、2 命中，<strong>1 不在</strong>，缺页⑥！最久没用是 7 → 淘汰 7 → {2,3,6,1}<br>
+      • 访问 2、3、6：全部命中<br>
+      <strong>淘汰顺序：3, 4, 5, 6, 1, 7 → 共 6 次</strong>（官方答案 6 次）<br>
+      最后驻留：<strong>6, 3, 2, 1</strong>（官方答 6 3 2 1）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 对比结论</div>
+      <table class="calc-table">
+        <tr><th>算法</th><th>缺页次数</th><th>淘汰顺序</th><th>最后驻留</th></tr>
+        <tr><td><strong>FIFO</strong></td><td class="miss">10 次</td><td>1,2,3,4,5,6,2,1,3,7</td><td>6,2,1,3</td></tr>
+        <tr><td><strong>LRU</strong></td><td class="hit">6 次</td><td>3,4,5,6,1,7</td><td>6,3,2,1</td></tr>
+      </table>
+      <strong>LRU 缺页更少</strong>（6 vs 10），因为 LRU 基于局部性原理，淘汰真正不用的页；FIFO 盲目淘汰最早的，可能淘汰马上要用的。
+    </div>
+
+    <div class="wt-final">✓ 答：FIFO 缺页 10 次（淘汰 1,2,3,4,5,6,2,1,3,7），LRU 缺页 6 次（淘汰 3,4,5,6,1,7）。<br>核心：① 本题"前四页已装入"前4次不缺页；② LRU 看最近访问时间，FIFO 看进入顺序。</div>
+  </div>
+
+  <div class="task" data-task="q5" data-answer="B" data-ok="对！LRU 淘汰"最近最久未被访问"的页，依据程序局部性原理；FIFO 盲目淘汰最早进入的。" data-no="FIFO 看进入时间不看使用情况，所以可能淘汰马上要用的页，缺页更多。" data-src="提纲：LRU 淘汰最近一段时间里较久未被访问的页，依据局部性。" data-review="回到题5第3步看LRU">
+    <div class="q">检验：为什么这道题 LRU 的缺页次数（6次）比 FIFO（10次）少？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. LRU 随机淘汰，运气好</button>
+      <button class="opt" data-val="B">B. LRU 基于局部性，淘汰真正不再用的页；FIFO 盲目淘汰最早的</button>
+      <button class="opt" data-val="C">C. LRU 内存更大</button>
+      <button class="opt" data-val="D">D. FIFO 算法实现有bug</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题6：页式地址变换 ============ -->
+<section id="s7">
+  <h2><span class="sec-id">题6</span>页式地址变换 · 64KB / 16 块</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 720~740 行（含官方答案）｜题型：地址变换三步法 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">页式管理 · 求总长度、起始地址、物理地址</div>
+    <div class="wt-given">假定某页式管理系统，主存为 <strong>64KB</strong>，分成 <strong>16 块</strong>，块号为 0、1、2……15。设某作业有 4 页，其页号为 0、1、2、3，被分别装入主存的 <strong>2、4、1、6 块</strong>。试问：<br>
+(1) 该作业的总长度是多少字节？<br>
+(2) 写出该作业每一页在主存中的起始地址。<br>
+(3) 若给出逻辑地址 [0,100]、[1,50]、[2,0]、[3,60]，请计算相应的内存地址。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 算每块大小（页大小 = 块大小）</div>
+      <div class="formula">每块大小 = 主存总容量 ÷ 块数 = 64KB ÷ 16 = <strong>4KB</strong></div>
+      所以页面大小 = 4KB = <strong>4096 字节</strong>。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · (1) 算作业总长度</div>
+      作业有 4 页，每页 4KB：<br>
+      <div class="formula">总长度 = 4 页 × 4KB = <strong>16KB</strong></div>
+      （官方答案：16KB）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · (2) 算每页的起始地址</div>
+      每页装入对应块，块的起始地址 = 块号 × 块大小（4KB = 4096B）：<br>
+      • 页0 → 块2：2 × 4096 = <strong>8192</strong>（8K）<br>
+      • 页1 → 块4：4 × 4096 = <strong>16384</strong>（16K）<br>
+      • 页2 → 块1：1 × 4096 = <strong>4096</strong>（4K）<br>
+      • 页3 → 块6：6 × 4096 = <strong>24576</strong>（24K）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · (3) 地址变换三步法</div>
+      <strong>公式</strong>：逻辑地址 [页号 P, 页内偏移 W] → 查页表得块号 F → 物理地址 = F × 块大小 + W<br><br>
+      • <strong>[0, 100]</strong>：页号0 → 查表得块号 <strong>2</strong>。<br>
+      　　物理地址 = 2 × 4096 + 100 = 8192 + 100 = <strong>8292</strong><br>
+      • <strong>[1, 50]</strong>：页号1 → 块号 <strong>4</strong>。<br>
+      　　物理地址 = 4 × 4096 + 50 = 16384 + 50 = <strong>16434</strong><br>
+      • <strong>[2, 0]</strong>：页号2 → 块号 <strong>1</strong>。<br>
+      　　物理地址 = 1 × 4096 + 0 = <strong>4096</strong><br>
+      • <strong>[3, 60]</strong>：页号3 → 块号 <strong>6</strong>。<br>
+      　　物理地址 = 6 × 4096 + 60 = 24576 + 60 = <strong>24636</strong>
+    </div>
+
+    <div class="wt-final">✓ 答：(1) 作业总长 16KB；(2) 页0~3 起始地址分别为 8192/16384/4096/24576；<br>(3) [0,100]→8292，[1,50]→16434，[2,0]→4096，[3,60]→24636。<br>核心三步：① 页号查表得块号 ② 块号×块大小+页内偏移 = 物理地址。页内偏移直接搬，不变！</div>
+  </div>
+
+  <div class="task" data-task="q6" data-answer="C" data-ok="对！页内偏移 W 不查表直接搬过去，需要查表变换的只有页号→块号。" data-no="页号要查表；块号是查表结果；段号属于段式管理。" data-src="提纲：逻辑地址由页号和页内地址组成，根据页号找块号，页内地址直接送入物理地址。" data-review="回到题6第4步看三步法">
+    <div class="q">检验：页式地址变换中，哪部分<strong>不需要</strong>查表，直接搬到物理地址？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 页号</button>
+      <button class="opt" data-val="B">B. 块号</button>
+      <button class="opt" data-val="C">C. 页内偏移</button>
+      <button class="opt" data-val="D">D. 段号</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s8">
   <h2><span class="sec-id">✓</span>检验汇总与学习报告</h2>
   <div class="card key">
-    <strong>做完 4 道检验题后，生成报告看看你的薄弱点。</strong><br>
+    <strong>做完 6 道检验题后，生成报告看看你的薄弱点。</strong><br>
     核心自测（考场上问自己）：<br>
     ☐ 调度题：会不会画时间轴、区分 SJF/FCFS/平分CPU？<br>
     ☐ 银行家：会不会算 Need、逐轮贪心找安全序列？<br>
-    ☐ 易错：归还是 Allocation 不是 Need；SJF 看"已到达中最短"。
+    ☐ 页面置换：会不会画 FIFO/LRU 的淘汰表、数缺页次数？<br>
+    ☐ 地址变换：会不会三步法（页号→块号→拼物理地址）？<br>
+    ☐ 易错：归还是 Allocation 不是 Need；置换题看清"前页是否已装入"。
   </div>
 
   <div class="wrong-section">
