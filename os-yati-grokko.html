@@ -91,7 +91,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 <div class="layout">
 <aside class="sidebar">
   <h1>提纲原题<br>手把手精讲</h1>
-  <div class="sub">押题精讲 · 6 道必练大题</div>
+  <div class="sub">押题精讲 · 8 道必练大题（全章覆盖）</div>
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
     <div class="progress-num" id="barNum">0 / 0</div>
@@ -104,7 +104,9 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
     <li><a href="#s5"><span class="num">题4</span>银行家：12磁带机（3进程）</a></li>
     <li><a href="#s6"><span class="num">题5</span>内存：页面置换 FIFO/LRU（7页4块）</a></li>
     <li><a href="#s7"><span class="num">题6</span>内存：页式地址变换（64KB/16块）</a></li>
-    <li><a href="#s8"><span class="num">✓</span>检验与学习报告</a></li>
+    <li><a href="#s8"><span class="num">题7</span>文件：磁盘调度四算法（磁头100）</a></li>
+    <li><a href="#s9"><span class="num">题8</span>IO：SPOOLing原理 + I/O控制分析</a></li>
+    <li><a href="#s10"><span class="num">✓</span>检验与学习报告</a></li>
   </ul>
 </aside>
 
@@ -520,16 +522,147 @@ JOB4 | 8:30 | 15 分钟<br><br>
   </div>
 </section>
 
+<!-- ============ 题7：磁盘调度四算法 ============ -->
 <section id="s8">
+  <h2><span class="sec-id">题7</span>磁盘调度四算法 · 磁头在100向增大</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 909 行（含官方答案）｜题型：磁盘调度 ★第4章必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题</div>
+    <div class="wt-title">设磁盘有 200 磁道 · FCFS / SSTF / SCAN / CSCAN</div>
+    <div class="wt-given">设磁盘有 200 个磁道，请求队列（按到达次序）为：<strong>55、58、39、18、90、160、150、38、184</strong>。<br>
+当前磁头在 <strong>100 号磁道</strong>，并<strong>向磁道号增加的方向移动</strong>。<br>
+请给出按 FCFS、SSTF、SCAN、CSCAN 调度的服务次序，并计算平均寻道长度。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · FCFS（按到达顺序服务）</div>
+      服务次序就是到达次序：100→55→58→39→18→90→160→150→38→184<br>
+      移动距离逐段：|55−100|=45，|58−55|=3，|39−58|=19，|18−39|=21，|90−18|=72，|160−90|=70，|150−160|=10，|38−150|=112，|184−38|=146<br>
+      <strong>总移动 = 45+3+19+21+72+70+10+112+146 = 498</strong>，平均 = 498/9 ≈ <strong>55.3</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · SSTF（每次选最近的）</div>
+      从 100 出发找最近：90(距离10)→58(32)→55(3)→39(16)→38(1)→18(20)→150(132)→160(10)→184(24)<br>
+      <strong>总移动 = 10+32+3+16+1+20+132+10+24 = 248</strong>，平均 = 248/9 ≈ <strong>27.6</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · SCAN（电梯算法，向增大方向先走到底再反向）</div>
+      磁头向<strong>增大方向</strong>，先服务 ≥100 的请求（从小到大），到最大(184)后反向服务 &lt;100 的（从大到小）：<br>
+      100→150→160→184（到头反向）→90→58→55→39→38→18<br>
+      移动：到184走 184−100=84，再到18走 184−18=166<br>
+      <strong>总移动 = 84+166 = 250</strong>，平均 = 250/9 ≈ <strong>27.8</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · CSCAN（单向扫描，到最大后回起点不服务）</div>
+      磁头向增大方向扫到最大(184)，再快速返回起点(0)，再向增大方向扫（返回时不服务）：<br>
+      100→150→160→184（快速回0）→18→38→39→55→58→90<br>
+      移动：到184走 84，回0走 184，再从0扫到90走 90<br>
+      <strong>总移动 = 84+184+90 = 322</strong>，平均 = 322/9 ≈ <strong>35.8</strong>
+    </div>
+
+    <div class="wt-final">✓ 答（官方答案一致）：FCFS≈55.3，SSTF≈27.6，SCAN≈27.8，CSCAN≈35.8。<br>核心：① SCAN 必须看清初始方向（本题向增大）；② CSCAN 到头后回起点<strong>不服务</strong>；③ SSTF 总移动最少但可能饥饿。<br><strong>对比记忆</strong>：SSTF 和 SCAN 总移动量接近且最优，FCFS 最差，CSCAN 居中。</div>
+  </div>
+
+  <div class="task" data-task="q7" data-answer="C" data-ok="对！CSCAN 从最大磁道返回 0 号时是"快速返回"，不为任何请求服务。" data-no="SCAN 到头后会反向继续服务；CSCAN 返回时不服务，这是两者关键区别。" data-src="提纲：单向扫描（CSCAN）返回时不为任何等待访问者服务。" data-review="回到题7第4步看CSCAN">
+    <div class="q">检验：CSCAN 算法从最大磁道返回起点时，会服务沿途请求吗？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 会，按从大到小顺序服务</button>
+      <button class="opt" data-val="B">B. 会，但只服务最近的</button>
+      <button class="opt" data-val="C">C. 不会，快速返回不服务</button>
+      <button class="opt" data-val="D">D. 会，但顺序随机</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="tip-box" style="margin-top:16px"><strong>⚠️ 第4章另一高频考法：记录优化分布</strong>（提纲第871、921、925行）<br>题型：给盘转速、扇区数、读时间、处理时间，求顺序存放总时间 + 优化分布方案。<br><strong>套路</strong>：每扇区旋转时间 = 转一周时间 ÷ 扇区数；优化间隔扇区数 = (读时间+处理时间) ÷ 每扇区时间。详细手把手演示见 <a href="os-ch4-grokko.html#s8" style="color:#1d70b8">第4章 html 模块8演示2</a>（含 204ms→60ms 完整推导）。</div>
+</section>
+
+<!-- ============ 题8：SPOOLing 原理 + I/O 控制分析 ============ -->
+<section id="s9">
+  <h2><span class="sec-id">题8</span>IO 设备管理 · SPOOLing 原理 + I/O 控制方式</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 提纲出处：第 949~993 行（概念大题）｜题型：简答/分析 ★第5章必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">提纲原题方向</div>
+    <div class="wt-title">说明 SPOOLing 系统的组成、工作原理和特点；分析 I/O 控制方式</div>
+    <div class="wt-given">第5章提纲里没有计算题，大题方向是<strong>简答/分析</strong>。两种最高频考法：<br>
+(1) 论述 SPOOLing（假脱机）系统的组成、工作原理、三大特点，并说明它如何把独占设备改造为共享设备。<br>
+(2) 说明程序查询、中断、DMA、通道四种 I/O 控制方式的区别。</div>
+
+    <div class="wt-step">
+      <div class="step-no">SPOOLing 标准答题模板（必背三段）</div>
+      <strong>① 组成（三部分）：</strong><br>
+      • <strong>输入井 / 输出井</strong>——在<strong>磁盘</strong>上，暂存多个进程的 I/O 数据<br>
+      • <strong>输入缓冲区 / 输出缓冲区</strong>——在<strong>内存</strong>中，作中转<br>
+      • <strong>输入进程 / 输出进程</strong>——管理模块，负责调度<br>
+      <strong>② 工作原理（以打印机为例）：</strong><br>
+      用户进程要打印时，数据先写入磁盘的<strong>输出井</strong>（进程立即返回，假装"打印完了"），输出井排队；SPOOLing 的输出进程利用 CPU 空闲时间，从输出井慢慢送到真正的打印机。物理上打印机一次只打一个，但逻辑上多个进程"同时"在用。<br>
+      <strong>③ 三大特点：</strong>提高 I/O 速度、将独占设备改造为共享设备、实现虚拟设备功能。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">易错点（阅卷扣分项）</div>
+      • <strong>输入井/输出井在磁盘，不在内存</strong>！内存里的是缓冲区。两者别搞混。<br>
+      • SPOOLing <strong>本质不是缓冲技术</strong>，是用磁盘把独占设备虚拟成共享设备（缓冲只是它的一部分）。<br>
+      • "虚拟设备"= 物理上独占，逻辑上共享。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">四种 I/O 控制方式对比（另一高频简答）</div>
+      <table class="calc-table">
+        <tr><th>方式</th><th>谁传数据</th><th>CPU 参与度</th><th>并行程度</th></tr>
+        <tr><td>程序查询</td><td>CPU</td><td>全程循环测试</td><td>最低（CPU外设串行）</td></tr>
+        <tr><td>中断方式</td><td>CPU</td><td>间歇（每字干预）</td><td>中（CPU外设并行）</td></tr>
+        <tr><td>DMA 方式</td><td>DMA控制器</td><td>少（仅首尾）</td><td>较高（成块传）</td></tr>
+        <tr><td>通道方式</td><td>通道（独立处理机）</td><td>极少（发指令即可）</td><td>最高（完全代管）</td></tr>
+      </table>
+      <strong>答题要点</strong>：四种方式<strong>并行程度递增</strong>，本质区别在于"CPU 和外设并行工作的程度不同"。程序查询 CPU 全程忙等；中断解放了 CPU 但每传一个字要干预；DMA 成块传送 CPU 只管首尾；通道是独立处理机完全代替 CPU 管 I/O。
+    </div>
+
+    <div class="wt-final">✓ 答题策略：第5章大题是<strong>背书型</strong>，没有计算。把"SPOOLing 三组成三特点"+"四种 I/O 控制方式对比表"背熟即可。建议手写一遍 SPOOLing 工作流程图（输入井→缓冲区→输出进程→设备）。</div>
+  </div>
+
+  <div class="task" data-task="q8" data-answer="A" data-ok="对！SPOOLing 三组成：输入井/输出井（磁盘）+ 输入/输出缓冲区（内存）+ 输入/输出进程。" data-no="CPU、总线、通道硬件不是 SPOOLing 的组成部分。" data-src="提纲：SPOOLING 系统的组成：输入井和输出井、输入缓冲区和输出缓冲区、输入进程和输出进程。" data-review="回到题8 SPOOLing模板">
+    <div class="q">检验：SPOOLing 系统的三个组成部分是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 输入井/输出井 + 输入/输出缓冲区 + 输入/输出进程</button>
+      <button class="opt" data-val="B">B. CPU + 内存 + 总线</button>
+      <button class="opt" data-val="C">C. 打印机 + 磁盘 + 显示器</button>
+      <button class="opt" data-val="D">D. 设备 + 控制器 + 通道</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="q8b" data-answer="B" data-ok="对！输入井/输出井在磁盘（容量大，暂存多进程数据）；缓冲区在内存（中转）。" data-no="井在磁盘（大），缓冲区在内存（小）。这是最易错点。" data-src="提纲：输入井和输出井（磁盘）、输入缓冲区和输出缓冲区（内存）。" data-review="回到题8易错点">
+    <div class="q">检验：SPOOLing 的"输入井/输出井"位于哪里？（高频易错）</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 内存</button>
+      <button class="opt" data-val="B">B. 磁盘</button>
+      <button class="opt" data-val="C">C. CPU 寄存器</button>
+      <button class="opt" data-val="D">D. Cache</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<section id="s10">
   <h2><span class="sec-id">✓</span>检验汇总与学习报告</h2>
   <div class="card key">
-    <strong>做完 6 道检验题后，生成报告看看你的薄弱点。</strong><br>
+    <strong>做完 8 道检验题后，生成报告看看你的薄弱点。</strong><br>
     核心自测（考场上问自己）：<br>
-    ☐ 调度题：会不会画时间轴、区分 SJF/FCFS/平分CPU？<br>
-    ☐ 银行家：会不会算 Need、逐轮贪心找安全序列？<br>
-    ☐ 页面置换：会不会画 FIFO/LRU 的淘汰表、数缺页次数？<br>
-    ☐ 地址变换：会不会三步法（页号→块号→拼物理地址）？<br>
-    ☐ 易错：归还是 Allocation 不是 Need；置换题看清"前页是否已装入"。
+    ☐ 第2章 调度题：会不会画时间轴、区分 SJF/FCFS/平分CPU？<br>
+    ☐ 第2章 银行家：会不会算 Need、逐轮贪心找安全序列？<br>
+    ☐ 第3章 页面置换：会不会画 FIFO/LRU 的淘汰表、数缺页次数？<br>
+    ☐ 第3章 地址变换：会不会三步法（页号→块号→拼物理地址）？<br>
+    ☐ <strong>第4章 磁盘调度</strong>：会不会算 FCFS/SSTF/SCAN/CSCAN 的移臂距离？<br>
+    ☐ <strong>第5章 SPOOLing</strong>：能不能默写三组成三特点 + 四种 I/O 控制方式？<br>
+    ☐ 易错：归还是 Allocation 不是 Need；置换题看清"前页是否已装入"；井在磁盘缓冲区在内存。
   </div>
 
   <div class="wrong-section">
