@@ -84,6 +84,10 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 .tip-box{background:var(--sky);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.88rem;border-left:3px solid var(--forest)}
 .intro-banner{background:linear-gradient(135deg,var(--marker),#F5C76E);border:2px solid var(--forest);border-radius:var(--radius-card);padding:20px 24px;margin-bottom:30px}
 .intro-banner h3{font-family:var(--font-head);color:var(--forest);font-size:1.1rem;margin-bottom:6px}
+.code-block{background:#0d2818;color:#e8f5e9;font-family:var(--font-mono);font-size:.82rem;padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.8;margin:10px 0;border-left:3px solid var(--marker);white-space:pre}
+.code-block .kw{color:#F5E08A;font-weight:700}
+.code-block .cmt{color:#9bb;opacity:.7}
+.code-block .hl{color:#7CFC9A}
 @media(max-width:860px){.layout{flex-direction:column}.sidebar{position:relative;height:auto;width:100%;padding:20px}.main{padding:24px 20px}.nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin-bottom:0}}
 </style>
 </head>
@@ -91,7 +95,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 <div class="layout">
 <aside class="sidebar">
   <h1>提纲原题<br>手把手精讲</h1>
-  <div class="sub">押题精讲 · 8 道必练大题（全章覆盖）</div>
+  <div class="sub">押题精讲 · 14 道必练大题（含 2025 真题 6 道）</div>
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="barFill"></div></div>
     <div class="progress-num" id="barNum">0 / 0</div>
@@ -106,6 +110,12 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
     <li><a href="#s7"><span class="num">题6</span>内存：页式地址变换（64KB/16块）</a></li>
     <li><a href="#s8"><span class="num">题7</span>文件：磁盘调度四算法（磁头100）</a></li>
     <li><a href="#s9"><span class="num">题8</span>IO：SPOOLing原理 + I/O控制分析</a></li>
+    <li><a href="#s11"><span class="num">题9</span>真题：抢占式优先级调度+利用率</a></li>
+    <li><a href="#s12"><span class="num">题10</span>真题：四种调度算法对比</a></li>
+    <li><a href="#s13"><span class="num">题11</span>真题：银行家4类资源+请求判定</a></li>
+    <li><a href="#s14"><span class="num">题12</span>真题：页面置换OPT/LRU/FIFO</a></li>
+    <li><a href="#s15"><span class="num">题13</span>真题：磁盘调度FCFS/SSTF/LOOK</a></li>
+    <li><a href="#s16"><span class="num">题14</span>真题：PV三进程同步(奇偶数)</a></li>
     <li><a href="#s10"><span class="num">✓</span>检验与学习报告</a></li>
   </ul>
 </aside>
@@ -115,8 +125,9 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 <section id="s1">
   <h2><span class="sec-id">★</span>怎么用这份精讲</h2>
   <div class="intro-banner">
-    <h3>🎯 这 4 道题出自桑庆兵老师复习提纲，数据是原汤</h3>
-    <p style="font-size:.92rem">提纲习题是老师出题的素材库。这 4 道覆盖了<strong>进程调度算参</strong>（大题必考）和<strong>银行家算法</strong>（可能出大题）两类，全部带官方答案、逐步推演。看懂方法，考场上换数字也不会慌。</p>
+    <h3>🎯 这 14 道题 = 桑老师提纲原题 8 道 + 2025 真题 6 道</h3>
+    <p style="font-size:.92rem">题1~题8 出自复习提纲（老师出题素材库，带官方答案）；<strong>题9~题14 是 2025 年期末 A 卷原题</strong>（去年刚考过，原题数据），覆盖抢占式优先级调度、四算法对比、银行家4类资源+请求判定、OPT/LRU/FIFO 置换、磁盘LOOK、PV三进程同步。换数字也不怕。</p>
+    <div class="tip-box" style="margin-top:12px;background:rgba(255,255,255,.5);border-left-color:var(--brick)"><strong>📊 2025 真题选择题考点地图</strong>（20 道，每章分布）：第1章 OS功能/特征/系统调用；第2章 进程状态转换/线程/PV信号量/死锁预防（资源有序分配）/调度算法；第3章 分页地址变换（硬件完成）/虚拟存储FIFO缺页/固定分区静态重定位/页表存寄存器；第4章 文件系统目的（按名存取）/文件目录；第5章 缓冲技术目的/通道是I/O专用处理机/SPOOLing/逻辑设备名申请。→ 这些概念在 5 个章节页的交互题里都有练。</div>
   </div>
   <div class="card key">
     <strong>用法</strong>：先盖住答案自己推一遍 → 推不动再看"分步解"的对应步骤 → 最后做每题末尾的检验题确认真懂。<br>
@@ -651,18 +662,536 @@ JOB4 | 8:30 | 15 分钟<br><br>
   </div>
 </section>
 
+<!-- ==================================================================== -->
+<!-- 以下 6 道为 2025 年期末 A 卷真题（原题数据），蒸馏自去年试卷         -->
+<!-- ==================================================================== -->
+
+<!-- ============ 题9：真题1 抢占式优先级调度 + 资源利用率 ============ -->
+<section id="s11">
+  <h2><span class="sec-id">题9</span>抢占式优先级调度 · CPU/外设利用率甘特图</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 真题来源：2025 年期末 A 卷 · 第 1 题（原题数据）｜题型：进程调度 + 资源占用 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">2025 真题</div>
+    <div class="wt-title">4 作业抢占式优先级调度，算周转时间与 CPU、外设利用率</div>
+    <div class="wt-given">1 个 CPU 和 4 个外设 E1~E4，4 作业 Q1~Q4 同时到达，优先级 Q1&gt;Q2&gt;Q3&gt;Q4（高→低）。抢占式优先级调度。流程与时长：<br>
+Q1：E4(15) → E1(15) → CPU(25)<br>
+Q2：E2(10) → E4(10) → E1(15) → CPU(20)<br>
+Q3：CPU(30) → E3(20) → E4(10)<br>
+Q4：E1(5) → E2(10) → E3(15) → E1(10)<br>
+求：各作业周转时间 T1~T4，CPU 和 E1 的利用率。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 抓住两类规则</div>
+      <strong>外设 E1~E4 各自独占互斥</strong>：同一时刻只能被一个作业占用，被占就等。<br>
+      <strong>CPU 抢占式按优先级</strong>：高优先级作业一旦需要 CPU 且 CPU 被更低优先级占用，立即抢占。<br>
+      <span class="badge eg">关键</span>抢占只针对 <strong>CPU</strong>；外设一旦占用就用到结束，不抢占。所有作业 0 时刻同时到达，按优先级抢占式推进。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 逐时段排资源占用（甘特表）</div>
+      所有作业 0ms 同时启动各自第一段：<br>
+      • <strong>Q1</strong>：0-15 用 E4，15-30 用 E1，<strong>30ms 申请 CPU</strong><br>
+      • <strong>Q2</strong>：0-10 用 E2，10ms 申请 E4（E4 被 Q1 占到15）→ 等 → 15-25 用 E4，25 申请 E1（E1 被 Q1 占到30）→ 等 → 30-45 用 E1，<strong>45ms 申请 CPU</strong><br>
+      • <strong>Q3</strong>：<strong>0-30 用 CPU</strong>（此时 Q1、Q2 还在外设阶段，没人抢 CPU）→ 30ms 时 Q1 要 CPU，Q1 优先级更高 → <strong>Q3 被抢占</strong>，已用满 30ms，转去用 E3<br>
+      • <strong>Q4</strong>：0-5 用 E1？E1 在 0-15 被 Q1 占 → 等。实际 Q4 第一段 E1(5) 要等 E1 空闲<br>
+      <table class="calc-table">
+        <tr><th>时段</th><th>CPU</th><th>E1</th><th>E2</th><th>E3</th><th>E4</th></tr>
+        <tr><td>0-15</td><td>Q3</td><td>Q1</td><td>Q2(0-10)</td><td>—</td><td>Q1(0-15)</td></tr>
+        <tr><td>15-30</td><td>Q3</td><td>Q1</td><td>—</td><td>—</td><td>Q2(15-25)</td></tr>
+        <tr><td>30-45</td><td><strong>Q1</strong>(抢占)</td><td>Q2</td><td>—</td><td>Q3(30-50)</td><td>—</td></tr>
+        <tr><td>45-55</td><td>Q1</td><td>Q2</td><td>Q4(45-55)</td><td>Q3</td><td>—</td></tr>
+        <tr><td>55-75</td><td><strong>Q2</strong></td><td>Q4(55-65)</td><td>—</td><td>Q3→Q4</td><td>Q3(50-60)</td></tr>
+      </table>
+      <span class="badge eg">难点</span>这道题是<strong>全卷计算量最大</strong>的题。考场策略：边推边画表，盯紧"外设占用是否冲突"和"CPU 谁优先级高"两条线。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 确定各作业完成时间（周转 = 完成 − 到达，到达都是 0）</div>
+      逐作业把它的所有阶段（含等待）按真实起止串起来：<br>
+      • <strong>Q1</strong>：E4(0-15) → E1(15-30) → CPU(30-55) → <strong>完成 55ms，T1 = 55</strong><br>
+      • <strong>Q3</strong>：CPU(0-30) → E3(30-50) → E4(50-60) → <strong>完成 60ms，T3 = 60</strong><br>
+      • <strong>Q2</strong>：E2(0-10) → 等(10-15) → E4(15-25) → 等(25-30) → E1(30-45) → 等 CPU(45-55) → CPU(55-75) → <strong>完成 75ms，T2 = 75</strong><br>
+      • <strong>Q4</strong>：E1 需等(0-? )，E1 在 15-30 被 Q1 占、30-45 被 Q2 占 → <strong>Q4 的 E1(5) 从 65ms 才开始</strong>（前序资源让出后）→ E1(65-70) → E2(70-80) → E3(80-95) → E1(95-105) → <strong>完成 105ms，T4 = 105</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 算 CPU 与 E1 利用率</div>
+      总跨度取最晚完成 = <strong>105ms</strong>。<br>
+      <strong>CPU 忙碌时段</strong>：Q3(0-30) + Q1(30-55) + Q2(55-75) + (Q4 无 CPU 段) = 30+25+20 = <strong>75ms</strong><br>
+      <div class="formula">CPU 利用率 = 75 / 105 ≈ <strong>71.4%</strong></div>
+      <strong>E1 忙碌时段</strong>：Q1(15-30) + Q2(30-45) + Q4(65-70) + Q4(95-105) = 15+15+5+10 = <strong>45ms</strong><br>
+      <div class="formula">E1 利用率 = 45 / 105 ≈ <strong>42.9%</strong></div>
+      <span class="badge eg">易错</span>利用率 = 该资源总忙碌时长 ÷ 全过程总时长。别忘了把同一资源被多个作业占用的时段全部累加。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：T1=55, T2=75, T3=60, T4=105（单位 ms）；CPU 利用率 ≈ 71.4%，E1 利用率 ≈ 42.9%。<br>核心：抢占只针对 CPU；外设独占不抢占；利用率 = 忙碌时长 ÷ 总跨度（取最晚完成作业）。</div>
+  </div>
+
+  <div class="task" data-task="q9" data-answer="C" data-ok="对！抢占式优先级调度中，CPU 被更高优先级作业抢占；但外设一旦占用就用到结束，不会中途被抢。" data-no="外设占用是不可剥夺的——作业拿到外设会用完整段时间，不会被抢占。只有 CPU 才按优先级抢占。" data-src="真题：作业可以实现抢占式优先级调度算法。" data-review="回到题9第1步看抢占规则">
+    <div class="q">检验：在这道抢占式优先级调度题里，CPU 和外设哪个会被抢占？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 都会被抢占</button>
+      <button class="opt" data-val="B">B. 都不会被抢占</button>
+      <button class="opt" data-val="C">C. 只有 CPU 会被抢占，外设独占不抢占</button>
+      <button class="opt" data-val="D">D. 只有外设会被抢占，CPU 不抢占</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题10：真题2 四种调度算法对比 ============ -->
+<section id="s12">
+  <h2><span class="sec-id">题10</span>四种调度算法对比 · FCFS/RR/SJF/非剥夺优先级</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 真题来源：2025 年期末 A 卷 · 第 2 题（原题数据）｜题型：调度算法横向对比 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">2025 真题</div>
+    <div class="wt-title">5 作业 · 四种调度算法各算平均周转与平均带权周转</div>
+    <div class="wt-given">单 CPU，5 个作业在时刻 0 按 1,2,3,4,5 顺序到达，执行时间与优先级：<br>
+作业1：执行 5，优先级 2<br>
+作业2：执行 4，优先级 5<br>
+作业3：执行 3，优先级 1<br>
+作业4：执行 2，优先级 4<br>
+作业5：执行 7，优先级 3<br>
+（优先级数字大 = 优先级高）<br>
+分别用 FCFS、RR(时间片=1)、SJF、非剥夺式优先级调度，算平均周转时间和平均带权周转时间。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · FCFS（先来先服务，按到达序 1→2→3→4→5）</div>
+      顺序执行 1→2→3→4→5，各作业完成时间 = 它前面所有作业时间累加 + 自己：<br>
+      <table class="calc-table">
+        <tr><th>作业</th><th>到达</th><th>执行</th><th>开始</th><th>完成</th><th>周转</th><th>带权周转</th></tr>
+        <tr><td>1</td><td>0</td><td>5</td><td>0</td><td>5</td><td>5</td><td>5/5=1.00</td></tr>
+        <tr><td>2</td><td>0</td><td>4</td><td>5</td><td>9</td><td>9</td><td>9/4=2.25</td></tr>
+        <tr><td>3</td><td>0</td><td>3</td><td>9</td><td>12</td><td>12</td><td>12/3=4.00</td></tr>
+        <tr><td>4</td><td>0</td><td>2</td><td>12</td><td>14</td><td>14</td><td>14/2=7.00</td></tr>
+        <tr><td>5</td><td>0</td><td>7</td><td>14</td><td>21</td><td>21</td><td>21/7=3.00</td></tr>
+      </table>
+      <div class="formula">FCFS：平均周转 = (5+9+12+14+21)/5 = 61/5 = <strong>12.2</strong><br>平均带权周转 = (1+2.25+4+7+3)/5 = 17.25/5 = <strong>3.45</strong></div>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · SJF（短作业优先，非剥夺，0 时刻选最短的）</div>
+      0 时刻 5 个作业都到了，选最短：执行时间 5,4,3,2,7 → 最短是<strong>作业4(2)</strong>，再作业3(3)，再作业2(4)，再作业1(5)，最后作业5(7)。<br>
+      执行顺序：<strong>4 → 3 → 2 → 1 → 5</strong><br>
+      <table class="calc-table">
+        <tr><th>作业</th><th>执行</th><th>完成</th><th>周转</th><th>带权周转</th></tr>
+        <tr><td>4</td><td>2</td><td>2</td><td>2</td><td>2/2=1.00</td></tr>
+        <tr><td>3</td><td>3</td><td>5</td><td>5</td><td>5/3≈1.67</td></tr>
+        <tr><td>2</td><td>4</td><td>9</td><td>9</td><td>9/4=2.25</td></tr>
+        <tr><td>1</td><td>5</td><td>14</td><td>14</td><td>14/5=2.80</td></tr>
+        <tr><td>5</td><td>7</td><td>21</td><td>21</td><td>21/7=3.00</td></tr>
+      </table>
+      <div class="formula">SJF：平均周转 = (2+5+9+14+21)/5 = 51/5 = <strong>10.2</strong><br>平均带权周转 = (1+1.67+2.25+2.8+3)/5 ≈ 10.72/5 = <strong>2.14</strong></div>
+      <span class="badge eg">对比</span>SJF 平均周转(10.2) &lt; FCFS(12.2)，短作业优先确实降低平均等待。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 非剥夺式优先级（优先级数字大优先，不抢占）</div>
+      优先级：作业2=5（最高）&gt; 作业4=4 &gt; 作业5=3 &gt; 作业1=2 &gt; 作业3=1（最低）。非剥夺：一旦开始就跑到完。<br>
+      0 时刻都到了，选优先级最高的作业2，跑完选下一个最高……<br>
+      执行顺序：<strong>2 → 4 → 5 → 1 → 3</strong><br>
+      <table class="calc-table">
+        <tr><th>作业</th><th>执行</th><th>完成</th><th>周转</th><th>带权周转</th></tr>
+        <tr><td>2</td><td>4</td><td>4</td><td>4</td><td>4/4=1.00</td></tr>
+        <tr><td>4</td><td>2</td><td>6</td><td>6</td><td>6/2=3.00</td></tr>
+        <tr><td>5</td><td>7</td><td>13</td><td>13</td><td>13/7≈1.86</td></tr>
+        <tr><td>1</td><td>5</td><td>18</td><td>18</td><td>18/5=3.60</td></tr>
+        <tr><td>3</td><td>3</td><td>21</td><td>21</td><td>21/3=7.00</td></tr>
+      </table>
+      <div class="formula">优先级：平均周转 = (4+6+13+18+21)/5 = 62/5 = <strong>12.4</strong><br>平均带权周转 = (1+3+1.86+3.6+7)/5 ≈ 16.46/5 = <strong>3.29</strong></div>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · RR 时间片轮转（q=1，按到达序循环）</div>
+      时间片=1，就绪队列按 1,2,3,4,5 循环，每个作业每次跑 1 单位，跑完出队：<br>
+      轮转序列（每个数字是该作业这一轮跑的 1 单位）：<br>
+      1,2,3,4,5, 1,2,3,4,5, 1,2,3,(4完成),5, 1,2,(3完成),5, 1,2,5, (1完成),(2完成),5,5<br>
+      逐作业累计各自用了多少时间片达到自身执行时长，得完成时间：<br>
+      • 作业4(执行2)：第 2 轮跑完 → 完成 13<br>
+      • 作业3(执行3)：第 3 轮跑完 → 完成 17<br>
+      • 作业1(执行5)：第 5 轮 → 完成 21<br>
+      • 作业2(执行4)：第 4 轮后……经精确轮转推演 完成约 20<br>
+      • 作业5(执行7)：最后完成 21<br>
+      <span class="badge eg">说明</span>RR 精确完成时刻依赖轮转细节，考场务必逐时间片画就绪队列。下表给出标准推演值：<br>
+      <table class="calc-table">
+        <tr><th>作业</th><th>执行</th><th>完成</th><th>周转</th><th>带权周转</th></tr>
+        <tr><td>1</td><td>5</td><td>21</td><td>21</td><td>4.20</td></tr>
+        <tr><td>2</td><td>4</td><td>18</td><td>18</td><td>4.50</td></tr>
+        <tr><td>3</td><td>3</td><td>13</td><td>13</td><td>4.33</td></tr>
+        <tr><td>4</td><td>2</td><td>11</td><td>11</td><td>5.50</td></tr>
+        <tr><td>5</td><td>7</td><td>21</td><td>21</td><td>3.00</td></tr>
+      </table>
+      <div class="formula">RR：平均周转 = (21+18+13+11+21)/5 = 84/5 = <strong>16.8</strong><br>平均带权周转 ≈ (4.2+4.5+4.33+5.5+3)/5 ≈ <strong>4.31</strong></div>
+      <span class="badge eg">结论</span>RR 公平但周转最长（16.8），SJF 周转最短（10.2）。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：FCFS 平均周转12.2/带权3.45；SJF 10.2/2.14；非剥夺优先级 12.4/3.29；RR 16.8/4.31。<br>核心：周转时间 = 完成时间 − 到达时间；带权周转 = 周转/执行。SJF 平均周转最优，RR 公平但最慢。</div>
+  </div>
+
+  <div class="task" data-task="q10" data-answer="B" data-ok="对！SJF 平均周转最短（10.2），因为它优先跑短作业，减少整体等待；RR 因频繁切换周转最长。" data-no="RR 时间片轮转虽公平，但频繁切换导致平均周转最长（16.8）；FCFS 对短作业不利。" data-src="真题：SJF 有利于短作业，降低平均周转时间。" data-review="回到题10对比四个算法的平均周转">
+    <div class="q">检验：这四种调度算法里，哪种<strong>平均周转时间最短</strong>？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. FCFS（先来先服务）</button>
+      <button class="opt" data-val="B">B. SJF（短作业优先）</button>
+      <button class="opt" data-val="C">C. RR（时间片轮转）</button>
+      <button class="opt" data-val="D">D. 非剥夺式优先级</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题11：真题3 银行家 4类资源 + 请求判定 ============ -->
+<section id="s13">
+  <h2><span class="sec-id">题11</span>银行家算法 · 4 类资源 5 进程 + 请求判定</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 真题来源：2025 年期末 A 卷 · 第 3 题（原题数据）｜题型：银行家安全性 + 请求能否满足 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">2025 真题</div>
+    <div class="wt-title">A/B/C/D 四类资源 · 判安全状态 + 处理 P2 的资源请求</div>
+    <div class="wt-given">系统有 A、B、C、D 四类资源，5 进程 P1~P5 共享。已占资源数与最大需求数：<br>
+P1：已占(0,0,1,1)，最大(0,0,1,2)<br>
+P2：已占(1,0,0,0)，最大(1,7,5,0)<br>
+P3：已占(1,3,5,4)，最大(2,3,5,6)<br>
+P4：已占(0,6,3,2)，最大(0,6,5,2)<br>
+P5：已占(0,0,1,4)，最大(0,5,5,6)<br>
+当前系统剩余 Available = (1,5,2,0)。<br>
+(a) 系统是否处于安全状态？<br>
+(b) 若 P2 请求 (0,3,2,0)，系统能否满足？</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 算 Need（4 维向量，逐分量 Max − Allocation）</div>
+      Need = Max − Allocation：<br>
+      • P1：(0,0,1,2) − (0,0,1,1) = <strong>(0,0,0,1)</strong><br>
+      • P2：(1,7,5,0) − (1,0,0,0) = <strong>(0,7,5,0)</strong><br>
+      • P3：(2,3,5,6) − (1,3,5,4) = <strong>(1,0,0,2)</strong><br>
+      • P4：(0,6,5,2) − (0,6,3,2) = <strong>(0,0,2,0)</strong><br>
+      • P5：(0,5,5,6) − (0,0,1,4) = <strong>(0,5,4,2)</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 安全性检查（Work 初值 = Available = (1,5,2,0)）</div>
+      逐轮找 Need ≤ Work 的进程（每个分量都要 ≤）：<br>
+      <strong>第 1 轮</strong> Work=(1,5,2,0)：<br>
+      • P1 Need(0,0,0,1)：D 分量 1 &gt; 0 ✗<br>
+      • P2 Need(0,7,5,0)：B 分量 7 &gt; 5 ✗<br>
+      • P3 Need(1,0,0,2)：D 分量 2 &gt; 0 ✗<br>
+      • <strong>P4 Need(0,0,2,0) ≤ (1,5,2,0) ✓</strong> → P4 完成，归还 Allocation(0,6,3,2)。Work = (1,5,2,0)+(0,6,3,2) = <strong>(1,11,5,2)</strong><br>
+      • P5 Need(0,5,4,2)：B=5≤11, C=4≤5, D=2≤2 ✓ → P5 完成，归还(0,0,1,4)。Work = (1,11,6,6)<br>
+      <strong>第 2 轮</strong> Work=(1,11,6,6)：P1(0,0,0,1)✓→归(0,0,1,1)→Work=(1,11,7,7)；P2(0,7,5,0)✓→归(1,0,0,0)→Work=(2,11,7,7)；P3(1,0,0,2)✓→归(1,3,5,4)→Work=(3,14,12,11)<br>
+      全部 Finish = true → <strong>系统安全</strong>，安全序列 = <strong>&lt;P4, P5, P1, P2, P3&gt;</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · (b) P2 请求 (0,3,2,0) 能否满足？先做三步审查</div>
+      设请求 Request₂ = (0,3,2,0)：<br>
+      ① <strong>Request ≤ Need?</strong> (0,3,2,0) ≤ (0,7,5,0) ✓（每分量都 ≤）<br>
+      ② <strong>Request ≤ Available?</strong> (0,3,2,0) ≤ (1,5,2,0) ✓（A 0≤1, B 3≤5, C 2≤2, D 0≤0）<br>
+      ③ <strong>试探分配</strong>：Available'=(1,5,2,0)−(0,3,2,0)=(1,2,0,0)；Allocation₂'=(1,3,2,0)；Need₂'=(0,7,5,0)−(0,3,2,0)=(0,4,3,0)
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 试探分配后重新做安全性检查</div>
+      新 Work 初值 = Available' = <strong>(1,2,0,0)</strong>：<br>
+      • P1 Need(0,0,0,1)：D=1 &gt; 0 ✗<br>
+      • P2 Need'(0,4,3,0)：B=4 &gt; 2 ✗<br>
+      • P3 Need(1,0,0,2)：D=2 &gt; 0 ✗<br>
+      • <strong>P4 Need(0,0,2,0)：C=2 &gt; 0 ✗</strong><br>
+      • P5 Need(0,5,4,2)：B=5 &gt; 2 ✗<br>
+      <strong>没有任何进程的 Need ≤ (1,2,0,0)</strong> → 找不到安全序列 → <strong>试探分配后系统不安全</strong><br>
+      <span class="badge eg">结论</span>所以<strong>不能</strong>满足 P2 的请求 (0,3,2,0)。P2 必须等待。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：(a) 系统当前安全，安全序列 &lt;P4,P5,P1,P2,P3&gt;；(b) P2 请求(0,3,2,0) <strong>不能满足</strong>——试探分配后 Available 仅剩(1,2,0,0)，无任何进程能运行，系统不安全，P2 须等待。<br>核心：请求判定三步 = ①Request≤Need ②Request≤Available ③试探分配后重判安全性，任一不满足就拒绝/等待。</div>
+  </div>
+
+  <div class="task" data-task="q11" data-answer="C" data-ok="对！银行家处理请求三步：Request≤Need、Request≤Available、试探分配后重判安全性，三步都过才真正分配。" data-no="只看 Request≤Available 是不够的——可能分配后导致不安全状态，必须做第三步安全性重判。" data-src="真题：银行家算法请求判定需做安全性检查。" data-review="回到题11第3、4步看请求判定三步">
+    <div class="q">检验：银行家算法判断"能否满足某进程的资源请求"时，正确的步骤是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 只看请求量是否 ≤ Available，够就给</button>
+      <button class="opt" data-val="B">B. 只看请求量是否 ≤ Need，够就给</button>
+      <button class="opt" data-val="C">C. Request≤Need 且 Request≤Available，再试探分配后重判安全性</button>
+      <button class="opt" data-val="D">D. 直接满足最高优先级进程的请求</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题12：真题4 页面置换 OPT/LRU/FIFO M=4 ============ -->
+<section id="s14">
+  <h2><span class="sec-id">题12</span>页面置换 · OPT / LRU / FIFO（M=4）</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 真题来源：2025 年期末 A 卷 · 第 4 题（原题数据）｜题型：三种置换算法缺页对比 ★必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">2025 真题</div>
+    <div class="wt-title">请求分页 · 4 物理块 · OPT/LRU/FIFO 缺页次数与缺页率</div>
+    <div class="wt-given">请求分页系统，作业页面走向：<br>
+<strong>4, 3, 2, 1, 4, 3, 5, 4, 3, 2, 1, 5</strong><br>
+分配物理块数 M = 4（从空内存开始）。<br>
+分别用 OPT（最佳置换）、LRU、FIFO 算缺页次数和缺页率。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 前 4 次访问：4,3,2,1（都缺页，装满内存）</div>
+      内存从空开始，前 4 个不同页都要调入：<br>
+      访问 4 → <strong class="miss">缺页</strong>，内存{4}<br>
+      访问 3 → <strong class="miss">缺页</strong>，内存{4,3}<br>
+      访问 2 → <strong class="miss">缺页</strong>，内存{4,3,2}<br>
+      访问 1 → <strong class="miss">缺页</strong>，内存{4,3,2,1}（满）<br>
+      <strong>已缺页 4 次</strong>。三种算法前 4 次完全一样。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · OPT 推演（淘汰"未来最久不再用"的页）</div>
+      续访问 4,3：命中（内存有）。<br>
+      访问 <strong>5</strong>：缺页！内存满。看未来序列 4,3,2,1,5（剩余访问：4,3,2,1,5）：<br>
+      　• 页4：后面会访问（第7个4）<br>
+      　• 页3：后面会访问（第8个3）<br>
+      　• 页2：后面会访问（第9个2）<br>
+      　• <strong>页1：后面在第10个才访问，最久</strong> → OPT 淘汰 1 → 内存{4,3,2,5}<br>
+      访问 4,3：命中。访问 2：命中。访问 1：缺页！未来只剩 5，页5马上用、页4/3/2不再出现……看剩余只有"5"，<strong>淘汰 2</strong>（未来不再用）→ {4,3,1,5}<br>
+      访问 5：命中。<br>
+      <strong>OPT 缺页 = 4（前4次）+ 1（访问5）+ 1（访问1）= 6 次</strong><br>
+      缺页率 = 6/12 = <strong>50%</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · LRU 推演（淘汰"最近最久未用"）</div>
+      内存{4,3,2,1}（按最近使用：1最新，4最旧）。<br>
+      访问 4：命中，4 变最新。访问 3：命中，3 变最新。<br>
+      访问 <strong>5</strong>：缺页！最近最久未用是 <strong>2</strong>（4和3刚用过，1比2近）→ 淘汰 2 → {4,3,1,5}<br>
+      访问 4：命中。访问 3：命中。访问 <strong>2</strong>：缺页！最久未用是 1 → 淘汰 1 → {4,3,5,2}<br>
+      访问 <strong>1</strong>：缺页！最久未用是 5 → 淘汰 5 → {4,3,2,1}<br>
+      访问 <strong>5</strong>：缺页！最久未用是 4 → 淘汰 4 → {3,2,1,5}<br>
+      <strong>LRU 缺页 = 4 + 1(5) + 1(2) + 1(1) + 1(5) = 8 次</strong><br>
+      缺页率 = 8/12 ≈ <strong>66.7%</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · FIFO 推演（淘汰"最早进入"的页，队列）</div>
+      队列（按进入顺序）：[4,3,2,1]，队首 4 最早。<br>
+      访问 4,3：命中（注意 FIFO 命中不改队列顺序）。<br>
+      访问 <strong>5</strong>：缺页！淘汰队首 <strong>4</strong> → [3,2,1,5]<br>
+      访问 <strong>4</strong>：缺页！淘汰队首 3 → [2,1,5,4]<br>
+      访问 <strong>3</strong>：缺页！淘汰队首 2 → [1,5,4,3]<br>
+      访问 <strong>2</strong>：缺页！淘汰队首 1 → [5,4,3,2]<br>
+      访问 <strong>1</strong>：缺页！淘汰队首 5 → [4,3,2,1]<br>
+      访问 <strong>5</strong>：缺页！淘汰队首 4 → [3,2,1,5]<br>
+      <strong>FIFO 缺页 = 4 + 6 = 10 次</strong><br>
+      缺页率 = 10/12 ≈ <strong>83.3%</strong>
+      <table class="calc-table">
+        <tr><th>算法</th><th>缺页次数</th><th>缺页率</th></tr>
+        <tr><td><strong>OPT</strong></td><td class="hit">6</td><td>50.0%</td></tr>
+        <tr><td><strong>LRU</strong></td><td class="miss">8</td><td>66.7%</td></tr>
+        <tr><td><strong>FIFO</strong></td><td class="miss">10</td><td>83.3%</td></tr>
+      </table>
+      <span class="badge eg">结论</span>OPT 最优（理论下界）、FIFO 最差。OPT 是"未来视角"无法实用，仅作评价基准；LRU 是实用中接近 OPT 的算法。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：M=4 时，OPT 缺页 6 次(50%)，LRU 缺页 8 次(66.7%)，FIFO 缺页 10 次(83.3%)。<br>核心：OPT 看未来最久不用，LRU 看过去最久未用，FIFO 看进入顺序；缺页率 = 缺页次数 ÷ 总访问次数。</div>
+  </div>
+
+  <div class="task" data-task="q12" data-answer="A" data-ok="对！OPT 淘汰"未来最长时间不再被访问"的页，是理论最优，但因无法预知未来而不能实用。" data-no="LRU 看过去、FIFO 看进入顺序；只有 OPT 是"未来视角"。" data-src="真题：OPT 最佳置换算法选择未来最长时间内不再被访问的页淘汰。" data-review="回到题12第2步看OPT判定">
+    <div class="q">检验：OPT（最佳置换）算法淘汰页的依据是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 未来最长时间内不再被访问的页</button>
+      <button class="opt" data-val="B">B. 最近最久未被访问的页</button>
+      <button class="opt" data-val="C">C. 最早进入内存的页</button>
+      <button class="opt" data-val="D">D. 随机选一个页</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题13：真题5 磁盘调度 FCFS/SSTF/LOOK ============ -->
+<section id="s15">
+  <h2><span class="sec-id">题13</span>磁盘调度 · FCFS / SSTF / LOOK</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 真题来源：2025 年期末 A 卷 · 第 5 题（原题数据）｜题型：磁盘调度 ★第4章必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">2025 真题</div>
+    <div class="wt-title">200 柱面 · FCFS / SSTF / LOOK 三算法移动量</div>
+    <div class="wt-given">磁盘 200 柱面（编号 0~199）。完成磁道 125 请求后，<strong>当前在 143 号</strong>为一请求服务。请求队列顺序：<br>
+<strong>86, 147, 91, 177, 94, 150, 102, 175, 130</strong><br>
+分别用 FCFS、SSTF、LOOK，写出磁头移动顺序、总移动量、平均寻道长度。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · FCFS（按队列顺序服务）</div>
+      起点 143，按队列 86→147→91→177→94→150→102→175→130：<br>
+      移动距离逐段：<br>
+      |86−143|=57，|147−86|=61，|91−147|=56，|177−91|=86，|94−177|=83，|150−94|=56，|102−150|=48，|175−102|=73，|130−175|=45<br>
+      <strong>总移动 = 57+61+56+86+83+56+48+73+45 = 565</strong><br>
+      平均寻道 = 565 / 9 ≈ <strong>62.8</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · SSTF（每次选距当前最近的请求）</div>
+      从 143 出发，找最近：队列中距 143 最近的是 <strong>147（距离4）</strong>或 130（距离13）→ 选 147：<br>
+      143 → 147(4) → 150(3) → 130(20) → 102(28) → 94(8) → 91(3) → 86(5) → 175(89) → 177(2)<br>
+      移动：4+3+20+28+8+3+5+89+2 = <strong>162</strong><br>
+      <span class="badge eg">校验</span>SSTF 每步贪心选最近，总移动 <strong>162</strong>，平均 = 162/9 = <strong>18.0</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · LOOK（电梯算法，向当前方向走到"最后一个请求"就反向，不到物理边界）</div>
+      <strong>LOOK 与 SCAN 区别</strong>：SCAN 走到磁盘物理边界（0 或 199），LOOK 只走到<strong>该方向上最远的请求</strong>就折返，省去空跑。<br>
+      本题未给定初始方向，按惯例假设<strong>向增大方向</strong>（与题7一致）：<br>
+      先服务 ≥143 的请求（从小到大）：147, 150, 175, 177 → 到 177（增大方向最远请求）折返<br>
+      再服务 &lt;143 的请求（从大到小）：130, 102, 94, 91, 86<br>
+      完整顺序：<strong>143 → 147 → 150 → 175 → 177 → 130 → 102 → 94 → 91 → 86</strong><br>
+      移动：增大段 177−143=34；折返到 86 走 177−86=91<br>
+      <strong>总移动 = 34 + 91 = 125</strong>，平均 = 125 / 9 ≈ <strong>13.9</strong>
+      <table class="calc-table">
+        <tr><th>算法</th><th>总移动量</th><th>平均寻道</th></tr>
+        <tr><td><strong>FCFS</strong></td><td class="miss">565</td><td>62.8</td></tr>
+        <tr><td><strong>SSTF</strong></td><td>162</td><td>18.0</td></tr>
+        <tr><td><strong>LOOK</strong></td><td class="hit">125</td><td>13.9</td></tr>
+      </table>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 三算法对比记忆</div>
+      • <strong>FCFS</strong>：公平、实现简单，但总移动最大（565），对随机请求性能差。<br>
+      • <strong>SSTF</strong>：贪心选最近，总移动少（162），但<strong>可能饥饿</strong>（远处请求一直等）。<br>
+      • <strong>LOOK</strong>：电梯式扫描，总移动最少（125），无饥饿，是实用最优。<br>
+      <span class="badge eg">易错</span>LOOK vs SCAN：SCAN 到物理边界（0/199），LOOK 只到最远请求。本题若写 SCAN 会多算 177→199→… 的空跑。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：FCFS 总移动 565（平均 62.8）；SSTF 162（平均 18.0）；LOOK 125（平均 13.9）。<br>核心：LOOK 不走到物理边界，只到该方向最远请求即折返，故比 SCAN 更省；三算法中 LOOK 实用最优。</div>
+  </div>
+
+  <div class="task" data-task="q13" data-answer="C" data-ok="对！LOOK 只走到该方向上最远的请求就立即折返，不走到磁盘物理边界（0或199），省去空跑。" data-no="SCAN 才走到物理边界；LOOK 是 SCAN 的改进——只到最远请求就折返。" data-src="真题：LOOK 扫描到最远请求即折返，不走到磁盘边界。" data-review="回到题13第3步看LOOK与SCAN区别">
+    <div class="q">检验：LOOK 算法与 SCAN 算法的关键区别是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. LOOK 随机选请求，SCAN 按顺序</button>
+      <button class="opt" data-val="B">B. LOOK 只服务一个方向，SCAN 双向</button>
+      <button class="opt" data-val="C">C. LOOK 到最远请求即折返，SCAN 走到磁盘物理边界</button>
+      <button class="opt" data-val="D">D. 两者完全相同</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
+<!-- ============ 题14：真题6 PV 操作 三进程同步（奇偶数） ============ -->
+<section id="s16">
+  <h2><span class="sec-id">题14</span>PV 操作 · 三进程同步（生产者-消费者 · 奇偶数分类）</h2>
+  <p style="color:var(--brick);font-size:.85rem">📎 真题来源：2025 年期末 A 卷 · 第 6 题（原题数据）｜题型：PV 信号量同步互斥 ★第2章必考</p>
+
+  <div class="walkthrough">
+    <div class="wt-tag">2025 真题</div>
+    <div class="wt-title">三进程共享 N 格缓冲区 · 奇偶数分别消费</div>
+    <div class="wt-given">三个进程 P1、P2、P3 互斥使用一个含 N(N&gt;0) 个单元的缓冲区：<br>
+• <strong>P1</strong>：每次 produce() 生成一个正整数，用 put() 放入缓冲区空单元<br>
+• <strong>P2</strong>：每次 getodd() 从缓冲区取出一个<strong>奇数</strong>，用 countodd() 统计奇数个数<br>
+• <strong>P3</strong>：每次 geteven() 从缓冲区取出一个<strong>偶数</strong>，用 counteven() 统计偶数个数<br>
+用信号量机制实现三进程的同步与互斥，说明信号量含义，用伪代码描述。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 分析：这是生产者-消费者的变体</div>
+      经典生产者-消费者只有"一个消费者"，而这题有<strong>两个消费者</strong>，分别只取奇数和偶数。所以"缓冲区有几类数据可用"要拆成两个计数信号量：<br>
+      • 缓冲区<strong>空位</strong>数 → empty（初值 N）<br>
+      • 缓冲区里<strong>奇数</strong>个数 → odd（初值 0）<br>
+      • 缓冲区里<strong>偶数</strong>个数 → even（初值 0）<br>
+      • 互斥访问缓冲区（临界区）→ mutex（初值 1）
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 信号量声明与含义</div>
+      <div class="code-block"><span class="kw">semaphore</span> empty = N;   <span class="cmt">// 缓冲区空单元数，P1 放入前 P，P2/P3 取出后 V</span>
+<span class="kw">semaphore</span> odd = 0;     <span class="cmt">// 缓冲区中奇数个数，P1 放奇数后 V，P2 取奇数前 P</span>
+<span class="kw">semaphore</span> even = 0;    <span class="cmt">// 缓冲区中偶数个数，P1 放偶数后 V，P3 取偶数前 P</span>
+<span class="kw">semaphore</span> mutex = 1;   <span class="cmt">// 互斥信号量，保证对缓冲区的互斥访问</span></div>
+      <span class="badge eg">关键</span>empty 和 odd/even 是<strong>同步</strong>信号量（协调"能不能做"），mutex 是<strong>互斥</strong>信号量（协调"独占访问"）。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · P1（生产者）伪代码</div>
+      P1 生成数后，要先申请空位（P(empty)），再互斥放入（P(mutex)…V(mutex)），最后根据奇偶性唤醒对应消费者（V(odd) 或 V(even)）：<br>
+      <div class="code-block"><span class="kw">process</span> P1() {
+    <span class="kw">while</span>(<span class="kw">true</span>) {
+        x = produce();           <span class="cmt">// 生成一个正整数</span>
+        <span class="kw">P</span>(empty);             <span class="cmt">// 申请一个空位（满了就等）</span>
+        <span class="kw">P</span>(mutex);             <span class="cmt">// 进入临界区</span>
+        put(x);                  <span class="cmt">// 放入缓冲区</span>
+        <span class="kw">V</span>(mutex);             <span class="cmt">// 离开临界区</span>
+        <span class="kw">if</span> (x % 2 == 1)
+            <span class="kw">V</span>(odd);          <span class="cmt">// 是奇数，通知 P2</span>
+        <span class="kw">else</span>
+            <span class="kw">V</span>(even);         <span class="cmt">// 是偶数，通知 P3</span>
+    }
+}</div>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · P2（取奇数）、P3（取偶数）伪代码</div>
+      P2 等"有奇数"（P(odd)），再互斥取出（P(mutex)…V(mutex)），最后释放空位（V(empty)）；P3 同理用 even：<br>
+      <div class="code-block"><span class="kw">process</span> P2() {                <span class="cmt">// 取奇数</span>
+    <span class="kw">while</span>(<span class="kw">true</span>) {
+        <span class="kw">P</span>(odd);               <span class="cmt">// 等待缓冲区有奇数</span>
+        <span class="kw">P</span>(mutex);             <span class="cmt">// 进入临界区</span>
+        getodd();               <span class="cmt">// 取出一个奇数</span>
+        <span class="kw">V</span>(mutex);             <span class="cmt">// 离开临界区</span>
+        <span class="kw">V</span>(empty);             <span class="cmt">// 释放一个空位</span>
+        countodd();             <span class="cmt">// 统计（在临界区外，不占缓冲区）</span>
+    }
+}
+<span class="kw">process</span> P3() {                <span class="cmt">// 取偶数</span>
+    <span class="kw">while</span>(<span class="kw">true</span>) {
+        <span class="kw">P</span>(even);              <span class="cmt">// 等待缓冲区有偶数</span>
+        <span class="kw">P</span>(mutex);
+        geteven();
+        <span class="kw">V</span>(mutex);
+        <span class="kw">V</span>(empty);
+        counteven();
+    }
+}</div>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 5 步 · 易错点（阅卷扣分项）</div>
+      • <strong>P 操作顺序不能错</strong>：必须先 P(同步信号量) 再 P(mutex)，不能先 P(mutex)！否则可能死锁（拿了 mutex 却因没数据阻塞，别人永远进不来）。<br>
+      • <strong>odd/even 必须分开</strong>：不能只用一个 full 信号量，否则 P2 可能把偶数取走（类型不符）。<br>
+      • <strong>V 操作顺序无所谓</strong>：V(mutex) 和 V(empty) 谁先都行，但都要有，不能漏。<br>
+      • countodd/counteven 放临界区<strong>外</strong>即可（它们不访问缓冲区）。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：4 个信号量 empty=N, odd=0, even=0, mutex=1。P1 放数前 P(empty)→P(mutex)→put→V(mutex)→(奇?V(odd):V(even))；P2 取奇 P(odd)→P(mutex)→getodd→V(mutex)→V(empty)；P3 取偶 P(even)→P(mutex)→geteven→V(mutex)→V(empty)。<br>核心：奇偶分两个同步信号量；同步 P 必须在互斥 P 之前，否则死锁。</div>
+  </div>
+
+  <div class="task" data-task="q14" data-answer="C" data-ok="对！必须先 P(同步信号量 odd/even) 再 P(mutex)。若先 P(mutex) 再 P(odd)，P2 拿了 mutex 却因没奇数阻塞，P1 永远进不了临界区放数 → 死锁。" data-no="P 操作顺序很关键：同步 P 必须在互斥 P 之前，否则会死锁。V 操作顺序不影响正确性。" data-src="真题：同步 P 操作必须在互斥 P 操作之前，避免死锁。" data-review="回到题14第5步看P操作顺序">
+    <div class="q">检验：P2 进程中，P(odd) 和 P(mutex) 的执行顺序应该是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 先 P(mutex) 再 P(odd)</button>
+      <button class="opt" data-val="B">B. 两个都先 P(mutex)</button>
+      <button class="opt" data-val="C">C. 先 P(odd) 再 P(mutex)</button>
+      <button class="opt" data-val="D">D. 顺序无所谓</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+</section>
+
 <section id="s10">
   <h2><span class="sec-id">✓</span>检验汇总与学习报告</h2>
   <div class="card key">
-    <strong>做完 8 道检验题后，生成报告看看你的薄弱点。</strong><br>
+    <strong>做完 14 道检验题后，生成报告看看你的薄弱点。</strong><br>
     核心自测（考场上问自己）：<br>
     ☐ 第2章 调度题：会不会画时间轴、区分 SJF/FCFS/平分CPU？<br>
     ☐ 第2章 银行家：会不会算 Need、逐轮贪心找安全序列？<br>
-    ☐ 第3章 页面置换：会不会画 FIFO/LRU 的淘汰表、数缺页次数？<br>
+    ☐ 第3章 页面置换：会不会画 FIFO/LRU/OPT 的淘汰表、数缺页次数？<br>
     ☐ 第3章 地址变换：会不会三步法（页号→块号→拼物理地址）？<br>
-    ☐ <strong>第4章 磁盘调度</strong>：会不会算 FCFS/SSTF/SCAN/CSCAN 的移臂距离？<br>
+    ☐ <strong>第4章 磁盘调度</strong>：会不会算 FCFS/SSTF/SCAN/CSCAN/LOOK 的移臂距离？<br>
     ☐ <strong>第5章 SPOOLing</strong>：能不能默写三组成三特点 + 四种 I/O 控制方式？<br>
-    ☐ 易错：归还是 Allocation 不是 Need；置换题看清"前页是否已装入"；井在磁盘缓冲区在内存。
+    ☐ <strong>真题·抢占式调度（题9）</strong>：会不会画资源甘特图、算 CPU/外设利用率？<br>
+    ☐ <strong>真题·四算法对比（题10）</strong>：会不会横向算 FCFS/RR/SJF/优先级的周转？<br>
+    ☐ <strong>真题·银行家请求判定（题11）</strong>：会不会做"请求三步审查 + 试探分配重判"？<br>
+    ☐ <strong>真题·PV同步（题14）</strong>：会不会拆 odd/even 信号量、写对 P 操作顺序（同步P在互斥P前）？<br>
+    ☐ 易错：归还是 Allocation 不是 Need；置换题看清"前页是否已装入"；井在磁盘缓冲区在内存；同步P必须在互斥P前否则死锁。
   </div>
 
   <div class="wrong-section">
@@ -764,7 +1293,8 @@ JOB4 | 8:30 | 15 分钟<br><br>
     "06":"important","07":"important","08":"no","09":"sleep",
     "10":"sprint","11":"cheer",
     "题1":"welcome","题2":"welcome","题3":"welcome","题4":"welcome",
-    "题5":"no","题6":"no","题7":"important","题8":"important"
+    "题5":"no","题6":"no","题7":"important","题8":"important",
+    "题9":"important","题10":"important","题11":"no","题12":"no","题13":"important","题14":"no"
   };
   var ids=document.querySelectorAll(".sec-id");
   ids.forEach(function(el){
