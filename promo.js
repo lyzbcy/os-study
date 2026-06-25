@@ -19,8 +19,8 @@
     // 赞赏二维码（与项目同仓库托管）
     rewardImg: "img/reward-qr.jpg",
     rewardTip: "📱 长按或扫码赞赏 · 金额随意，心意到就好",
-    // 微信表情包下载二维码（固定，长按扫码即可在微信使用）
-    stickerQr: "https://s41.ax1x.com/2026/06/25/pmtdMWV.png",
+    // 微信表情包下载二维码（自托管，与项目同仓库，避免图床失效）
+    stickerQr: "img/sticker/sticker-qr.png",
     stickerTip: "📱 长按或扫码 · 微信里也能用这些表情"
   };
 
