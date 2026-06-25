@@ -570,6 +570,88 @@ T0 时刻状态：<br>
     <button class="check">检查</button>
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
+
+  <div class="walkthrough">
+    <div class="wt-title">演示 4 · 银行家算法「请求判定」（真题高频考法）</div>
+    <p>演示 3 只做了 T0 安全性检查。但真题常考<strong>后半步</strong>：某进程提出请求后，能否分配？这要"试探分配 + 重新检查安全性"。</p>
+    <div class="wt-given">接演示 3 的系统（3 进程，12 磁带机，T0 安全，Available=3）。<br>
+<strong>现在 P1 提出请求 Request = 2 台</strong>。<br>
+问：能否满足 P1 的请求？</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 请求判定三步审查</div>
+      设 Request₁ = 2（P1 请求 2 台），逐项检查：<br>
+      ① <strong>Request ≤ Need?</strong>　P1 的 Need = 5，2 ≤ 5 ✓<br>
+      ② <strong>Request ≤ Available?</strong>　Available = 3，2 ≤ 3 ✓<br>
+      ③ 两关都过，进入"试探分配"。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 试探分配（修改数据结构）</div>
+      假装把资源分给 P1，更新：<br>
+      • Available' = 3 − 2 = <strong>1</strong><br>
+      • Allocation₁' = 5 + 2 = <strong>7</strong>（P1 现在手上有 7 台）<br>
+      • Need₁' = 5 − 2 = <strong>3</strong>（P1 还需 3 台）<br>
+      <span class="badge eg">注意</span>这一步只是"假装分"，不是真分。如果下一步安全性检查不通过，要<strong>恢复</strong>原数据。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 试探分配后重新做安全性检查</div>
+      新 Work 初值 = Available' = <strong>1</strong>：<br>
+      <strong>第 1 轮</strong>（Work=1）：<br>
+      • P1：Need' 3 &gt; 1 ✗<br>
+      • P2：Need 2 &gt; 1 ✗<br>
+      • P3：Need 7 &gt; 1 ✗<br>
+      <strong>没有任何进程 Need ≤ 1</strong> → 找不到安全序列 → <strong>试探分配后系统不安全</strong>！
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 4 步 · 判定与恢复</div>
+      安全性检查不通过 → <strong>不能满足 P1 的请求</strong>，P1 必须等待。<br>
+      恢复试探前的数据：Available 回到 3，Allocation₁ 回到 5，Need₁ 回到 5。<br>
+      <span class="badge eg">结论</span>请求判定 = 三步审查（Request≤Need、Request≤Available、试探后重判安全），<strong>任一不满足就拒绝/等待</strong>。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：P1 请求 2 台<strong>不能满足</strong>。试探分配后 Available 仅剩 1 台，无任何进程能运行，系统不安全，P1 必须等待。<br>核心：请求判定 = 三步审查，第三步"试探后重判安全性"是最容易漏的，一定要做。</div>
+  </div>
+
+  <div class="task" data-task="ch2-m8d" data-answer="C" data-ok="对！必须试探分配后重判安全性。只看 Request≤Available 是不够的，可能分配后导致不安全状态。" data-no="银行家算法的核心是'避免不安全状态'，所以必须做第三步安全性重判，不能只看够不够分。" data-src="真题：银行家算法处理请求需做安全性检查。" data-review="回到模块8演示4请求判定三步">
+    <div class="q">检验：银行家算法判断"能否满足某进程的请求"，正确的做法是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 只要 Request ≤ Available 就立即分配</button>
+      <button class="opt" data-val="B">B. 只要 Request ≤ Need 就立即分配</button>
+      <button class="opt" data-val="C">C. Request≤Need 且 Request≤Available，再试探分配后重判安全性，通过才真分配</button>
+      <button class="opt" data-val="D">D. 按优先级高低决定是否分配</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="tip-box" style="margin-top:16px"><strong>⚡ 真题选择题高频点</strong>（去年选择 + 提纲母题）</div>
+
+  <div class="task" data-task="ch2-m8e" data-answer="B" data-ok="对！S 初值 2，现在 -1，说明 2 个资源分完了，还有 1 个进程在等待（|S|=1）。S&lt;0 时 |S| = 等待进程数。" data-no="S&lt;0 时，|S| 才是等待进程数。S=-1 表示有 1 个等待；S≥0 时无等待。" data-src="提纲：S&lt;0 正在等待使用临界区的进程数（绝对值）。" data-review="回到信号量S值含义">
+    <div class="q">若 P、V 操作的信号量 S 初值为 2，当前值为 −1，则表示有几个进程在等待？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 0 个</button>
+      <button class="opt" data-val="B">B. 1 个</button>
+      <button class="opt" data-val="C">C. 2 个</button>
+      <button class="opt" data-val="D">D. 3 个</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch2-m8f" data-answer="D" data-ok="对！资源有序分配策略（按编号递增申请）破坏了"循环等待"条件，是死锁预防的常用方法。" data-no="银行家是死锁避免（不是预防）；一次性分配破坏的是请求和保持；剥夺资源法破坏不剥夺条件。" data-src="提纲：资源有序分配法把资源线性编号，按递增顺序申请，破坏循环等待。" data-review="回到死锁预防破坏循环等待">
+    <div class="q">下列方法中，破坏死锁"循环等待"条件的是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 银行家算法</button>
+      <button class="opt" data-val="B">B. 一次性分配策略（预先分配全部资源）</button>
+      <button class="opt" data-val="C">C. 剥夺资源法</button>
+      <button class="opt" data-val="D">D. 资源有序分配策略（按编号递增申请）</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
 </section>
 
 <section id="s9">

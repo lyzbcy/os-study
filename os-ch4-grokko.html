@@ -394,6 +394,71 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
 
+  <!-- 演示 1b：CSCAN + LOOK（真题高频，去年考了 LOOK） -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 1b · CSCAN 单向扫描 & LOOK 电梯改进（真题考点）</div>
+    <p>演示 1 只画了 FCFS/SSTF/SCAN。但<strong>去年真题考了 LOOK</strong>，CSCAN 也常考。这俩和 SCAN 的区别是关键考点。</p>
+    <div class="wt-given">同样数据：磁头在 53，<strong>向磁道号减小方向移动</strong>，队列 98,183,37,122,14,124,65,67。<br>分别用 CSCAN 和 LOOK 算服务顺序和总移动量。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · CSCAN（单向扫描，到端点快速回起点不服务）</div>
+      向<strong>减小方向</strong>扫到 0（端点），快速返回 199 端点（返回时不服务），再向减小扫：<br>
+      53 → 37 → 14（到减小端点 0 附近）→ 快速返回 199 → 183 → 124 → 98 → 67 → 65<br>
+      移动：53→37(16) → 14(23) → 到0再回199共 14+199=213 → 183(16) → 124(59) → 98(26) → 67(31) → 65(2)<br>
+      <strong>总移动 ≈ 16+23+213+16+59+26+31+2 = 386</strong><br>
+      <span class="badge eg">关键</span>CSCAN 到端点后<strong>快速返回另一端，返回沿途不服务任何请求</strong>。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · LOOK（SCAN 改进：到最后一个请求即反向，不到物理端点）</div>
+      <strong>LOOK vs SCAN 区别</strong>：SCAN 走到磁盘物理边界（0 或 199），LOOK 只走到<strong>该方向上最远的请求</strong>就立即折返，省去空跑。<br>
+      向<strong>减小方向</strong>：先服务 &lt;53 的请求（从大到小）：37, 14 → 到 14（减小方向最远请求）折返<br>
+      再服务 &gt;53 的请求（从小到大）：65, 67, 98, 122, 124, 183<br>
+      完整顺序：<strong>53 → 37 → 14 → 65 → 67 → 98 → 122 → 124 → 183</strong><br>
+      移动：53→37(16) → 14(23)，折返 14→183(169)<br>
+      <strong>总移动 = 16 + 23 + 169 = 208</strong>
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 四算法横向对比</div>
+      <table class="calc-table">
+        <tr><th>算法</th><th>到端点吗</th><th>返回时服务吗</th><th>本例总移动</th></tr>
+        <tr><td><strong>SCAN</strong></td><td>走到物理端点(0/199)</td><td>反向时服务</td><td>约 208（同方向）</td></tr>
+        <tr><td><strong>LOOK</strong></td><td class="hit">只到最远请求即折返</td><td>反向时服务</td><td>208</td></tr>
+        <tr><td><strong>CSCAN</strong></td><td>走到物理端点</td><td class="miss">返回时不服务</td><td>386</td></tr>
+      </table>
+      <span class="badge eg">记忆</span>SCAN 像电梯"走到底再回"；LOOK 是"到最后一名乘客就回"（更省）；CSCAN 是"单行道，到头空车回起点"。
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：CSCAN 总移动约 386（到端点空车返回不服务）；LOOK 总移动 208（到最远请求即折返，不到物理端点）。<br>核心：LOOK 是 SCAN 的改进——不到边界、到最远请求就回，所以更省寻道时间。</div>
+  </div>
+
+  <div class="task" data-task="ch4-m8a2" data-answer="C" data-ok="对！LOOK 只走到该方向上最远的请求就立即折返，不走到磁盘物理边界，省去空跑。" data-no="SCAN 才走到物理边界(0/199)；LOOK 是 SCAN 的改进，到最远请求即折返。" data-src="提纲：LOOK 是扫描算法的改进，到最后一个请求即反向。" data-review="回到模块8演示1b看LOOK与SCAN区别">
+    <div class="q">LOOK 算法与 SCAN 算法的关键区别是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. LOOK 随机选请求</button>
+      <button class="opt" data-val="B">B. LOOK 只服务一个方向</button>
+      <button class="opt" data-val="C">C. LOOK 到最远请求即折返，SCAN 走到磁盘物理边界</button>
+      <button class="opt" data-val="D">D. 两者完全相同</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="tip-box" style="margin-top:16px"><strong>⚡ 真题选择题高频点</strong>（去年选择 + 提纲母题）</div>
+
+  <div class="task" data-task="ch4-m8b2" data-answer="A" data-ok="对！文件系统的主要目的就是实现'按名存取'——用户用文件名访问，系统负责名→物理位置的映射。" data-no="虚拟存储是内存管理的功能；提高外存读写速度/存储系统文件不是文件系统的核心目的。" data-src="提纲：文件系统实现按名存取，用户用文件名存取文件。" data-review="回到文件系统目的">
+    <div class="q">操作系统中，文件系统的主要目的是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 实现对文件的按名存取</button>
+      <button class="opt" data-val="B">B. 实现虚拟存储</button>
+      <button class="opt" data-val="C">C. 提高外存的读写速度</button>
+      <button class="opt" data-val="D">D. 专门存储系统文件</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
   <!-- 演示 2：记录优化分布 -->
   <div class="walkthrough">
     <div class="wt-title">演示 2 · 记录优化分布（旋转调度）</div>

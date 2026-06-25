@@ -482,6 +482,80 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
     <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
   </div>
 
+  <!-- 演示 2b：OPT 置换（真题高频，去年考了） -->
+  <div class="walkthrough">
+    <div class="wt-title">演示 2b · OPT 最佳置换（真题高频，去年考了）</div>
+    <p>OPT（最佳置换）淘汰的是<strong>"未来最长时间不再被访问"</strong>的页。它需要"往后看"未来访问序列，和 FIFO/LRU（往后看历史）相反。OPT 是理论最优但无法实用，只作评价基准。</p>
+    <div class="wt-given">同样的序列和块数：<strong>1, 2, 3, 4, 1, 2, 5</strong>，3 块，前 4 页已装入。<br>用 OPT 算缺页次数。</div>
+
+    <div class="wt-step">
+      <div class="step-no">第 1 步 · 内存初始状态（前4页装入，但只有3块）</div>
+      注意：本题 4 页但只 3 块，"前4页装入"时第4页要淘汰一页。按 OPT：访问到 4 时内存{1,2,3}，4 不在 → 缺页。<br>
+      看<strong>未来序列</strong>（4 之后：1,2,5）：1 会再用、2 会再用、3 不再用 → OPT 淘汰 3 → {1,2,4}。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 2 步 · 逐次访问推演（核心：每次淘汰看"未来"）</div>
+      续访问 1：命中（内存有1）。{1,2,4}<br>
+      访问 2：命中。{1,2,4}<br>
+      访问 <strong>5</strong>：缺页！内存满{1,2,4}。看<strong>未来序列</strong>（5 之后无更多访问，即 1/2/4 都不再用）：<br>
+      　• 此时 1、2、4 未来都不再访问 → 可任选淘汰一个（通常淘汰编号大或随机）→ 假设淘汰 4 → {1,2,5}<br>
+      <span class="badge eg">关键</span>OPT 判断时<strong>往未来看</strong>：未来最久不用的优先淘汰。本题 5 之后无访问，1/2/4 都"永不复用"，淘汰谁都行。
+    </div>
+
+    <div class="wt-step">
+      <div class="step-no">第 3 步 · 数缺页 & 对比三算法</div>
+      OPT 缺页：访问 4 时 1 次 + 访问 5 时 1 次 = <strong>2 次</strong>（前 1/2/3 装入不缺页）<br>
+      对比演示 2 的 FIFO/LRU（本例都是 7 次因"前4页装入"的特殊设定）：
+      <table class="calc-table">
+        <tr><th>算法</th><th>看什么</th><th>能否实用</th><th>缺页数(本例)</th></tr>
+        <tr><td><strong>OPT</strong></td><td>未来最久不用</td><td>不能（需预知未来）</td><td class="hit">最少</td></tr>
+        <tr><td><strong>LRU</strong></td><td>过去最久未用</td><td>能（近似OPT）</td><td>中</td></tr>
+        <tr><td><strong>FIFO</strong></td><td>调入时间最早</td><td>能（最简单）</td><td>多</td></tr>
+      </table>
+    </div>
+
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：OPT 淘汰"未来最长时间不再被访问"的页，是理论最优（缺页最少），但因无法预知未来而不能实用。<br>三算法口诀：OPT 看<strong>未来</strong>、LRU 看<strong>过去</strong>、FIFO 看<strong>进入顺序</strong>。</div>
+  </div>
+
+  <div class="task" data-task="ch3-m8c2" data-answer="C" data-ok="对！OPT 淘汰'未来最长时间内不再被访问'的页，是理论最优。它和 LRU（看过去）正好相反。" data-no="LRU 看过去最久未用；FIFO 看进入顺序；只有 OPT 是'未来视角'。" data-src="提纲：OPT 淘汰以后不再访问或距现在最长时间后再访问的页。" data-review="回到模块8演示2b看OPT">
+    <div class="q">OPT（最佳置换）算法淘汰页的依据是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 最近最久未被访问的页（看过去）</button>
+      <button class="opt" data-val="B">B. 最早进入内存的页（看进入顺序）</button>
+      <button class="opt" data-val="C">C. 未来最长时间内不再被访问的页（看未来）</button>
+      <button class="opt" data-val="D">D. 随机淘汰一页</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="tip-box" style="margin-top:16px"><strong>⚡ 真题选择题高频点</strong>（去年选择 + 提纲母题）</div>
+
+  <div class="task" data-task="ch3-m8d2" data-answer="A" data-ok="对！分页式存储管理的地址转换由硬件（地址变换机构）自动完成，不需要软件程序干预。" data-no="用户程序、装入程序、地址转换程序都是软件；分页地址变换靠硬件机构完成，这是它快的原因。" data-src="提纲：页式存储管理采用动态重定位方式，靠硬件地址变换机构完成。" data-review="回到地址变换由硬件完成">
+    <div class="q">分页式存储管理中，地址转换工作是由（    ）完成的。</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 硬件（地址变换机构）</button>
+      <button class="opt" data-val="B">B. 地址转换程序</button>
+      <button class="opt" data-val="C">C. 用户程序</button>
+      <button class="opt" data-val="D">D. 装入程序</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
+  <div class="task" data-task="ch3-m8e2" data-answer="A" data-ok="对！固定分区采用静态重定位（作业装入时一次性完成地址转换，执行中不再转换）。" data-no="可变分区/页式/段式都用动态重定位（执行时由硬件机构转换）。固定分区因为作业不动，用静态即可。" data-src="提纲：固定分区采用静态地址重定位方式。" data-review="回到固定分区静态重定位">
+    <div class="q">下列存储管理方式中，可以采用静态重定位的是？</div>
+    <div class="opts">
+      <button class="opt" data-val="A">A. 固定分区</button>
+      <button class="opt" data-val="B">B. 可变分区</button>
+      <button class="opt" data-val="C">C. 页式</button>
+      <button class="opt" data-val="D">D. 段式</button>
+    </div>
+    <button class="check">检查</button>
+    <div class="feedback" aria-live="polite">选择后点击检查，这里会显示反馈。</div>
+  </div>
+
   <!-- 演示 3：可变分区 -->
   <div class="walkthrough">
     <div class="wt-title">演示 3 · 可变分区分配（首次适应 vs 最佳适应）</div>
