@@ -214,6 +214,22 @@
   display: block;
   margin: 0 auto;
 }
+.promo-sticker-preview {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.promo-sticker-preview img {
+  width: 34px;
+  height: 34px;
+  max-width: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border: none;
+  border-radius: 4px;
+  margin: 0;
+}
 .promo-cell-tip {
   font-size: 10px !important;
   color: rgba(26, 32, 24, 0.55) !important;

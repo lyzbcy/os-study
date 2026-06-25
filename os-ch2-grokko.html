@@ -59,7 +59,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 .opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
 .check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
 .check:hover{background:#2a5232}
-.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}.fb-emoji{width:36px;height:36px;vertical-align:middle;margin-right:8px;float:left;border-radius:6px}.feedback{min-height:44px;overflow:hidden}.feedback::after{content:'';display:block;clear:both}.wt-stamp{width:42px;height:42px;vertical-align:middle;margin-right:6px;display:inline-block;border-radius:6px}.sec-sticker{width:34px;height:34px;vertical-align:middle;margin:0 2px 4px;display:inline-block;border-radius:6px}
 .feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
 .feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
 .feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
@@ -437,7 +437,7 @@ P3：到达 9:15，需运行 25 分钟<br>
       <div class="formula">平均周转时间 T = (60 + 70 + 120) / 3 = 250 / 3 ≈ <strong>83.3 分钟</strong></div>
     </div>
 
-    <div class="wt-final">✓ 答：完成顺序 P1→P3→P2；平均周转时间 ≈ 83 分 20 秒。</div>
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：完成顺序 P1→P3→P2；平均周转时间 ≈ 83 分 20 秒。</div>
   </div>
 
   <div class="task" data-task="ch2-m8a" data-answer="C" data-ok="对。10:00 时 P1 刚完成，等待队列有 P2(45) 和 P3(25)，SJF 选运行时间短的 P3。" data-no="FCFS 才会选 P2（先到先做）；SJF 比较的是运行时间，不是到达时间。" data-src="原文：SJF 总是优先调度要求运行时间最短的作业。" data-review="回到模块 8 演示 1 的第 2 步">
@@ -495,7 +495,7 @@ P3：到达 9:15，需运行 25 分钟<br>
       <span class="plain">规律：P 同步在前，P 互斥在后；V 的顺序无所谓。</span>
     </div>
 
-    <div class="wt-final">✓ 这就是 PV 题的万能模板：换个场景（司机售票员、理发师、吃水果），改的只是信号量的名字和含义，骨架完全一样。</div>
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 这就是 PV 题的万能模板：换个场景（司机售票员、理发师、吃水果），改的只是信号量的名字和含义，骨架完全一样。</div>
   </div>
 
   <div class="task" data-task="ch2-m8b" data-answer="A" data-ok="对。把 P(mutex) 和 V(mutex) 看作进入/离开临界区的开关，中间是要保护的共享操作。" data-no="mutex 是互斥锁，必须成对出现，夹住对共享缓冲区的访问。" data-src="原文：互斥信号量 mutex，初值 1，每个进程均可对之施加 P/V 操作。" data-review="回到模块 8 演示 2 的代码注释">
@@ -556,7 +556,7 @@ T0 时刻状态：<br>
       全部为 true → <strong>系统安全</strong>。
     </div>
 
-    <div class="wt-final">✓ 答：系统安全，安全序列为 &lt;P2, P1, P3&gt;。<br>（注意：每一步归还的是该进程的 Allocation，不是 Need）</div>
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：系统安全，安全序列为 &lt;P2, P1, P3&gt;。<br>（注意：每一步归还的是该进程的 Allocation，不是 Need）</div>
   </div>
 
   <div class="task" data-task="ch2-m8c" data-answer="B" data-ok="对。这是最常踩的坑：归还的是 Allocation（进程已分到的），不是 Need（它还需要的）。" data-no="Need 是还需要的，进程本来就没拿到，谈何归还？归还的是已经分到手的那部分。" data-src="原文：Work = Work + Allocation；进程 Pi 获得资源后顺利执行直至完成并释放分配给它的资源。" data-review="回到模块 8 演示 3 的第 3 步">
@@ -705,7 +705,7 @@ T0 时刻状态：<br>
     }
     var body=ok?(t.getAttribute('data-ok')||'回答正确。'):(t.getAttribute('data-no')||'再想想。');
     var src=t.getAttribute('data-src');
-    setFb(t,ok?'ok':'no',(ok?'✅ ':'❌ ')+body+(src?('<span class="src">'+src+'</span>'):''));
+    setFb(t,ok?'ok':'no','<img class="fb-emoji" src="img/sticker/'+(ok?'ok':'no')+'.png" alt="">' +body+(src?('<span class="src">'+src+'</span>'):''));
     t.setAttribute('data-answered','1');t.setAttribute('data-correct',ok?'1':'0');
     updateBar();renderWrong();
   }
@@ -739,6 +739,32 @@ T0 时刻状态：<br>
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<script>
+/* module 标题轮换表情贴 · 按 sec-id 语义映射 */
+(function(){
+  var MAP={
+    "01":"welcome","02":"cheer","03":"cheer","04":"important","05":"important",
+    "06":"important","07":"important","08":"no","09":"sleep",
+    "10":"sprint","11":"cheer",
+    "题1":"welcome","题2":"welcome","题3":"welcome","题4":"welcome",
+    "题5":"no","题6":"no","题7":"important","题8":"important"
+  };
+  var ids=document.querySelectorAll(".sec-id");
+  ids.forEach(function(el){
+    var key=(el.textContent||"").trim();
+    var name=MAP[key];
+    if(!name) name="cheer";
+    if(el.getAttribute("data-sticker")) return;
+    el.setAttribute("data-sticker","1");
+    var img=document.createElement("img");
+    img.className="sec-sticker";
+    img.src="img/sticker/"+name+".png";
+    img.alt="";
+    el.parentNode.insertBefore(img,el.nextSibling);
+  });
+})();
+</script>
+
 
   <link rel="stylesheet" href="promo.css">
   <script src="promo.js"></script>

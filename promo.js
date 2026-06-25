@@ -83,6 +83,11 @@
           '<div class="promo-cell">' +
             '<div class="promo-cell-head"><span class="icon">😺</span>微信表情包</div>' +
             '<p class="promo-cell-sub">周三涵 / 周五涵 / 星星布丁系列，扫码即可在微信使用 ✨</p>' +
+            '<div class="promo-sticker-preview">' +
+              '<img src="img/sticker/welcome.png" alt="">' +
+              '<img src="img/sticker/ok.png" alt="">' +
+              '<img src="img/sticker/cheer.png" alt="">' +
+            '</div>' +
             '<img src="' + CONFIG.stickerQr + '" alt="微信表情包二维码">' +
             '<p class="promo-cell-tip">' + CONFIG.stickerTip + '</p>' +
           '</div>' +

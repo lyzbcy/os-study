@@ -58,7 +58,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--font-body);line-
 .opt.selected{background:var(--sky);border-color:var(--forest);font-weight:600}
 .check{background:var(--forest);color:var(--cream);border:none;padding:8px 20px;border-radius:var(--radius-pill);font-family:var(--font-head);font-size:.85rem;cursor:pointer;transition:background .2s}
 .check:hover{background:#2a5232}
-.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.6;border:1px solid #ddd}.fb-emoji{width:36px;height:36px;vertical-align:middle;margin-right:8px;float:left;border-radius:6px}.feedback{min-height:44px;overflow:hidden}.feedback::after{content:'';display:block;clear:both}.wt-stamp{width:42px;height:42px;vertical-align:middle;margin-right:6px;display:inline-block;border-radius:6px}.sec-sticker{width:34px;height:34px;vertical-align:middle;margin:0 2px 4px;display:inline-block;border-radius:6px}
 .feedback.ok{background:#e8f5e9;border-color:var(--correct);color:var(--correct)}
 .feedback.no{background:#fce8e8;border-color:var(--wrong);color:var(--wrong)}
 .feedback .src{display:block;margin-top:8px;padding:6px 10px;background:rgba(30,58,36,.08);border-radius:4px;font-size:.82rem;font-family:var(--font-mono)}
@@ -407,7 +407,7 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
       物理地址 = 1 × 1024 + 100 = <strong>1124</strong>
     </div>
 
-    <div class="wt-final">✓ 答：逻辑地址 2148 → 物理地址 1124。<br>（页内偏移 100 直接搬过去，查表只换了页号 2→块号 1）</div>
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：逻辑地址 2148 → 物理地址 1124。<br>（页内偏移 100 直接搬过去，查表只换了页号 2→块号 1）</div>
   </div>
 
   <div class="task" data-task="ch3-m8a" data-answer="C" data-ok="对。页号=⌊2864/1024⌋=2，偏移=2864−2048=816，查表页号2→块号1，物理地址=1×1024+816=1840。" data-no="常见错误：把页号当块号（得2864）、忘记乘页大小、偏移算错。" data-src="原文：页式地址变换：查页表得块号，物理地址=块号×页大小+页内偏移。" data-review="回到模块 8 演示 1 的三步法">
@@ -467,7 +467,7 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
       <span class="badge eg">注意</span>题目说"前 4 页已在内存"时，前 4 次不算缺页，要从第 5 次开始数。
     </div>
 
-    <div class="wt-final">✓ 答：FIFO 缺页 7 次，LRU 缺页 7 次（本例特殊），缺页率 100%。<br>口诀：画表时每次访问后更新内存状态，缺页就标红数。</div>
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：FIFO 缺页 7 次，LRU 缺页 7 次（本例特殊），缺页率 100%。<br>口诀：画表时每次访问后更新内存状态，缺页就标红数。</div>
   </div>
 
   <div class="task" data-task="ch3-m8b" data-answer="A" data-ok="对。FIFO 淘汰最早调入的页（队列先进先出），不管最近有没有被访问过。" data-no="B 是 LRU；C 是 OPT；D 是 CLOCK。" data-src="原文：FIFO 总是淘汰最先调入主存的那一页。" data-review="回到模块 8 演示 2 的 FIFO 表">
@@ -518,7 +518,7 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
       <span class="badge eg">考试常考</span>首次适应分配后申请大块可能失败，最佳适应能成功（或反之）——具体看题目数据。
     </div>
 
-    <div class="wt-final">✓ 答：首次适应下 J1、J2 都进 F1（剩 2K）；最佳适应下 J1 进 F1、J2 进 F2（F2 零浪费）。<br>口诀：首次"看到能放就放"，最佳"挑最合身的"。</div>
+    <div class="wt-final"><img class="wt-stamp" src="img/sticker/final.png" alt=""> 答：首次适应下 J1、J2 都进 F1（剩 2K）；最佳适应下 J1 进 F1、J2 进 F2（F2 零浪费）。<br>口诀：首次"看到能放就放"，最佳"挑最合身的"。</div>
   </div>
 
   <div class="task" data-task="ch3-m8c" data-answer="B" data-ok="对。最佳适应选"最小且≥需求"的，目的是少浪费，但会产生很多小碎片。" data-no="首次适应按地址顺序取第一个能放下的；最佳适应挑最贴身的。" data-src="原文：最佳适应把能容纳的一个最接近尺寸且≥作业大小的分区给申请者。" data-review="回到模块 8 演示 3 的第 1 步">
@@ -664,7 +664,7 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
     }
     var body=ok?(t.getAttribute('data-ok')||'回答正确。'):(t.getAttribute('data-no')||'再想想。');
     var src=t.getAttribute('data-src');
-    setFb(t,ok?'ok':'no',(ok?'✅ ':'❌ ')+body+(src?('<span class="src">'+src+'</span>'):''));
+    setFb(t,ok?'ok':'no','<img class="fb-emoji" src="img/sticker/'+(ok?'ok':'no')+'.png" alt="">' +body+(src?('<span class="src">'+src+'</span>'):''));
     t.setAttribute('data-answered','1');t.setAttribute('data-correct',ok?'1':'0');
     updateBar();renderWrong();
   }
@@ -698,6 +698,32 @@ select.match{display:block;width:100%;padding:8px 12px;margin-bottom:8px;border-
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<script>
+/* module 标题轮换表情贴 · 按 sec-id 语义映射 */
+(function(){
+  var MAP={
+    "01":"welcome","02":"cheer","03":"cheer","04":"important","05":"important",
+    "06":"important","07":"important","08":"no","09":"sleep",
+    "10":"sprint","11":"cheer",
+    "题1":"welcome","题2":"welcome","题3":"welcome","题4":"welcome",
+    "题5":"no","题6":"no","题7":"important","题8":"important"
+  };
+  var ids=document.querySelectorAll(".sec-id");
+  ids.forEach(function(el){
+    var key=(el.textContent||"").trim();
+    var name=MAP[key];
+    if(!name) name="cheer";
+    if(el.getAttribute("data-sticker")) return;
+    el.setAttribute("data-sticker","1");
+    var img=document.createElement("img");
+    img.className="sec-sticker";
+    img.src="img/sticker/"+name+".png";
+    img.alt="";
+    el.parentNode.insertBefore(img,el.nextSibling);
+  });
+})();
+</script>
+
 
   <link rel="stylesheet" href="promo.css">
   <script src="promo.js"></script>
