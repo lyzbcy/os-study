@@ -50,6 +50,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow-y: auto;
 }
 .promo-overlay.show {
   display: flex;
@@ -59,11 +60,12 @@
   border: 3px solid #1E3A24;
   border-radius: 18px;
   padding: 28px 28px 24px;
-  max-width: 380px;
+  max-width: 440px;
   width: 100%;
   box-shadow: 8px 8px 0 rgba(30, 58, 36, 0.2);
   position: relative;
   animation: promoPop .25s ease;
+  margin: auto;
 }
 @keyframes promoPop {
   from { transform: scale(.85); opacity: 0; }
@@ -83,34 +85,57 @@
   opacity: 0.6;
 }
 .promo-close:hover { opacity: 1; }
-.promo-card h2 {
-  font-family: "Archivo Black", "Noto Sans SC", "PingFang SC", sans-serif;
-  color: #1E3A24;
-  font-size: 22px;
-  margin-bottom: 6px;
+
+/* —— ① 作者介绍区 —— */
+.promo-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
 }
-.promo-card .promo-tag {
+.promo-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid #1E3A24;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #fffaf0;
+}
+.promo-author-info {
+  flex: 1;
+  min-width: 0;
+}
+.promo-author-info .promo-tag {
   display: inline-block;
   background: #B5482A;
   color: #F5E08A;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 3px 12px;
+  padding: 3px 10px;
   border-radius: 999px;
-  margin-bottom: 14px;
+  margin-bottom: 4px;
 }
-.promo-card p {
+.promo-card h2 {
+  font-family: "Archivo Black", "Noto Sans SC", "PingFang SC", sans-serif;
+  color: #1E3A24;
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+.promo-tagline {
+  font-size: 12px !important;
+  color: rgba(26, 32, 24, 0.65) !important;
+  margin-bottom: 0 !important;
+  font-style: italic;
+}
+.promo-desc {
   font-size: 14px;
   color: #1A2018;
   line-height: 1.7;
   margin-bottom: 14px;
 }
-.promo-links {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
+
+/* —— Hero link（作者主页大按钮）—— */
 .promo-link {
   display: flex;
   align-items: center;
@@ -140,9 +165,78 @@
   color: rgba(26, 32, 24, 0.6);
   margin-top: 2px;
 }
+.promo-link-hero {
+  margin-bottom: 18px;
+  background: #F5E08A;
+}
 
+/* —— ② ③ ④ 三入口卡片网格 —— */
+.promo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.promo-cell {
+  background: #fffaf0;
+  border: 2px solid #1E3A24;
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+}
+.promo-cell-head {
+  font-weight: 700;
+  font-size: 13px;
+  color: #1E3A24;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.promo-cell-head .icon {
+  font-size: 16px;
+}
+.promo-cell-sub {
+  font-size: 11px !important;
+  color: rgba(26, 32, 24, 0.7) !important;
+  line-height: 1.5 !important;
+  margin-bottom: 8px !important;
+  min-height: 50px;
+}
+.promo-cell img {
+  width: 100%;
+  max-width: 110px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #1E3A24;
+  display: block;
+  margin: 0 auto;
+}
+.promo-cell-tip {
+  font-size: 10px !important;
+  color: rgba(26, 32, 24, 0.55) !important;
+  margin-top: 6px !important;
+  margin-bottom: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.promo-thanks {
+  text-align: center;
+  font-size: 13px !important;
+  color: #B5482A !important;
+  font-weight: 700;
+  margin-top: 18px !important;
+  margin-bottom: 0 !important;
+}
+
+/* —— 响应式 —— */
 @media (max-width: 600px) {
   .promo-bar { right: 12px; bottom: 12px; }
   .promo-btn { padding: 8px 12px; font-size: 13px; }
-  .promo-card { padding: 22px 18px; }
+  .promo-card { padding: 22px 16px; max-width: 100%; }
+  .promo-grid { grid-template-columns: 1fr; gap: 12px; }
+  .promo-cell-sub { min-height: auto; }
+  .promo-cell img { max-width: 160px; }
 }

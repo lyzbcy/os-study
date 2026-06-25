@@ -1,5 +1,6 @@
 // 捞鱼工作室导流入口 · promo.js
 // 原生 JS，无依赖。在每个页面 <body> 末尾引入 promo.css + promo.js 即可。
+// 四大入口：作者介绍 + QQ群 + 赞赏 + 微信表情包
 (function () {
   "use strict";
 
@@ -7,9 +8,20 @@
   var CONFIG = {
     studio: "捞鱼工作室",
     author: "捞鱼",
+    tagline: "一个弱小但有梦想的开发者",   // 作者一句话签名
     home: "https://lyzbcy.github.io/",
+    about: "https://lyzbcy.github.io/about/", // 作者主页（更详细介绍）
+    // 作者头像（固定 URL，imgtu 图床）
+    avatar: "https://s41.ax1x.com/2025/12/05/pZmPZPH.png",
+    // QQ群二维码（与项目同仓库托管，路径相对页面）
+    qqGroupImg: "img/qq-group.jpg",
+    qqGroupTip: "📱 长按或扫码加群 · 也可以直接搜索群号",
+    // 赞赏二维码（与项目同仓库托管）
+    rewardImg: "img/reward-qr.jpg",
+    rewardTip: "📱 长按或扫码赞赏 · 金额随意，心意到就好",
     // 微信表情包下载二维码（固定，长按扫码即可在微信使用）
-    stickerQr: "https://s41.ax1x.com/2026/06/25/pmtdMWV.png"
+    stickerQr: "https://s41.ax1x.com/2026/06/25/pmtdMWV.png",
+    stickerTip: "📱 长按或扫码 · 微信里也能用这些表情"
   };
 
   // 注入顶部浮条
@@ -24,7 +36,7 @@
     document.getElementById("promoAboutBtn").addEventListener("click", openModal);
   }
 
-  // 注入模态框
+  // 注入模态框（4 区块：作者介绍 + QQ群 + 赞赏 + 表情包）
   function injectModal() {
     if (document.getElementById("promoOverlay")) return;
     var ov = document.createElement("div");
@@ -33,21 +45,51 @@
     ov.innerHTML =
       '<div class="promo-card">' +
         '<button class="promo-close" id="promoClose" aria-label="关闭">×</button>' +
-        '<span class="promo-tag">由 ' + CONFIG.studio + ' 制作</span>' +
-        '<h2>🐟 关于捞鱼</h2>' +
-        '<p>这个备考网站由<strong>捞鱼</strong>独立制作。捞鱼还在做更多好玩的东西——趣味测试、微信表情包、学习工具。</p>' +
-        '<div class="promo-links">' +
-          '<a class="promo-link" href="' + CONFIG.home + '" target="_blank" rel="noopener">' +
-            '<span class="icon">🏠</span><span>访问捞鱼主页<small>更多作品 · lyzbcy.github.io</small></span>' +
-          '</a>' +
-          '<a class="promo-link" href="' + CONFIG.stickerQr + '" target="_blank" rel="noopener">' +
-            '<span class="icon">😺</span><span>微信扫码下载表情包<small>周三涵/周五涵系列 · 长按识别</small></span>' +
-          '</a>' +
+
+        // —— ① 作者介绍 ——
+        '<div class="promo-author">' +
+          '<img class="promo-avatar" src="' + CONFIG.avatar + '" alt="捞鱼头像">' +
+          '<div class="promo-author-info">' +
+            '<span class="promo-tag">由 ' + CONFIG.studio + ' 制作</span>' +
+            '<h2>🐟 捞鱼</h2>' +
+            '<p class="promo-tagline">' + CONFIG.tagline + '</p>' +
+          '</div>' +
         '</div>' +
-        '<div style="margin-top:16px;text-align:center">' +
-          '<img src="' + CONFIG.stickerQr + '" alt="微信表情包二维码" style="width:150px;height:150px;border:2px solid #1E3A24;border-radius:12px">' +
-          '<p style="font-size:12px;color:rgba(26,32,24,.6);margin-top:8px">📱 长按或扫码 · 微信里也能用这些表情</p>' +
+        '<p class="promo-desc">这个备考网站由<strong>捞鱼</strong>独立制作。捞鱼还在做更多好玩的东西——趣味测试、微信表情包、学习工具。</p>' +
+        '<a class="promo-link promo-link-hero" href="' + CONFIG.about + '" target="_blank" rel="noopener">' +
+          '<span class="icon">🏠</span><span>了解更多关于捞鱼<small>个人主页 · ' + CONFIG.home.replace(/^https?:\/\//, '') + '</small></span>' +
+        '</a>' +
+
+        // —— ② ③ ④ 三入口卡片网格 ——
+        '<div class="promo-grid">' +
+
+          // QQ群
+          '<div class="promo-cell">' +
+            '<div class="promo-cell-head"><span class="icon">💬</span>加入 QQ 群</div>' +
+            '<p class="promo-cell-sub">反馈建议、找作者补数据、单纯想认识捞鱼？扫码进群一起玩 🎉</p>' +
+            '<img src="' + CONFIG.qqGroupImg + '" alt="QQ群二维码">' +
+            '<p class="promo-cell-tip">' + CONFIG.qqGroupTip + '</p>' +
+          '</div>' +
+
+          // 赞赏
+          '<div class="promo-cell">' +
+            '<div class="promo-cell-head"><span class="icon">☕</span>请作者喝咖啡</div>' +
+            '<p class="promo-cell-sub">如果这个网站对你有帮助，欢迎请捞鱼喝杯咖啡 ☕</p>' +
+            '<img src="' + CONFIG.rewardImg + '" alt="赞赏二维码">' +
+            '<p class="promo-cell-tip">' + CONFIG.rewardTip + '</p>' +
+          '</div>' +
+
+          // 表情包
+          '<div class="promo-cell">' +
+            '<div class="promo-cell-head"><span class="icon">😺</span>微信表情包</div>' +
+            '<p class="promo-cell-sub">周三涵 / 周五涵 / 星星布丁系列，扫码即可在微信使用 ✨</p>' +
+            '<img src="' + CONFIG.stickerQr + '" alt="微信表情包二维码">' +
+            '<p class="promo-cell-tip">' + CONFIG.stickerTip + '</p>' +
+          '</div>' +
+
         '</div>' +
+
+        '<p class="promo-thanks">感谢每一份支持 🙏</p>' +
       '</div>';
     document.body.appendChild(ov);
     document.getElementById("promoClose").addEventListener("click", closeModal);
